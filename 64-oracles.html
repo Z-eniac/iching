@@ -159,7 +159,7 @@ function makeInterpretation(changed, vals, info){
       var dir = (vals[i]===6) ? '음→양(↗ 개시)' : '양→음(↘ 수렴)';
       html += '<li>' + POS_LABEL[i] + ' ' + POS_ROLE[i] + ' · ' + dir + '</li>';
     }
-    html += '</ul><div style="margin-top:6px">→ 변괘 요지: ' + info.summary + '</div>';
+    html += '</ul><div style="margin-top:6px">→ 점괘 요지: ' + info.summary + '</div>';
   }
   return html;
 }
