@@ -331,6 +331,11 @@ render = function(prefix, arr, changed, vals, info){
       else w.classList.remove('unset');
     });
   } catch(e){}
+
+    try{
+    const gistBox = document.getElementById(prefix + 'Gist');
+    if (gistBox && info) gistBox.textContent = info.summary || '';
+  }catch(e){}
 };
 
 
