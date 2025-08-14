@@ -179,14 +179,6 @@ function makeInterpretation(changed, vals, info, label){
   var html = '<h4>해석</h4>';
   if (k===0) {
     html += '무변: 현상 유지. ';
-      loadOverride(bInfo.no, mInfo.no).then(ov => {
-    if(!ov) return;
-    d.textContent = ov.detail + '\n\n'
-      + '연애: '  + ov.domains['연애']  + '\n'
-      + '사업: '  + ov.domains['사업']  + '\n'
-      + '공부: '  + ov.domains['공부']  + '\n'
-      + '건강: '  + ov.domains['건강'];
-  });
   } else {
     html += '<div>변효 ' + k + '개</div><ul>';
     for (var i=0;i<6;i++) {
