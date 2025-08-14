@@ -264,8 +264,7 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
   if (TRI_META[mInfo.upper].elem!==TRI_META[bInfo.upper].elem && TRI_META[mInfo.lower].elem!==TRI_META[bInfo.lower].elem){ advice.push('오행 상호작용이 전면 교체됩니다. 단번에 모두 바꾸기보다 단계적으로 전환하세요.'); }
   if (!advice.length){ advice.push('바뀌는 쪽의 장점을 선택하되, 본괘의 강점은 잃지 마세요.'); }
   parts = parts.concat(advice);
-  d.textContent = parts.join('
-');
+  d.textContent = parts.join('\n');
   // overrides (changed) — if exists, replace texts
   try {
     window.__overrideLoad && window.__overrideLoad(bInfo.no, mInfo.no).then(ov => {
