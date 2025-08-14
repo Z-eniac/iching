@@ -234,12 +234,14 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
     try {
       window.__overrideLoad && window.__overrideLoad(bInfo.no, bInfo.no).then(ov => {
         if(!ov) return;
-        s.textContent = ov.summary;
-        d.textContent = ov.detail + '\n\n'
-          + '연애: ' + ov.domains['연애'] + '\n'
-          + '사업: ' + ov.domains['사업'] + '\n'
-          + '공부: ' + ov.domains['공부'] + '\n'
-          + '건강: ' + ov.domains['건강'];
+- s.textContent = ov.summary;
+- d.textContent = ov.detail + '\n\n'
++ s.textContent = stripLabelsInline(ov.summary || '');
++ d.textContent = stripLabelsInDetail(ov.detail || '') + '\n\n'
+    + '연애: ' + ov.domains['연애'] + '\n'
+    + '사업: ' + ov.domains['사업'] + '\n'
+    + '공부: ' + ov.domains['공부'] + '\n'
+    + '건강: ' + ov.domains['건강'];
       });
     } catch(e){ console.warn(e); }
     return;
@@ -263,12 +265,14 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
   try {
     window.__overrideLoad && window.__overrideLoad(bInfo.no, mInfo.no).then(ov => {
       if(!ov) return;
-      s.textContent = ov.summary;
-      d.textContent = ov.detail + '\n\n'
-        + '연애: ' + ov.domains['연애'] + '\n'
-        + '사업: ' + ov.domains['사업'] + '\n'
-        + '공부: ' + ov.domains['공부'] + '\n'
-        + '건강: ' + ov.domains['건강'];
+- s.textContent = ov.summary;
+- d.textContent = ov.detail + '\n\n'
++ s.textContent = stripLabelsInline(ov.summary || '');
++ d.textContent = stripLabelsInDetail(ov.detail || '') + '\n\n'
+    + '연애: ' + ov.domains['연애'] + '\n'
+    + '사업: ' + ov.domains['사업'] + '\n'
+    + '공부: ' + ov.domains['공부'] + '\n'
+    + '건강: ' + ov.domains['건강'];
     });
   } catch(e){ console.warn(e); }
 }
@@ -305,5 +309,20 @@ document.getElementById('btnRun').onclick = function(){
   document.getElementById('backWrap').classList.remove('hidden');
 };
 renderBlank();
+
+function stripLabelsInline(t){
+  // 요약 한 줄에서 " · 핵심: …", " · 상세: …" 꼬리 제거
+  return (t||'').replace(/\s*[·•]?\s*(핵심|상세)\s*:\s*[^\n\r]*/g, '')
+                .replace(/\s{2,}/g,' ')
+                .trim();
+}
+function stripLabelsInDetail(t){
+  // 본문에서 "핵심:" 줄은 통째로 제거, "상세:"는 라벨만 지우고 뒤 내용은 보존
+  if(!t) return '';
+  return t.split(/\r?\n/).map(l=>{
+    if(/^\s*[·•]?\s*핵심\s*:/.test(l)) return '';            // 핵심: 줄 삭제
+    return l.replace(/^\s*[·•]?\s*상세\s*:\s*/, '');          // 상세: 라벨만 제거
+  }).filter(Boolean).join('\n');
+}
 </script>
 </body></html>
