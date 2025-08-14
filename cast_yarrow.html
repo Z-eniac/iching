@@ -238,10 +238,10 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
 s.textContent = stripLabelsInline(ov.summary || '');
 const doms = ov.domains || {};
 const body = (stripLabelsInDetail(ov.detail || '') + '\n\n'
-  + '연애: ' + (doms['연애'] || '') + '\n'
-  + '사업: ' + (doms['사업'] || '') + '\n'
-  + '공부: ' + (doms['공부'] || '') + '\n'
-  + '건강: ' + (doms['건강'] || '')).trim();
+  + '· 연애: ' + (doms['연애'] || '') + '\n'
+  + '· 사업: ' + (doms['사업'] || '') + '\n'
+  + '· 공부: ' + (doms['공부'] || '') + '\n'
+  + '· 건강: ' + (doms['건강'] || '')).trim();
 
 // 박스 비우고 제목 + 본문을 안전하게 추가
 d.replaceChildren();
@@ -282,10 +282,10 @@ d.appendChild(t);
 s.textContent = stripLabelsInline(ov.summary || '');
 const doms = ov.domains || {};
 const body = (stripLabelsInDetail(ov.detail || '') + '\n\n'
-  + '연애: ' + (doms['연애'] || '') + '\n'
-  + '사업: ' + (doms['사업'] || '') + '\n'
-  + '공부: ' + (doms['공부'] || '') + '\n'
-  + '건강: ' + (doms['건강'] || '')).trim();
+  + '· 연애: ' + (doms['연애'] || '') + '\n'
+  + '· 사업: ' + (doms['사업'] || '') + '\n'
+  + '· 공부: ' + (doms['공부'] || '') + '\n'
+  + '· 건강: ' + (doms['건강'] || '')).trim();
 
 // 박스 비우고 제목 + 본문을 안전하게 추가
 d.replaceChildren();
