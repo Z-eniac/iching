@@ -147,11 +147,11 @@ function metaRow(label, tri){
     + '</div>';
 }
 
-function makeInterpretation(changed, vals, info){
+function makeInterpretation(changed, vals, info, label='요약'){
   var k = changed.filter(Boolean).length;
   var html = '<h4>해석</h4>';
   if (k===0) {
-    html += '무변: 현상 유지. ' + info.summary;
+    html += '무변: 현상 유지. <div style="margin-top:6px">→ ' + label + ': ' + info.summary + '</div>';
   } else {
     html += '<div>변효 ' + k + '개</div><ul>';
     for (var i=0;i<6;i++) {
@@ -181,7 +181,8 @@ function render(prefix, hex, changed, vals, info){
   if (info){
     title.innerHTML = makeTitle(info);
     metaUnder.innerHTML = metaRow('상괘', info.upper) + metaRow('하괘', info.lower);
-    readBox.innerHTML = makeInterpretation(changed, vals, info);
+    const label = (prefix === 'base') ? '본괘 요지' : '변괘 요지';
+    readBox.innerHTML = makeInterpretation(changed, vals, info, label);
   } else { title.textContent='—'; }
 }
 
