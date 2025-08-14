@@ -68,7 +68,7 @@
 .centerTop{display:flex;flex-direction:column;align-items:center;margin:18px 0 6px}
 .centerTop .run{background:#7c8bf5;color:#fff;border:0;border-radius:14px;padding:12px 18px;font-weight:900;cursor:pointer}
 .warn{color:#f52059;font-weight:400;margin-top:10px;margin-bottom:10px}
-.hidden{display:none}
+.hidden{display:none !important;}
 .unset .line::before{content:'';position:absolute;inset:2px;background:#162338;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
 .debugBox{position:fixed;right:10px;bottom:10px;max-width:46vw;background:#111a2a;color:#e7efff;border:1px solid #2e3c5a;border-radius:10px;padding:10px 12px;font:12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;z-index:9999;display:none;white-space:pre-wrap}
 .debugBox b{color:#9bdcff}
@@ -125,7 +125,7 @@
       </div>
       <div id="inlineCustom" class="customInline">
         <div class="ciHead">커스텀 입력</div>
-        <div class="ciGrid"></div>
+        <div class="ciGrid"> … <select> … </select> … </div>
       </div>
       <div class="read" id="baseRead"></div>
     </div>
