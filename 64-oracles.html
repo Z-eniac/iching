@@ -226,7 +226,7 @@ function render(prefix, hex, changed, vals, info){
 
 function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
   var s = document.getElementById('jointSummary');
-  var d = document.getElementById('jointSummary');
+  var d = document.getElementById('jointdetail');
   var k = changed.filter(Boolean).length;
   var ups = 0, downs = 0, posArr = [];
   for (var i=0;i<6;i++){ if(changed[i]){ posArr.push((i+1)+'효'); if(vals[i]===6) ups++; else downs++; } }
