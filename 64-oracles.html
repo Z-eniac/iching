@@ -240,6 +240,7 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
     try {
       window.__overrideLoad && window.__overrideLoad(bInfo.no, bInfo.no).then(ov => {
         if(!ov) return;
+        s.textContent - ov.summary + '\n'
         d.textContent = ov.detail + '\n\n'
           + '연애: ' + ov.domains['연애'] + '\n'
           + '사업: ' + ov.domains['사업'] + '\n'
@@ -268,6 +269,7 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
   try {
     window.__overrideLoad && window.__overrideLoad(bInfo.no, mInfo.no).then(ov => {
       if(!ov) return;
+      s.textContent - ov.summary + '\n'
       d.textContent = ov.detail + '\n\n'
         + '연애: ' + ov.domains['연애'] + '\n'
         + '사업: ' + ov.domains['사업'] + '\n'
