@@ -237,7 +237,8 @@ function makeInterpretation(changed, vals, info){
   var k = changed.filter(Boolean).length;
   var html = '<h4>해석</h4>';
   if (k===0) {
-    html += '무변: 현상 유지. ' + info.summary;
+    html += '무변(無變): 현상 유지.';
+    html += '<div style="margin-top:6px">→ 점괘 요지: ' + info.summary + '</div>';
   } else {
     html += '<div>변효 ' + k + '개</div><ul>';
     for (var i=0;i<6;i++) {
