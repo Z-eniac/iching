@@ -259,7 +259,6 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
   if (!advice.length){ advice.push('바뀌는 쪽의 장점을 선택하되, 본괘의 강점은 잃지 마세요.'); }
   parts = parts.concat(advice);
   d.textContent = parts.join('\n');
-}
   // overrides (changed) — if exists, replace texts
   try {
     window.__overrideLoad && window.__overrideLoad(bInfo.no, mInfo.no).then(ov => {
@@ -271,7 +270,7 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
         + '공부: ' + ov.domains['공부'] + '\n'
         + '건강: ' + ov.domains['건강'];
     });
-  } catch(e){ console.warn(e);
+  } catch(e){ console.warn(e); }
 }
 document.getElementById('castYarrow').onclick = function(){ cast('yarrow'); };
 document.getElementById('castCoins').onclick = function(){ cast('coins'); };
