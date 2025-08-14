@@ -40,7 +40,9 @@
   .metaRow{display:grid;grid-template-columns:var(--metaCol1) var(--metaCol2) var(--metaCol3) var(--metaCol4) var(--metaCol5);align-items:center;justify-items:start;column-gap:6px;margin:2px 0}
   .metaRow .lab2{color:#a9b8dc;justify-self:end;padding-right:2px}
   .metaRow .mono{font-variant-numeric:tabular-nums}
-  .kw{display:none}
+  .kw{display:block;margin:10px 0 6px;text-align:center}
+  .kw .cap{display:block;font-size:13px;color:var(--muted);letter-spacing:.2px;margin-bottom:4px}
+  .kw .big{font-size:22px;font-weight:900;line-height:1.5}
   .read{margin-top:8px;padding:8px 10px;border:1px solid #2a3b5a;border-radius:10px;background:#0f1a2e}
   .read h4{margin:0 0 6px;font-size:15px;color:#cfe0ff}
   .read ul{margin:6px 0 0 18px;padding:0;line-height:1.45}
@@ -147,11 +149,12 @@ function metaRow(label, tri){
     + '</div>';
 }
 
-function makeInterpretation(changed, vals, info, label='요약'){
+function makeInterpretation(changed, vals, info, label){
   var k = changed.filter(Boolean).length;
   var html = '<h4>해석</h4>';
   if (k===0) {
-    html += '무변: 현상 유지. <div style="margin-top:6px">→ ' + label + ': ' + info.summary + '</div>';
+    html += '무변: 현상 유지. ';
+    
   } else {
     html += '<div>변효 ' + k + '개</div><ul>';
     for (var i=0;i<6;i++) {
@@ -159,7 +162,7 @@ function makeInterpretation(changed, vals, info, label='요약'){
       var dir = (vals[i]===6) ? '음→양(↗ 개시)' : '양→음(↘ 수렴)';
       html += '<li>' + POS_LABEL[i] + ' ' + POS_ROLE[i] + ' · ' + dir + '</li>';
     }
-    html += '</ul><div style="margin-top:6px">→ 요약: ' + info.summary + '</div>';
+    html += '</ul>';
   }
   return html;
 }
@@ -169,7 +172,18 @@ function render(prefix, hex, changed, vals, info){
   var title =document.getElementById(prefix+'Title');
   var metaUnder=document.getElementById(prefix+'Meta');
   var readBox=document.getElementById(prefix+'Read');
-  hexBox.innerHTML=''; metaUnder.innerHTML=''; readBox.innerHTML=''; title.innerHTML='';
+  var kwBox=document.getElementById(prefix+'KW');
+  hexBox.innerHTML=''; metaUnder.innerHTML=''; readBox.innerHTML=''; title.innerHTML=''; kwBox.innerHTML='';
+  // move the KW block (요지) inside the panel, between hex and metaUnder
+  (function(){
+    try {
+      var panel = hexBox.parentElement;
+      if (panel && metaUnder) {
+        panel.insertBefore(kwBox, metaUnder);
+      }
+    } catch(e){}
+  })();
+
   for (var r=5; r>=0; r--) {
     var lab=document.createElement('div'); lab.className='lab'; lab.textContent=(r+1);
     var wrap=document.createElement('div'); wrap.className='lineWrap ' + (hex[r]?'yang':'yin') + (changed[r]?' chg':'');
@@ -182,6 +196,7 @@ function render(prefix, hex, changed, vals, info){
     title.innerHTML = makeTitle(info);
     metaUnder.innerHTML = metaRow('상괘', info.upper) + metaRow('하괘', info.lower);
     const label = (prefix === 'base') ? '본괘 요지' : '변괘 요지';
+    kwBox.innerHTML = '<span class="cap">' + label + '</span><div class="big">' + info.summary + '</div>';
     readBox.innerHTML = makeInterpretation(changed, vals, info, label);
   } else { title.textContent='—'; }
 }
