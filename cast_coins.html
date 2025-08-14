@@ -70,6 +70,7 @@ h1{text-align:center;margin-top:46px}
 @media (max-width:560px){ .gist .gistText{font-size:22px} }
 /* custom page helper */
 .hidden{display:none}
+.unset .line::before{content:'';position:absolute;inset:2px;background:#162338;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
 .warn{color:#ffb6a1;font-weight:800;margin-top:8px}
 </style></head>
 <body>
@@ -318,6 +319,19 @@ function renderBlank(){
 }
 renderBlank();
 
+  function drawPreview(prefix, base, changed, unsetMask){
+    var hexBox=document.getElementById(prefix+'Hex'); if(!hexBox){ log('drawPreview missing', prefix+'Hex'); return; }
+    hexBox.innerHTML='';
+    for (var r=5; r>=0; r--){
+      var lab=document.createElement('div'); lab.className='lab'; lab.textContent=(r+1);
+      var cls = unsetMask[r] ? 'unset' : (base[r] ? 'yang' : 'yin') + (changed[r]?' chg':'');
+      var wrap=document.createElement('div'); wrap.className='lineWrap ' + cls;
+      var line=document.createElement('div'); line.className='line'; wrap.appendChild(line);
+      if(!unsetMask[r] && !base[r]){ var gap=document.createElement('div'); gap.className='gap'; wrap.appendChild(gap); }
+      hexBox.appendChild(lab); hexBox.appendChild(wrap);
+      var sp=document.createElement('div'); sp.className='sp'; hexBox.appendChild(sp);
+    }
+  }
 
 // patch render to inject gist text
 const __render_orig = render;
