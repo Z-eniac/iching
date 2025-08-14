@@ -319,28 +319,18 @@ function renderBlank(){
 }
 renderBlank();
 
-  function drawPreview(prefix, base, changed, unsetMask){
-    var hexBox=document.getElementById(prefix+'Hex'); if(!hexBox){ log('drawPreview missing', prefix+'Hex'); return; }
-    hexBox.innerHTML='';
-    for (var r=5; r>=0; r--){
-      var lab=document.createElement('div'); lab.className='lab'; lab.textContent=(r+1);
-      var cls = unsetMask[r] ? 'unset' : (base[r] ? 'yang' : 'yin') + (changed[r]?' chg':'');
-      var wrap=document.createElement('div'); wrap.className='lineWrap ' + cls;
-      var line=document.createElement('div'); line.className='line'; wrap.appendChild(line);
-      if(!unsetMask[r] && !base[r]){ var gap=document.createElement('div'); gap.className='gap'; wrap.appendChild(gap); }
-      hexBox.appendChild(lab); hexBox.appendChild(wrap);
-      var sp=document.createElement('div'); sp.className='sp'; hexBox.appendChild(sp);
-    }
-  }
-
 // patch render to inject gist text
 const __render_orig = render;
 render = function(prefix, arr, changed, vals, info){
   __render_orig(prefix, arr, changed, vals, info);
-  try{
-    var gistBox = document.getElementById(prefix + 'Gist');
-    if(gistBox && info) gistBox.textContent = info.summary || '';
-  }catch(e){}
+  // ① 실행 전이면(= info 없음) 어두운 막대(placeholder) 적용
+  try {
+    const wraps = document.querySelectorAll('#' + prefix + 'Hex .lineWrap');
+    wraps.forEach(w => {
+      if (!info) w.classList.add('unset');
+      else w.classList.remove('unset');
+    });
+  } catch(e){}
 };
 
 
