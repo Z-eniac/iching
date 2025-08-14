@@ -260,19 +260,7 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
   parts = parts.concat(advice);
   d.textContent = parts.join('\n');
 }
-  // overrides (changed) — if exists, replace texts
-  try {
-    window.__overrideLoad && window.__overrideLoad(bInfo.no, mInfo.no).then(ov => {
-      if(!ov) return;
-      s.textContent = ov.summary;
-      d.textContent = ov.detail + '\n\n'
-        + '연애: ' + ov.domains['연애'] + '\n'
-        + '사업: ' + ov.domains['사업'] + '\n'
-        + '공부: ' + ov.domains['공부'] + '\n'
-        + '건강: ' + ov.domains['건강'];
-    });
-  } catch(e){ console.warn(e); }
-}
+
 document.getElementById('castYarrow').onclick = function(){ cast('yarrow'); };
 document.getElementById('castCoins').onclick = function(){ cast('coins'); };
 function renderBlank(){
