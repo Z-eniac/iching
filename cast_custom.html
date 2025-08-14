@@ -72,6 +72,31 @@
 .unset .line::before{content:'';position:absolute;inset:2px;background:#162338;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
 .debugBox{position:fixed;right:10px;bottom:10px;max-width:46vw;background:#111a2a;color:#e7efff;border:1px solid #2e3c5a;border-radius:10px;padding:10px 12px;font:12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;z-index:9999;display:none;white-space:pre-wrap}
 .debugBox b{color:#9bdcff}
+  /* 커스텀 입력 헤더 & 선택창 가운데 정렬 */
+.customInline {            /* 커스텀 입력 전체 박스 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* 가로 중앙 */
+}
+
+.customInline .ciHead {    /* "커스텀 입력" 제목 */
+  text-align: center;
+}
+
+.customInline .ciGrid {    /* 선택상자 컨테이너 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* 내부 항목 중앙 */
+  gap: 10px;
+}
+
+.customInline .ciGrid select {
+  display: block;          /* margin: auto가 먹도록 */
+  margin: 0 auto;
+  width: 180px;            /* 필요 시 폭 고정 */
+  text-align-last: center; /* 선택된 값 중앙(크롬/사파리) */
+  -moz-text-align-last: center; /* 파폭 */
+}
 </style>
 </head>
 <body>
