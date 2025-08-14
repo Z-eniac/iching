@@ -234,14 +234,12 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
     try {
       window.__overrideLoad && window.__overrideLoad(bInfo.no, bInfo.no).then(ov => {
         if(!ov) return;
-- s.textContent = ov.summary;
-- d.textContent = ov.detail + '\n\n'
-+ s.textContent = stripLabelsInline(ov.summary || '');
-+ d.textContent = stripLabelsInDetail(ov.detail || '') + '\n\n'
-    + '연애: ' + ov.domains['연애'] + '\n'
-    + '사업: ' + ov.domains['사업'] + '\n'
-    + '공부: ' + ov.domains['공부'] + '\n'
-    + '건강: ' + ov.domains['건강'];
+s.textContent = stripLabelsInline(ov.summary || '');
+d.textContent = stripLabelsInDetail(ov.detail || '') + '\n\n'
+  + '연애: ' + (ov.domains?.['연애'] || '') + '\n'
+  + '사업: ' + (ov.domains?.['사업'] || '') + '\n'
+  + '공부: ' + (ov.domains?.['공부'] || '') + '\n'
+  + '건강: ' + (ov.domains?.['건강'] || '');
       });
     } catch(e){ console.warn(e); }
     return;
@@ -265,14 +263,12 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
   try {
     window.__overrideLoad && window.__overrideLoad(bInfo.no, mInfo.no).then(ov => {
       if(!ov) return;
-- s.textContent = ov.summary;
-- d.textContent = ov.detail + '\n\n'
-+ s.textContent = stripLabelsInline(ov.summary || '');
-+ d.textContent = stripLabelsInDetail(ov.detail || '') + '\n\n'
-    + '연애: ' + ov.domains['연애'] + '\n'
-    + '사업: ' + ov.domains['사업'] + '\n'
-    + '공부: ' + ov.domains['공부'] + '\n'
-    + '건강: ' + ov.domains['건강'];
+s.textContent = stripLabelsInline(ov.summary || '');
+d.textContent = stripLabelsInDetail(ov.detail || '') + '\n\n'
+  + '연애: ' + (ov.domains?.['연애'] || '') + '\n'
+  + '사업: ' + (ov.domains?.['사업'] || '') + '\n'
+  + '공부: ' + (ov.domains?.['공부'] || '') + '\n'
+  + '건강: ' + (ov.domains?.['건강'] || '');
     });
   } catch(e){ console.warn(e); }
 }
