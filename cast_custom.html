@@ -275,7 +275,7 @@ renderBlank();
 <script>
 (function(){
   const dbg = document.getElementById('dbg');
-  function log(...a){ dbg.style.display='block'; dbg.innerHTML += a.join(' ')+'\n'; }
+  function log(...a){ dbg.innerHTML += a.join(' ')+'\n'; }
   window.addEventListener('keydown',e=>{ if(e.shiftKey && e.key.toLowerCase()==='d') dbg.style.display=(dbg.style.display==='none'?'block':'none'); });
 
   function ensureEl(id, parentSel, html){ 
