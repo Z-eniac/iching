@@ -425,7 +425,12 @@ renderBlank();
     }
     const mutated = base.map((l,i)=> changed[i] ? (l^1) : l);
     try{ robustRender(base, mutated, changed, vv); }catch(e){ log('submit error:', e.message); }
-    const box=document.getElementById('inlineCustom'); if(box) box.classList.add('hidden');
+    const box=document.getElementById('inlineCustom');
+    if (box) {
+     box.classList.add('hidden'); // 기본
+     box.style.display = 'none';  // 혹시 모를 충돌 대비
+     box.setAttribute('aria-hidden', 'true');
+    }
     if(btn) btn.classList.add('hidden');
   }
 
