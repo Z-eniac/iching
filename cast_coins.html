@@ -42,6 +42,7 @@
   .joint{margin-top:22px;padding:28px 28px;border:1px solid #2a3b5a;border-radius:16px;background:#0e172a;text-align:left;width:calc((2 * var(--cardW)) + var(--cardGap));margin-left:auto;margin-right:auto}
   .joint .summary{font-size:30px;font-weight:900;margin:0 0 16px;text-align:center}
   .joint .detail{font-size:19px;line-height:2.0;white-space:pre-line}
+  .adviceTitle{font-weight:700;font-size:1.1rem;line-height:1.25;margin-bottom:8px;letter-spacing:.01em}
   .legend{margin-top:12px;margin-bottom:20px;font-size:12px;color:#a4b2d4;text-align:center}
   @media (max-width:860px){
     .card{flex-basis:100%;max-width:640px}
@@ -235,11 +236,25 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
       window.__overrideLoad && window.__overrideLoad(bInfo.no, bInfo.no).then(ov => {
         if(!ov) return;
 s.textContent = stripLabelsInline(ov.summary || '');
-d.textContent = stripLabelsInDetail(ov.detail || '') + '\n\n'
-  + '연애: ' + (ov.domains?.['연애'] || '') + '\n'
-  + '사업: ' + (ov.domains?.['사업'] || '') + '\n'
-  + '공부: ' + (ov.domains?.['공부'] || '') + '\n'
-  + '건강: ' + (ov.domains?.['건강'] || '');
+const doms = ov.domains || {};
+const body = (stripLabelsInDetail(ov.detail || '') + '\n\n'
+  + '연애: ' + (doms['연애'] || '') + '\n'
+  + '사업: ' + (doms['사업'] || '') + '\n'
+  + '공부: ' + (doms['공부'] || '') + '\n'
+  + '건강: ' + (doms['건강'] || '')).trim();
+
+// 박스 비우고 제목 + 본문을 안전하게 추가
+d.replaceChildren();
+
+const h = document.createElement('div');
+h.className = 'adviceTitle';
+h.textContent = '한 줄 조언';
+d.appendChild(h);
+
+const t = document.createElement('div');
+t.style.whiteSpace = 'pre-line';      // 줄바꿈 유지
+t.textContent = body;
+d.appendChild(t);
       });
     } catch(e){ console.warn(e); }
     return;
@@ -264,11 +279,25 @@ d.textContent = stripLabelsInDetail(ov.detail || '') + '\n\n'
     window.__overrideLoad && window.__overrideLoad(bInfo.no, mInfo.no).then(ov => {
       if(!ov) return;
 s.textContent = stripLabelsInline(ov.summary || '');
-d.textContent = stripLabelsInDetail(ov.detail || '') + '\n\n'
-  + '연애: ' + (ov.domains?.['연애'] || '') + '\n'
-  + '사업: ' + (ov.domains?.['사업'] || '') + '\n'
-  + '공부: ' + (ov.domains?.['공부'] || '') + '\n'
-  + '건강: ' + (ov.domains?.['건강'] || '');
+const doms = ov.domains || {};
+const body = (stripLabelsInDetail(ov.detail || '') + '\n\n'
+  + '연애: ' + (doms['연애'] || '') + '\n'
+  + '사업: ' + (doms['사업'] || '') + '\n'
+  + '공부: ' + (doms['공부'] || '') + '\n'
+  + '건강: ' + (doms['건강'] || '')).trim();
+
+// 박스 비우고 제목 + 본문을 안전하게 추가
+d.replaceChildren();
+
+const h = document.createElement('div');
+h.className = 'adviceTitle';
+h.textContent = '한 줄 조언';
+d.appendChild(h);
+
+const t = document.createElement('div');
+t.style.whiteSpace = 'pre-line';      // 줄바꿈 유지
+t.textContent = body;
+d.appendChild(t);
     });
   } catch(e){ console.warn(e); }
 }
