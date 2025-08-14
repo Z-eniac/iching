@@ -40,9 +40,9 @@
   .read ul{margin:6px 0 0 18px;padding:0;line-height:1.45}
   /* Joint interpretation area */
   .joint{margin-top:22px;padding:28px 28px;border:1px solid #2a3b5a;border-radius:16px;background:#0e172a;text-align:left;width:calc((2 * var(--cardW)) + var(--cardGap));margin-left:auto;margin-right:auto}
-  .joint .summary{font-size:30px;font-weight:900;margin:0 0 16px;text-align:center}
+  .joint .summary{font-size:30px;font-weight:900;margin:0 0 1px;text-align:center}
   .joint .detail{font-size:19px;line-height:2.0;white-space:pre-line}
-  .adviceTitle{font-weight:700;font-size:1.1rem;line-height:1.25;margin-bottom:8px;letter-spacing:.01em}
+  .adviceTitle{font-weight:700;font-size:2rem;line-height:1.25;margin-bottom:18px;letter-spacing:.01em}
   .legend{margin-top:12px;margin-bottom:20px;font-size:12px;color:#a4b2d4;text-align:center}
   @media (max-width:860px){
     .card{flex-basis:100%;max-width:640px}
@@ -235,12 +235,26 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
     try {
       window.__overrideLoad && window.__overrideLoad(bInfo.no, bInfo.no).then(ov => {
         if(!ov) return;
-        s.textContent = ov.summary;
-        d.textContent = ov.detail + '\n\n'
-          + '연애: ' + ov.domains['연애'] + '\n'
-          + '사업: ' + ov.domains['사업'] + '\n'
-          + '공부: ' + ov.domains['공부'] + '\n'
-          + '건강: ' + ov.domains['건강'];
+s.textContent = stripLabelsInline(ov.summary || '');
+const doms = ov.domains || {};
+const body = (stripLabelsInDetail(ov.detail || '') + '\n\n'
+  + '연애: ' + (doms['연애'] || '') + '\n'
+  + '사업: ' + (doms['사업'] || '') + '\n'
+  + '공부: ' + (doms['공부'] || '') + '\n'
+  + '건강: ' + (doms['건강'] || '')).trim();
+
+// 박스 비우고 제목 + 본문을 안전하게 추가
+d.replaceChildren();
+
+const h = document.createElement('div');
+h.className = 'adviceTitle';
+h.textContent = '한 줄 조언';
+d.appendChild(h);
+
+const t = document.createElement('div');
+t.style.whiteSpace = 'pre-line';      // 줄바꿈 유지
+t.textContent = body;
+d.appendChild(t);
       });
     } catch(e){ console.warn(e); }
     return;
@@ -265,14 +279,28 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
   try {
     window.__overrideLoad && window.__overrideLoad(bInfo.no, mInfo.no).then(ov => {
       if(!ov) return;
-      s.textContent = ov.summary;
-      d.textContent = ov.detail + '\n\n'
-        + '연애: ' + ov.domains['연애'] + '\n'
-        + '사업: ' + ov.domains['사업'] + '\n'
-        + '공부: ' + ov.domains['공부'] + '\n'
-        + '건강: ' + ov.domains['건강'];
-    });
-  } catch(e){ console.warn(e); }
+s.textContent = stripLabelsInline(ov.summary || '');
+const doms = ov.domains || {};
+const body = (stripLabelsInDetail(ov.detail || '') + '\n\n'
+  + '연애: ' + (doms['연애'] || '') + '\n'
+  + '사업: ' + (doms['사업'] || '') + '\n'
+  + '공부: ' + (doms['공부'] || '') + '\n'
+  + '건강: ' + (doms['건강'] || '')).trim();
+
+// 박스 비우고 제목 + 본문을 안전하게 추가
+d.replaceChildren();
+
+const h = document.createElement('div');
+h.className = 'adviceTitle';
+h.textContent = '한 줄 조언';
+d.appendChild(h);
+
+const t = document.createElement('div');
+t.style.whiteSpace = 'pre-line';      // 줄바꿈 유지
+t.textContent = body;
+d.appendChild(t);
+      });
+    } catch(e){ console.warn(e); }
 }
 document.getElementById('castYarrow').onclick = function(){ cast('yarrow'); };
 document.getElementById('castCoins').onclick = function(){ cast('coins'); };
@@ -307,5 +335,19 @@ document.getElementById('btnRun').onclick = function(){
   document.getElementById('backWrap').classList.remove('hidden');
 };
 renderBlank();
+  function stripLabelsInline(t){
+  // 요약 한 줄에서 " · 핵심: …", " · 상세: …" 꼬리 제거
+  return (t||'').replace(/\s*[·•]?\s*(핵심|상세)\s*:\s*[^\n\r]*/g, '')
+                .replace(/\s{2,}/g,' ')
+                .trim();
+}
+function stripLabelsInDetail(t){
+  // 본문에서 "핵심:" 줄은 통째로 제거, "상세:"는 라벨만 지우고 뒤 내용은 보존
+  if(!t) return '';
+  return t.split(/\r?\n/).map(l=>{
+    if(/^\s*[·•]?\s*핵심\s*:/.test(l)) return '';            // 핵심: 줄 삭제
+    return l.replace(/^\s*[·•]?\s*상세\s*:\s*/, '');          // 상세: 라벨만 제거
+  }).filter(Boolean).join('\n');
+}
 </script>
 </body></html>
