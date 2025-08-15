@@ -115,7 +115,7 @@ h1{text-align:center;margin-top:46px}
 /* 트랜지션은 항상 걸어두기 */
 #baseHex .lineWrap .line,
 #mutHex .lineWrap .line{
-  transition: opacity .2s ease, transform .2s ease;
+  transition: opacity .28s ease, transform .28s ease;
 }
 
 /* 애니 중에, 아직 공개되지 않은 효만 숨김 */
@@ -135,7 +135,7 @@ h1{text-align:center;margin-top:46px}
 #mutHex.animating .lineWrap.revealed .line{
   opacity: 1;
   transform: scaleX(1);
-  animation: tossPulse .2s ease-out;
+  animation: tossPulse .28s ease-out;
 }
 
 /* 접근성: 저감 모션 */
@@ -472,7 +472,7 @@ function stripLabelsInDetail(t){
 function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
 
 /** 한 효씩 드러내기 (아래→위) */
-async function animateHex(prefix, arr, changed, vals, info, delay=300){
+async function animateHex(prefix, arr, changed, vals, info, delay=200){
   render(prefix, arr, changed, vals, info);
 
   const hex = document.getElementById(prefix + 'Hex');
@@ -489,7 +489,7 @@ async function animateHex(prefix, arr, changed, vals, info, delay=300){
   hex?.classList.remove('animating');
 }
 
-async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo, delay=300){
+async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo, delay=200){
   // 1) 두 괘를 먼저 통째로 렌더(라인 DOM 생성). 텍스트는 CSS로 가려둘 거라 상관없음
   render('base', base, changed, vals, bInfo);
   render('mut',  mutated, changed, vals, mInfo);
