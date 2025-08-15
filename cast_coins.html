@@ -72,7 +72,10 @@
   .yin .line::before{left:2px} .yin .line::after{right:2px}
   .yin .gap{position:absolute;left:50%;top:2px;bottom:2px;transform:translateX(-50%);width:var(--yinGap);background:#111a2b;border-radius:4px;box-shadow:0 0 0 1px rgba(0,0,0,.12) inset}
   .chg::after{content:'變';position:absolute;right:-8px;top:-4px;background:var(--mark);color:#fff;font-weight:600;font-size:11px;line-height:16px;padding:0 6px;border-radius:6px;box-shadow:0 1px 6px rgba(0,0,0,.3)}
-  /* Meta under hex - fixed columns, tighter */
+      /* 변효 아이콘: 줄이 공개될 때 함께 보이기 */
+    .lineWrap.chg::after{ opacity: 0; transform: translateY(-4px); transition: opacity .28s ease, transform .28s ease; }
+    .lineWrap.revealed.chg::after{ opacity: 1; transform: translateY(0); }
+ /* Meta under hex - fixed columns, tighter */
   .metaUnder{border-top:1px dashed #2a3b5a;margin-top:8px;padding-top:6px;text-align:center;width:100%}
   .metaRow{display:grid;grid-template-columns:var(--metaCol1) var(--metaCol2) var(--metaCol3) var(--metaCol4) var(--metaCol5);align-items:center;justify-items:start;column-gap:6px;margin:2px 0}
   .metaRow .lab2{color:#a9b8dc;justify-self:end;padding-right:2px}
@@ -108,6 +111,64 @@ h1{text-align:center;margin-top:46px}
 .hidden{display:none}
 .unset .line::before{content:'';position:absolute;inset:2px;background:#162338;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
 .warn{color:#ffb6a1;font-weight:800;margin-top:8px}
+
+/* 트랜지션은 항상 걸어두기 */
+#baseHex .lineWrap .line,
+#mutHex .lineWrap .line{
+  transition: opacity .28s ease, transform .28s ease;
+}
+
+/* 애니 중에, 아직 공개되지 않은 효만 숨김 */
+#baseHex.animating .lineWrap:not(.revealed) .line,
+#mutHex.animating .lineWrap:not(.revealed) .line{
+  opacity: 0;
+  transform: scaleX(.92);
+}
+
+/* 공개된 효는 보이게 + 살짝 튕김 */
+@keyframes tossPulse{
+  0%{ transform: scaleX(.92); }
+  60%{ transform: scaleX(1.02); }
+  100%{ transform: scaleX(1); }
+}
+#baseHex.animating .lineWrap.revealed .line,
+#mutHex.animating .lineWrap.revealed .line{
+  opacity: 1;
+  transform: scaleX(1);
+  animation: tossPulse .28s ease-out;
+}
+
+/* 접근성: 저감 모션 */
+@media (prefers-reduced-motion: reduce){
+  #baseHex .lineWrap .line, #mutHex .lineWrap .line{ transition: none !important; }
+  #baseHex.animating .lineWrap.revealed .line,
+  #mutHex.animating .lineWrap.revealed .line{ animation: none !important; }
+}
+
+/* 카드 안의 텍스트(괘명/요지/상하괘/해석)를 애니 중엔 숨겼다가 끝에 동시에 등장 */
+.card .title, .card .gist, .card .metaUnder, .card .read{
+  transition: opacity 1.0s ease, transform 1.0s ease;
+}
+.card.animating .title, .card.animating .gist, .card.animating .metaUnder, .card.animating .read{
+  opacity: 0; transform: translateY(6px);
+}
+/* joint 박스도 같이 */
+.joint{ transition: opacity 1.0s ease, transform 1.0s ease; }
+.joint.animating{ opacity: 0; transform: translateY(6px); }
+.card.prehide .title,
+.card.prehide .gist,
+.card.prehide .metaUnder,
+.card.prehide .read{
+  opacity: 0;
+  transform: translateY(6px);
+  transition: none !important;
+}
+.joint.prehide{
+  opacity: 0;
+  transform: translateY(6px);
+  transition: none !important;
+}
+      
 </style></head>
 <body>
 <div style="display:none"><button id="castCoins"></button><button id="castYarrow"></button><button id="customInput"></button></div>
@@ -182,7 +243,7 @@ h1{text-align:center;margin-top:46px}
     window.__overrideLoad = __overrideLoad;
   })();
   /* --- end loader --- */
-const META = {"u乾l乾": {"no": 1, "nameHan": "乾", "nameKo": "건", "upper": "乾", "lower": "乾", "summary": "창조와 시작, 강건한 추진력"}, "u坤l坤": {"no": 2, "nameHan": "坤", "nameKo": "곤", "upper": "坤", "lower": "坤", "summary": "포용과 순응, 넓은 수용력"}, "u坎l震": {"no": 3, "nameHan": "屯", "nameKo": "둔", "upper": "坎", "lower": "震", "summary": "초기 난관, 인내로 방향을 잡아라"}, "u艮l坎": {"no": 4, "nameHan": "蒙", "nameKo": "몽", "upper": "艮", "lower": "坎", "summary": "미덥지 못함, 배움과 길잡이가 필요하다"}, "u坎l乾": {"no": 5, "nameHan": "需", "nameKo": "수", "upper": "坎", "lower": "乾", "summary": "때를 기다림, 준비된 인내"}, "u乾l坎": {"no": 6, "nameHan": "訟", "nameKo": "송", "upper": "乾", "lower": "坎", "summary": "다툼과 논쟁, 원칙과 절제가 해법"}, "u坤l坎": {"no": 7, "nameHan": "師", "nameKo": "사", "upper": "坤", "lower": "坎", "summary": "조직과 규율, 리더십이 필요"}, "u坎l坤": {"no": 8, "nameHan": "比", "nameKo": "비", "upper": "坎", "lower": "坤", "summary": "결합과 친화, 신의 지키기"}, "u巽l乾": {"no": 9, "nameHan": "小畜", "nameKo": "소축", "upper": "巽", "lower": "乾", "summary": "작게 모아 힘을 기르는 때"}, "u乾l兌": {"no": 10, "nameHan": "履", "nameKo": "리", "upper": "乾", "lower": "兌", "summary": "예절과 절도 속의 전진"}, "u坤l乾": {"no": 11, "nameHan": "泰", "nameKo": "태", "upper": "坤", "lower": "乾", "summary": "소통과 상생, 형통함"}, "u乾l坤": {"no": 12, "nameHan": "否", "nameKo": "비", "upper": "乾", "lower": "坤", "summary": "막힘과 단절, 접촉면을 넓혀라"}, "u乾l離": {"no": 13, "nameHan": "同人", "nameKo": "동인", "upper": "乾", "lower": "離", "summary": "공동체와 연대, 뜻을 함께함"}, "u離l乾": {"no": 14, "nameHan": "大有", "nameKo": "대유", "upper": "離", "lower": "乾", "summary": "풍요와 성취, 명성과 소유"}, "u坤l艮": {"no": 15, "nameHan": "謙", "nameKo": "겸", "upper": "坤", "lower": "艮", "summary": "겸손과 절제, 낮을수록 단단하다"}, "u震l坤": {"no": 16, "nameHan": "豫", "nameKo": "예", "upper": "震", "lower": "坤", "summary": "즐거운 준비, 기획과 예비"}, "u兌l震": {"no": 17, "nameHan": "隨", "nameKo": "수", "upper": "兌", "lower": "震", "summary": "따름과 순응, 유연한 전환"}, "u艮l巽": {"no": 18, "nameHan": "蠱", "nameKo": "고", "upper": "艮", "lower": "巽", "summary": "폐단을 고치고 기반을 수리하라"}, "u坤l兌": {"no": 19, "nameHan": "臨", "nameKo": "임", "upper": "坤", "lower": "兌", "summary": "다가감·접근, 상호성"}, "u巽l坤": {"no": 20, "nameHan": "觀", "nameKo": "관", "upper": "巽", "lower": "坤", "summary": "관찰과 통찰, 큰 그림 보기"}, "u離l震": {"no": 21, "nameHan": "噬嗑", "nameKo": "서합", "upper": "離", "lower": "震", "summary": "결단과 집행, 악을 씹어 없애라"}, "u艮l離": {"no": 22, "nameHan": "賁", "nameKo": "비", "upper": "艮", "lower": "離", "summary": "치장과 표현, 아름다움의 배치"}, "u艮l坤": {"no": 23, "nameHan": "剝", "nameKo": "박", "upper": "艮", "lower": "坤", "summary": "깎여 나감, 쇠퇴 속 전환 준비"}, "u坤l震": {"no": 24, "nameHan": "復", "nameKo": "복", "upper": "坤", "lower": "震", "summary": "되돌아옴, 회복과 재기의 시작"}, "u乾l震": {"no": 25, "nameHan": "無妄", "nameKo": "무망", "upper": "乾", "lower": "震", "summary": "사심 없음, 자연스러움이 길"}, "u艮l乾": {"no": 26, "nameHan": "大畜", "nameKo": "대축", "upper": "艮", "lower": "乾", "summary": "큰 길들임, 축적과 자제"}, "u艮l震": {"no": 27, "nameHan": "頤", "nameKo": "이", "upper": "艮", "lower": "震", "summary": "양육과 섭생, 말 조심"}, "u兌l巽": {"no": 28, "nameHan": "大過", "nameKo": "대과", "upper": "兌", "lower": "巽", "summary": "지나침, 과부하를 바로잡아라"}, "u坎l坎": {"no": 29, "nameHan": "坎", "nameKo": "감", "upper": "坎", "lower": "坎", "summary": "험난·반복 속 체득"}, "u離l離": {"no": 30, "nameHan": "離", "nameKo": "리", "upper": "離", "lower": "離", "summary": "빛과 명료, 의지를 붙들라"}, "u兌l艮": {"no": 31, "nameHan": "咸", "nameKo": "함", "upper": "兌", "lower": "艮", "summary": "감응과 끌림, 상호 매력"}, "u震l巽": {"no": 32, "nameHan": "恒", "nameKo": "항", "upper": "震", "lower": "巽", "summary": "지속과 지조, 꾸준함"}, "u乾l艮": {"no": 33, "nameHan": "遯", "nameKo": "둔", "upper": "乾", "lower": "艮", "summary": "물러남, 때를 기다리는 퇴각"}, "u震l乾": {"no": 34, "nameHan": "大壯", "nameKo": "대장", "upper": "震", "lower": "乾", "summary": "큰 힘의 발휘, 무리하지 말라"}, "u離l坤": {"no": 35, "nameHan": "晉", "nameKo": "진", "upper": "離", "lower": "坤", "summary": "전진·승진, 낮에서 높으로"}, "u坤l離": {"no": 36, "nameHan": "明夷", "nameKo": "명이", "upper": "坤", "lower": "離", "summary": "빛이 상함, 숨고 보존하라"}, "u巽l離": {"no": 37, "nameHan": "家人", "nameKo": "가인", "upper": "巽", "lower": "離", "summary": "가정과 역할 질서"}, "u離l兌": {"no": 38, "nameHan": "睽", "nameKo": "규", "upper": "離", "lower": "兌", "summary": "엇갈림과 불화, 차이의 인정"}, "u坎l艮": {"no": 39, "nameHan": "蹇", "nameKo": "건", "upper": "坎", "lower": "艮", "summary": "난관·지체, 우회하라"}, "u震l坎": {"no": 40, "nameHan": "解", "nameKo": "해", "upper": "震", "lower": "坎", "summary": "풀림과 해결, 사면"}, "u艮l兌": {"no": 41, "nameHan": "損", "nameKo": "손", "upper": "艮", "lower": "兌", "summary": "감소·비움, 자발적 절제"}, "u巽l震": {"no": 42, "nameHan": "益", "nameKo": "익", "upper": "巽", "lower": "震", "summary": "증가·보상, 도움 주고 받기"}, "u兌l乾": {"no": 43, "nameHan": "夬", "nameKo": "쾌", "upper": "兌", "lower": "乾", "summary": "단호한 결단의 선포"}, "u乾l巽": {"no": 44, "nameHan": "姤", "nameKo": "구", "upper": "乾", "lower": "巽", "summary": "뜻밖의 만남, 경계 유지"}, "u兌l坤": {"no": 45, "nameHan": "萃", "nameKo": "췌", "upper": "兌", "lower": "坤", "summary": "모임·수합, 동원"}, "u坤l巽": {"no": 46, "nameHan": "升", "nameKo": "승", "upper": "坤", "lower": "巽", "summary": "오름·승진, 점진적 성장"}, "u兌l坎": {"no": 47, "nameHan": "困", "nameKo": "곤", "upper": "兌", "lower": "坎", "summary": "곤궁·압박, 내적 힘"}, "u坎l巽": {"no": 48, "nameHan": "井", "nameKo": "정", "upper": "坎", "lower": "巽", "summary": "우물·자원, 공익과 재분배"}, "u兌l離": {"no": 49, "nameHan": "革", "nameKo": "혁", "upper": "兌", "lower": "離", "summary": "변혁과 탈피, 새 질서"}, "u離l巽": {"no": 50, "nameHan": "鼎", "nameKo": "정", "upper": "離", "lower": "巽", "summary": "솥·조리, 프로젝트 완성"}, "u震l震": {"no": 51, "nameHan": "震", "nameKo": "진", "upper": "震", "lower": "震", "summary": "충격과 각성, 시작의 우레"}, "u艮l艮": {"no": 52, "nameHan": "艮", "nameKo": "간", "upper": "艮", "lower": "艮", "summary": "그침·멈춤, 명상과 경계"}, "u巽l艮": {"no": 53, "nameHan": "漸", "nameKo": "점", "upper": "巽", "lower": "艮", "summary": "점진·서서히 성숙"}, "u震l兌": {"no": 54, "nameHan": "歸妹", "nameKo": "귀매", "upper": "震", "lower": "兌", "summary": "불균형한 결합, 임시적 동맹"}, "u震l離": {"no": 55, "nameHan": "豐", "nameKo": "풍", "upper": "震", "lower": "離", "summary": "풍요의 절정, 가시성"}, "u離l艮": {"no": 56, "nameHan": "旅", "nameKo": "여", "upper": "離", "lower": "艮", "summary": "나그네, 임시·경계 지키기"}, "u巽l巽": {"no": 57, "nameHan": "巽", "nameKo": "손", "upper": "巽", "lower": "巽", "summary": "스며듦, 점진 침투"}, "u兌l兌": {"no": 58, "nameHan": "兌", "nameKo": "태", "upper": "兌", "lower": "兌", "summary": "기쁨과 열린 교류"}, "u巽l坎": {"no": 59, "nameHan": "渙", "nameKo": "환", "upper": "巽", "lower": "坎", "summary": "흩어짐·분산, 정화"}, "u坎l兌": {"no": 60, "nameHan": "節", "nameKo": "절", "upper": "坎", "lower": "兌", "summary": "규범·절제, 한정"}, "u巽l兌": {"no": 61, "nameHan": "中孚", "nameKo": "중부", "upper": "巽", "lower": "兌", "summary": "성실·진정성, 내적 신뢰"}, "u震l艮": {"no": 62, "nameHan": "小過", "nameKo": "소과", "upper": "震", "lower": "艮", "summary": "작은 과도, 조심스런 진전"}, "u坎l離": {"no": 63, "nameHan": "既濟", "nameKo": "기제", "upper": "坎", "lower": "離", "summary": "이미 건넌 뒤의 유지·관리"}, "u離l坎": {"no": 64, "nameHan": "未濟", "nameKo": "미제", "upper": "離", "lower": "坎", "summary": "아직 미완, 마무리 전 주의"}};
+const META = {"u乾l乾": {"no": 1, "nameHan": "乾", "nameKo": "건", "upper": "乾", "lower": "乾", "summary": "창조와 시작, 강건한 추진력"}, "u坤l坤": {"no": 2, "nameHan": "坤", "nameKo": "곤", "upper": "坤", "lower": "坤", "summary": "포용과 순응, 넓은 수용력"}, "u坎l震": {"no": 3, "nameHan": "屯", "nameKo": "둔", "upper": "坎", "lower": "震", "summary": "초기 난관, 인내로 방향을 잡아라"}, "u艮l坎": {"no": 4, "nameHan": "蒙", "nameKo": "몽", "upper": "艮", "lower": "坎", "summary": "미덥지 못함, 배움과 길잡이가 필요하다"}, "u坎l乾": {"no": 5, "nameHan": "需", "nameKo": "수", "upper": "坎", "lower": "乾", "summary": "때를 기다림, 준비된 인내"}, "u乾l坎": {"no": 6, "nameHan": "訟", "nameKo": "송", "upper": "乾", "lower": "坎", "summary": "다툼과 논쟁, 원칙과 절제가 해법"}, "u坤l坎": {"no": 7, "nameHan": "師", "nameKo": "사", "upper": "坤", "lower": "坎", "summary": "조직과 규율, 리더십이 필요"}, "u坎l坤": {"no": 8, "nameHan": "比", "nameKo": "비", "upper": "坎", "lower": "坤", "summary": "결합과 친화, 신의 지키기"}, "u巽l乾": {"no": 9, "nameHan": "小畜", "nameKo": "소축", "upper": "巽", "lower": "乾", "summary": "작게 모아 힘을 기르는 때"}, "u乾l兌": {"no": 10, "nameHan": "履", "nameKo": "리", "upper": "乾", "lower": "兌", "summary": "예절과 절도 속의 전진"}, "u坤l乾": {"no": 11, "nameHan": "泰", "nameKo": "태", "upper": "坤", "lower": "乾", "summary": "소통과 상생, 형통함"}, "u乾l坤": {"no": 12, "nameHan": "否", "nameKo": "비", "upper": "乾", "lower": "坤", "summary": "막힘과 단절, 접촉면을 넓혀라"}, "u乾l離": {"no": 13, "nameHan": "同人", "nameKo": "동인", "upper": "乾", "lower": "離", "summary": "공동체와 연대, 뜻을 함께함"}, "u離l乾": {"no": 14, "nameHan": "大有", "nameKo": "대유", "upper": "離", "lower": "乾", "summary": "풍요와 성취, 명성과 소유"}, "u坤l艮": {"no": 15, "nameHan": "謙", "nameKo": "겸", "upper": "坤", "lower": "艮", "summary": "겸손과 절제, 낮을수록 단단하다"}, "u震l坤": {"no": 16, "nameHan": "豫", "nameKo": "예", "upper": "震", "lower": "坤", "summary": "즐거운 준비, 기획과 예비"}, "u兌l震": {"no": 17, "nameHan": "隨", "nameKo": "수", "upper": "兌", "lower": "震", "summary": "따름과 순응, 유연한 전환"}, "u艮l巽": {"no": 18, "nameHan": "蠱", "nameKo": "고", "upper": "艮", "lower": "巽", "summary": "폐단을 고치고 기반을 수리하라"}, "u坤l兌": {"no": 19, "nameHan": "臨", "nameKo": "임", "upper": "坤", "lower": "兌", "summary": "다가감·접근, 상호성"}, "u巽l坤": {"no": 20, "nameHan": "觀", "nameKo": "관", "upper": "巽", "lower": "坤", "summary": "관찰과 통찰, 큰 그림 보기"}, "u離l震": {"no": 21, "nameHan": "噬嗑", "nameKo": "서합", "upper": "離", "lower": "震", "summary": "결단과 집행, 악을 씹어 없애라"}, "u艮l離": {"no": 22, "nameHan": "賁", "nameKo": "비", "upper": "艮", "lower": "離", "summary": "치장과 표현, 아름다움의 배치"}, "u艮l坤": {"no": 23, "nameHan": "剝", "nameKo": "박", "upper": "艮", "lower": "坤", "summary": "깎여 나감, 쇠퇴 속 전환 준비"}, "u坤l震": {"no": 24, "nameHan": "復", "nameKo": "복", "upper": "坤", "lower": "震", "summary": "되돌아옴, 회복과 재기의 시작"}, "u乾l震": {"no": 25, "nameHan": "無妄", "nameKo": "무망", "upper": "乾", "lower": "震", "summary": "사심 없음, 자연스러움이 길"}, "u艮l乾": {"no": 26, "nameHan": "大畜", "nameKo": "대축", "upper": "艮", "lower": "乾", "summary": "큰 길들임, 축적과 자제"}, "u艮l震": {"no": 27, "nameHan": "頤", "nameKo": "이", "upper": "艮", "lower": "震", "summary": "양육과 섭생, 말 조심"}, "u兌l巽": {"no": 28, "nameHan": "大過", "nameKo": "대과", "upper": "兌", "lower": "巽", "summary": "지나침, 과부하를 바로잡아라"}, "u坎l坎": {"no": 29, "nameHan": "坎", "nameKo": "감", "upper": "坎", "lower": "坎", "summary": "험난·반복 속 체득"}, "u離l離": {"no": 30, "nameHan": "離", "nameKo": "리", "upper": "離", "lower": "離", "summary": "빛과 명료, 의지를 붙들라"}, "u兌l艮": {"no": 31, "nameHan": "咸", "nameKo": "함", "upper": "兌", "lower": "艮", "summary": "감응과 끌림, 상호 매력"}, "u震l巽": {"no": 32, "nameHan": "恆", "nameKo": "항", "upper": "震", "lower": "巽", "summary": "지속과 지조, 꾸준함"}, "u乾l艮": {"no": 33, "nameHan": "遯", "nameKo": "둔", "upper": "乾", "lower": "艮", "summary": "물러남, 때를 기다리는 퇴각"}, "u震l乾": {"no": 34, "nameHan": "大壯", "nameKo": "대장", "upper": "震", "lower": "乾", "summary": "큰 힘의 발휘, 무리하지 말라"}, "u離l坤": {"no": 35, "nameHan": "晉", "nameKo": "진", "upper": "離", "lower": "坤", "summary": "전진·승진, 낮에서 높으로"}, "u坤l離": {"no": 36, "nameHan": "明夷", "nameKo": "명이", "upper": "坤", "lower": "離", "summary": "빛이 상함, 숨고 보존하라"}, "u巽l離": {"no": 37, "nameHan": "家人", "nameKo": "가인", "upper": "巽", "lower": "離", "summary": "가정과 역할 질서"}, "u離l兌": {"no": 38, "nameHan": "睽", "nameKo": "규", "upper": "離", "lower": "兌", "summary": "엇갈림과 불화, 차이의 인정"}, "u坎l艮": {"no": 39, "nameHan": "蹇", "nameKo": "건", "upper": "坎", "lower": "艮", "summary": "난관·지체, 우회하라"}, "u震l坎": {"no": 40, "nameHan": "解", "nameKo": "해", "upper": "震", "lower": "坎", "summary": "풀림과 해결, 사면"}, "u艮l兌": {"no": 41, "nameHan": "損", "nameKo": "손", "upper": "艮", "lower": "兌", "summary": "감소·비움, 자발적 절제"}, "u巽l震": {"no": 42, "nameHan": "益", "nameKo": "익", "upper": "巽", "lower": "震", "summary": "증가·보상, 도움 주고 받기"}, "u兌l乾": {"no": 43, "nameHan": "夬", "nameKo": "쾌", "upper": "兌", "lower": "乾", "summary": "단호한 결단의 선포"}, "u乾l巽": {"no": 44, "nameHan": "姤", "nameKo": "구", "upper": "乾", "lower": "巽", "summary": "뜻밖의 만남, 경계 유지"}, "u兌l坤": {"no": 45, "nameHan": "萃", "nameKo": "췌", "upper": "兌", "lower": "坤", "summary": "모임·수합, 동원"}, "u坤l巽": {"no": 46, "nameHan": "升", "nameKo": "승", "upper": "坤", "lower": "巽", "summary": "오름·승진, 점진적 성장"}, "u兌l坎": {"no": 47, "nameHan": "困", "nameKo": "곤", "upper": "兌", "lower": "坎", "summary": "곤궁·압박, 내적 힘"}, "u坎l巽": {"no": 48, "nameHan": "井", "nameKo": "정", "upper": "坎", "lower": "巽", "summary": "우물·자원, 공익과 재분배"}, "u兌l離": {"no": 49, "nameHan": "革", "nameKo": "혁", "upper": "兌", "lower": "離", "summary": "변혁과 탈피, 새 질서"}, "u離l巽": {"no": 50, "nameHan": "鼎", "nameKo": "정", "upper": "離", "lower": "巽", "summary": "솥·조리, 프로젝트 완성"}, "u震l震": {"no": 51, "nameHan": "震", "nameKo": "진", "upper": "震", "lower": "震", "summary": "충격과 각성, 시작의 우레"}, "u艮l艮": {"no": 52, "nameHan": "艮", "nameKo": "간", "upper": "艮", "lower": "艮", "summary": "그침·멈춤, 명상과 경계"}, "u巽l艮": {"no": 53, "nameHan": "漸", "nameKo": "점", "upper": "巽", "lower": "艮", "summary": "점진·서서히 성숙"}, "u震l兌": {"no": 54, "nameHan": "歸妹", "nameKo": "귀매", "upper": "震", "lower": "兌", "summary": "불균형한 결합, 임시적 동맹"}, "u震l離": {"no": 55, "nameHan": "豐", "nameKo": "풍", "upper": "震", "lower": "離", "summary": "풍요의 절정, 가시성"}, "u離l艮": {"no": 56, "nameHan": "旅", "nameKo": "여", "upper": "離", "lower": "艮", "summary": "나그네, 임시·경계 지키기"}, "u巽l巽": {"no": 57, "nameHan": "巽", "nameKo": "손", "upper": "巽", "lower": "巽", "summary": "스며듦, 점진 침투"}, "u兌l兌": {"no": 58, "nameHan": "兌", "nameKo": "태", "upper": "兌", "lower": "兌", "summary": "기쁨과 열린 교류"}, "u巽l坎": {"no": 59, "nameHan": "渙", "nameKo": "환", "upper": "巽", "lower": "坎", "summary": "흩어짐·분산, 정화"}, "u坎l兌": {"no": 60, "nameHan": "節", "nameKo": "절", "upper": "坎", "lower": "兌", "summary": "규범·절제, 한정"}, "u巽l兌": {"no": 61, "nameHan": "中孚", "nameKo": "중부", "upper": "巽", "lower": "兌", "summary": "성실·진정성, 내적 신뢰"}, "u震l艮": {"no": 62, "nameHan": "小過", "nameKo": "소과", "upper": "震", "lower": "艮", "summary": "작은 과도, 조심스런 진전"}, "u坎l離": {"no": 63, "nameHan": "既濟", "nameKo": "기제", "upper": "坎", "lower": "離", "summary": "이미 건넌 뒤의 유지·관리"}, "u離l坎": {"no": 64, "nameHan": "未濟", "nameKo": "미제", "upper": "離", "lower": "坎", "summary": "아직 미완, 마무리 전 주의"}};
 const TRIS = ['坤','震','坎','兌','艮','離','巽','乾']; // 000..111 (bottom-up)
 const TRIS_KO = {'坤':'곤','震':'진','坎':'감','艮':'간','巽':'손','離':'리','兌':'태','乾':'건'};
 const TRI_MEAN_HAN = {'乾':'天','坤':'地','坎':'水','離':'火','震':'雷','巽':'風','艮':'山','兌':'澤'};
@@ -200,19 +261,26 @@ function rollYarrow(){ const r = crypto.getRandomValues(new Uint8Array(1))[0] & 
 function rollCoins(){ const r = crypto.getRandomValues(new Uint8Array(1))[0] & 7; if(r===0) return 6; if(r<=3) return 7; if(r<=6) return 8; return 9; }
 function toLine(v){ if(v===6) return {line:0,changing:true,val:6}; if(v===9) return {line:1,changing:true,val:9}; if(v===7) return {line:1,changing:false,val:7}; return {line:0,changing:false,val:8}; }
 
-function cast(method){
+async function cast(method){
+  // 기존 계산 로직 그대로
   const base=[], changed=[], vals=[];
   for(let i=0;i<6;i++){
     const v = (method==='yarrow') ? rollYarrow() : rollCoins();
     const o = toLine(v);
     base.push(o.line); changed.push(o.changing); vals.push(o.val);
   }
-  const mutated=base.map((l,i)=> changed[i] ? (l^1) : l);
+  const mutated = base.map((l,i)=> changed[i] ? (l^1) : l);
+
+  // 메타 조회
   const bInfo = lookup(base);
   const mInfo = lookup(mutated);
-  render('base', base, changed, vals, bInfo);
-  render('mut',  mutated, changed, vals, mInfo);
+
+  // 본괘 → 변괘 순서로 애니메이션
+  await animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo);
   renderJoint(base, mutated, changed, vals, bInfo, mInfo);
+  // joint 텍스트가 채워진 직후에 ‘뾰로롱’
+  const joint = document.getElementById('jointBox');
+  requestAnimationFrame(()=> joint?.classList.remove('animating'));
 }
 
 function lookup(hex){
@@ -413,5 +481,74 @@ function stripLabelsInDetail(t){
     return l.replace(/^\s*[·•]?\s*상세\s*:\s*/, '');          // 상세: 라벨만 제거
   }).filter(Boolean).join('\n');
 }
+
+function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+/** 한 효씩 드러내기 (아래→위) */
+async function animateHex(prefix, arr, changed, vals, info, delay=250){
+  render(prefix, arr, changed, vals, info);
+
+  const hex = document.getElementById(prefix + 'Hex');
+  hex?.classList.add('animating');
+
+  const wraps = Array.from(document.querySelectorAll('#' + prefix + 'Hex .lineWrap'));
+  wraps.forEach(w => w.classList.remove('revealed'));
+
+  const bottomUp = wraps.slice().reverse(); // 아래→위
+  for(const w of bottomUp){
+    w.classList.add('revealed');
+    await new Promise(r=>setTimeout(r, delay));
+  }
+  hex?.classList.remove('animating');
+}
+
+async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo, delay=250){
+  // 0) 대상 노드 준비
+  const baseHex = document.getElementById('baseHex');
+  const mutHex  = document.getElementById('mutHex');
+  const baseCard = document.getElementById('baseTitle')?.closest('.card');
+  const mutCard  = document.getElementById('mutTitle')?.closest('.card');
+  const joint    = document.getElementById('jointBox');
+
+  // 1) 애니메이션 상태 ON (라인/텍스트/공유해석 모두 가려두기)
+  // 텍스트는 일단 '전환 없이' 즉시 숨김 → 다음 프레임에 전환 복구
+  baseHex?.classList.add('animating');
+  mutHex?.classList.add('animating');
+  baseCard?.classList.add('prehide','animating');
+  mutCard?.classList.add('prehide','animating');
+  joint?.classList.add('prehide','animating');
+
+  // 다음 프레임에 전환 복구(여전히 .animating 상태라 숨김 유지)
+requestAnimationFrame(()=>{
+  baseCard?.classList.remove('prehide');
+  mutCard?.classList.remove('prehide');
+  joint?.classList.remove('prehide');
+});
+
+  // 2) 두 괘를 먼저 통째로 렌더(텍스트는 .animating 때문에 보이지 않음)
+  render('base', base,    changed, vals, bInfo);
+  render('mut',  mutated, changed, vals, mInfo);
+
+  // 3) 라인들을 수집 후 모두 숨김 초기화
+  const baseWraps = Array.from(baseHex.querySelectorAll('.lineWrap')).reverse(); // 아래→위
+  const mutWraps  = Array.from(mutHex.querySelectorAll('.lineWrap')).reverse();
+  baseWraps.forEach(w=>w.classList.remove('revealed'));
+  mutWraps.forEach(w=>w.classList.remove('revealed'));
+
+  // 4) 본i & 변i 를 동시에 공개 → 한 번 대기
+  for(let i=0;i<6;i++){
+    baseWraps[i].classList.add('revealed');
+    mutWraps[i].classList.add('revealed');
+    await sleep(delay);
+  }
+
+  // 5) 애니메이션 상태 OFF (두 카드 텍스트 + joint가 동시에 “뾰로롱”)
+  baseHex?.classList.remove('animating');
+  mutHex?.classList.remove('animating');
+  baseCard?.classList.remove('animating');
+  mutCard?.classList.remove('animating');
+  // joint는 cast()에서 renderJoint 직후에 풀어줌 (아래 참고)
+}
+      
 </script>
 </body></html>
