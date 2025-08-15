@@ -108,6 +108,29 @@ h1{text-align:center;margin-top:46px}
 .hidden{display:none}
 .unset .line::before{content:'';position:absolute;inset:2px;background:#162338;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
 .warn{color:#ffb6a1;font-weight:800;margin-top:8px}
+
+/* 처음엔 라인을 살짝 숨겨두고 */
+#baseHex .lineWrap .line, #mutHex .lineWrap .line{
+  opacity: 0; transform: scaleX(.92);
+  transition: opacity .28s ease, transform .28s ease;
+}
+/* 보여줄 때 붙이는 클래스 */
+.revealed .line{ opacity: 1; transform: scaleX(1); }
+
+/* (선택) 톡-하고 탄성 주기 */
+@keyframes tossPulse{
+  0%{ transform: scaleX(.92); }
+  60%{ transform: scaleX(1.02); }
+  100%{ transform: scaleX(1); }
+}
+.revealed .line{ animation: tossPulse .28s ease-out; }
+
+/* 접근성: 사용자 ‘저감 모션’ 설정 존중 */
+@media (prefers-reduced-motion: reduce){
+  #baseHex .lineWrap .line, #mutHex .lineWrap .line{ transition: none !important; }
+  .revealed .line{ animation: none !important; }
+}
+      
 </style></head>
 <body>
 <div style="display:none"><button id="castCoins"></button><button id="castYarrow"></button><button id="customInput"></button></div>
@@ -200,18 +223,25 @@ function rollYarrow(){ const r = crypto.getRandomValues(new Uint8Array(1))[0] & 
 function rollCoins(){ const r = crypto.getRandomValues(new Uint8Array(1))[0] & 7; if(r===0) return 6; if(r<=3) return 7; if(r<=6) return 8; return 9; }
 function toLine(v){ if(v===6) return {line:0,changing:true,val:6}; if(v===9) return {line:1,changing:true,val:9}; if(v===7) return {line:1,changing:false,val:7}; return {line:0,changing:false,val:8}; }
 
-function cast(method){
+async function cast(method){
+  // 기존 계산 로직 그대로
   const base=[], changed=[], vals=[];
   for(let i=0;i<6;i++){
     const v = (method==='yarrow') ? rollYarrow() : rollCoins();
     const o = toLine(v);
     base.push(o.line); changed.push(o.changing); vals.push(o.val);
   }
-  const mutated=base.map((l,i)=> changed[i] ? (l^1) : l);
+  const mutated = base.map((l,i)=> changed[i] ? (l^1) : l);
+
+  // 메타 조회
   const bInfo = lookup(base);
   const mInfo = lookup(mutated);
-  render('base', base, changed, vals, bInfo);
-  render('mut',  mutated, changed, vals, mInfo);
+
+  // 본괘 → 변괘 순서로 애니메이션
+  await animateHex('base', base, changed, vals, bInfo);
+  await animateHex('mut',  mutated, changed, vals, mInfo);
+
+  // 합산 해석은 마지막에 표시
   renderJoint(base, mutated, changed, vals, bInfo, mInfo);
 }
 
@@ -413,5 +443,25 @@ function stripLabelsInDetail(t){
     return l.replace(/^\s*[·•]?\s*상세\s*:\s*/, '');          // 상세: 라벨만 제거
   }).filter(Boolean).join('\n');
 }
+
+function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+/** 한 효씩 드러내기 (아래→위) */
+async function animateHex(prefix, arr, changed, vals, info, delay=360){
+  // 1) 먼저 해당 괘를 통째로 렌더해서 DOM 생성
+  render(prefix, arr, changed, vals, info);
+
+  // 2) 모두 숨김 초기화
+  const wraps = Array.from(document.querySelectorAll('#' + prefix + 'Hex .lineWrap'));
+  wraps.forEach(w => w.classList.remove('revealed'));
+
+  // 3) 아래(초효) → 위(상효) 순서로 하나씩 보이기
+  const bottomUp = wraps.slice().reverse();
+  for(const w of bottomUp){
+    w.classList.add('revealed');
+    await sleep(delay);
+  }
+}
+      
 </script>
 </body></html>
