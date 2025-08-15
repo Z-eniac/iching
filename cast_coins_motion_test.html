@@ -72,7 +72,10 @@
   .yin .line::before{left:2px} .yin .line::after{right:2px}
   .yin .gap{position:absolute;left:50%;top:2px;bottom:2px;transform:translateX(-50%);width:var(--yinGap);background:#111a2b;border-radius:4px;box-shadow:0 0 0 1px rgba(0,0,0,.12) inset}
   .chg::after{content:'變';position:absolute;right:-8px;top:-4px;background:var(--mark);color:#fff;font-weight:600;font-size:11px;line-height:16px;padding:0 6px;border-radius:6px;box-shadow:0 1px 6px rgba(0,0,0,.3)}
-  /* Meta under hex - fixed columns, tighter */
+      /* 변효 아이콘: 줄이 공개될 때 함께 보이기 */
+    .lineWrap.chg::after{ opacity: 0; transform: translateY(-4px); transition: opacity .28s ease, transform .28s ease; }
+    .lineWrap.revealed.chg::after{ opacity: 1; transform: translateY(0); }
+ /* Meta under hex - fixed columns, tighter */
   .metaUnder{border-top:1px dashed #2a3b5a;margin-top:8px;padding-top:6px;text-align:center;width:100%}
   .metaRow{display:grid;grid-template-columns:var(--metaCol1) var(--metaCol2) var(--metaCol3) var(--metaCol4) var(--metaCol5);align-items:center;justify-items:start;column-gap:6px;margin:2px 0}
   .metaRow .lab2{color:#a9b8dc;justify-self:end;padding-right:2px}
@@ -141,6 +144,17 @@ h1{text-align:center;margin-top:46px}
   #baseHex.animating .lineWrap.revealed .line,
   #mutHex.animating .lineWrap.revealed .line{ animation: none !important; }
 }
+
+/* 카드 안의 텍스트(괘명/요지/상하괘/해석)를 애니 중엔 숨겼다가 끝에 동시에 등장 */
+.card .title, .card .gist, .card .metaUnder, .card .read{
+  transition: opacity .28s ease, transform .28s ease;
+}
+.card.animating .title, .card.animating .gist, .card.animating .metaUnder, .card.animating .read{
+  opacity: 0; transform: translateY(6px);
+}
+/* joint 박스도 같이 */
+.joint{ transition: opacity .28s ease, transform .28s ease; }
+.joint.animating{ opacity: 0; transform: translateY(6px); }
       
 </style></head>
 <body>
@@ -249,8 +263,7 @@ async function cast(method){
   const mInfo = lookup(mutated);
 
   // 본괘 → 변괘 순서로 애니메이션
-  await animateHex('base', base, changed, vals, bInfo);
-  await animateHex('mut',  mutated, changed, vals, mInfo);
+  await animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo);
   renderJoint(base, mutated, changed, vals, bInfo, mInfo);
 }
 
@@ -471,6 +484,51 @@ async function animateHex(prefix, arr, changed, vals, info, delay=360){
     await new Promise(r=>setTimeout(r, delay));
   }
   hex?.classList.remove('animating');
+}
+
+async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo, delay=360){
+  // 1) 두 괘를 먼저 통째로 렌더(라인 DOM 생성). 텍스트는 CSS로 가려둘 거라 상관없음
+  render('base', base, changed, vals, bInfo);
+  render('mut',  mutated, changed, vals, mInfo);
+
+  // 2) 애니메이션 상태 ON (라인/텍스트 모두)
+  const baseHex = document.getElementById('baseHex');
+  const mutHex  = document.getElementById('mutHex');
+  baseHex?.classList.add('animating');
+  mutHex?.classList.add('animating');
+
+  const baseCard = document.getElementById('baseTitle')?.closest('.card');
+  const mutCard  = document.getElementById('mutTitle')?.closest('.card');
+  baseCard?.classList.add('animating');
+  mutCard?.classList.add('animating');
+
+  // joint 박스도 가려두기
+  const joint = document.getElementById('jointBox');
+  joint?.classList.add('animating');
+
+  // 3) 라인들 수집 후 모두 숨김 초기화
+  const baseWraps = Array.from(baseHex.querySelectorAll('.lineWrap')).reverse(); // 아래→위
+  const mutWraps  = Array.from(mutHex.querySelectorAll('.lineWrap')).reverse();
+  baseWraps.forEach(w=>w.classList.remove('revealed'));
+  mutWraps.forEach(w=>w.classList.remove('revealed'));
+
+  // 4) 본1 → 변1 → 본2 → 변2 … 순서로 공개
+  for(let i=0;i<6;i++){
+    baseWraps[i].classList.add('revealed');
+    await sleep(delay);
+    mutWraps[i].classList.add('revealed');
+    await sleep(delay);
+  }
+
+  // 5) 애니메이션 상태 OFF → 텍스트/공유해석이 동시에 “뾰로롱”
+  baseHex?.classList.remove('animating');
+  mutHex?.classList.remove('animating');
+  baseCard?.classList.remove('animating');
+  mutCard?.classList.remove('animating');
+
+  // (※ joint 내용은 cast() 마지막에 renderJoint로 채운 뒤 보이게)
+  // 잠깐의 브라우저 레이아웃 반영 여유 후 표시
+  requestAnimationFrame(()=> joint?.classList.remove('animating'));
 }
       
 </script>
