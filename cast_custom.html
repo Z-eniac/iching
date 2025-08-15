@@ -52,7 +52,13 @@
   .card{flex:0 1 var(--cardW);max-width:var(--cardW);background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
   .badge{display:inline-block;background:#1a2540;border:1px solid #2c3b58;border-radius:10px;padding:4px 10px;margin-bottom:8px}
   .title{text-align:center;margin:6px 0 16px}
-  .title .han{font-size:36px;font-weight:900;letter-spacing:1px}
+.title .han{
+  font-size:45px;
+  letter-spacing:1px;
+  font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif;
+  font-weight:600;        /* Semibold 파일과 일치 */
+  font-synthesis:none;    /* 가짜 볼드 금지 */
+}
   .title .ko{font-size:14px;color:var(--muted);margin-top:4px}
   .panel{display:grid;grid-template-columns:auto;gap:10px;align-items:center;justify-items:center}
   .hex{display:grid;grid-template-columns:26px auto 26px;row-gap:var(--rowGap);align-items:center}
