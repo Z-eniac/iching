@@ -12,20 +12,28 @@
 
 <style>
 
-  @font-face{
+@font-face{
   font-family: "NotoSerifCJK-ICHING";
   src: url("./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2") format("woff2");
-  font-weight: 600;              /* Semibold */
+  font-weight: 600;          /* Semibold */
   font-style: normal;
   font-display: swap;
 }
 
-/* 적용할 요소 */
-.hex-name-han, .hex-gist{
-  font-family: "NotoSerifCJK-ICHING", serif;
+/* 괘명(큰 한자) — 우선순위 높여 강제 적용 */
+#baseNameHan.hex-name-han,
+#mutNameHan.hex-name-han{
+  font-family: "NotoSerifCJK-ICHING","Source Han Serif K",serif !important;
+  font-weight: 600 !important;
+  font-synthesis: none;
+  letter-spacing: .02em;
+}
+
+/* 요지(한 줄 요약) */
+.hex-gist{
+  font-family: "NotoSerifCJK-ICHING","Source Han Serif K",serif;
   font-weight: 600;
-  font-synthesis: none;          /* 가짜 볼드 방지 */
-  letter-spacing: .02em;         /* 취향 보정 */
+  font-synthesis: none;
 }
   
   :root{
@@ -45,7 +53,7 @@
   .card{flex:0 1 var(--cardW);max-width:var(--cardW);background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
   .badge{display:inline-block;background:#1a2540;border:1px solid #2c3b58;border-radius:10px;padding:4px 10px;margin-bottom:8px}
   .title{text-align:center;margin:6px 0 16px}
-  .title .han{font-size:36px;font-weight:600;letter-spacing:1px}
+  .title .han{font-size:36px;font-weight:900;letter-spacing:1px}
   .title .ko{font-size:14px;color:var(--muted);margin-top:4px}
   .panel{display:grid;grid-template-columns:auto;gap:10px;align-items:center;justify-items:center}
   .hex{display:grid;grid-template-columns:26px auto 26px;row-gap:var(--rowGap);align-items:center}
@@ -136,10 +144,14 @@ h1{text-align:center;margin-top:46px}
 </div>
 <script>
   
-  ['base','mut'].forEach(p=>{
+/* 대상 요소에 클래스 꽂기 (한 번만 실행되면 됨) */
+['base','mut'].forEach(p=>{
   const han  = document.getElementById(p+'NameHan');
   const gist = document.getElementById(p+'Gist');
-  if(han){  han.classList.add('hex-name-han'); han.setAttribute('lang','zh-Hant'); }
+  if(han){
+    han.classList.add('hex-name-han');
+    han.setAttribute('lang','zh-Hant'); // 번체 스타일 의도
+  }
   if(gist){ gist.classList.add('hex-gist'); }
 });
   
