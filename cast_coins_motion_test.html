@@ -265,6 +265,9 @@ async function cast(method){
   // 본괘 → 변괘 순서로 애니메이션
   await animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo);
   renderJoint(base, mutated, changed, vals, bInfo, mInfo);
+  // joint 텍스트가 채워진 직후에 ‘뾰로롱’
+  const joint = document.getElementById('jointBox');
+  requestAnimationFrame(()=> joint?.classList.remove('animating'));
 }
 
 function lookup(hex){
@@ -512,10 +515,9 @@ async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo
   baseWraps.forEach(w=>w.classList.remove('revealed'));
   mutWraps.forEach(w=>w.classList.remove('revealed'));
 
-  // 4) 본1 → 변1 → 본2 → 변2 … 순서로 공개
+  // 4) 본i & 변i 를 동시에 공개 → 한 번 대기
   for(let i=0;i<6;i++){
     baseWraps[i].classList.add('revealed');
-    await sleep(delay);
     mutWraps[i].classList.add('revealed');
     await sleep(delay);
   }
@@ -525,10 +527,6 @@ async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo
   mutHex?.classList.remove('animating');
   baseCard?.classList.remove('animating');
   mutCard?.classList.remove('animating');
-
-  // (※ joint 내용은 cast() 마지막에 renderJoint로 채운 뒤 보이게)
-  // 잠깐의 브라우저 레이아웃 반영 여유 후 표시
-  requestAnimationFrame(()=> joint?.classList.remove('animating'));
 }
       
 </script>
