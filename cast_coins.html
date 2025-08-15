@@ -6,8 +6,28 @@
 <title>주역 캐스터: 동전법</title>
 <link rel="icon" type="image/svg+xml" href="icon/No49.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="icon/No49.png">
+<link rel="preload"
+      href="./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2"
+      as="font" type="font/woff2" crossorigin>
+
 <style>
 
+  @font-face{
+  font-family: "NotoSerifCJK-ICHING";
+  src: url("./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2") format("woff2");
+  font-weight: 600;              /* Semibold */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 적용할 요소 */
+.hex-name-han, .hex-gist{
+  font-family: "NotoSerifCJK-ICHING", serif;
+  font-weight: 600;
+  font-synthesis: none;          /* 가짜 볼드 방지 */
+  letter-spacing: .02em;         /* 취향 보정 */
+}
+  
   :root{
     --bg:#0c111b; --card:#111a2b; --border:#22304a; --ink:#eaf0ff;
     --muted:#a8b6d7; --accent:#2b8cff; --yang:#e7eefc; --yin:#e7eefc; --mark:#ff6b6b;
@@ -115,6 +135,14 @@ h1{text-align:center;margin-top:46px}
   <div class="legend">© 2025. Zeniac. All Rights Reserved.</div>
 </div>
 <script>
+  
+  ['base','mut'].forEach(p=>{
+  const han  = document.getElementById(p+'NameHan');
+  const gist = document.getElementById(p+'Gist');
+  if(han){  han.classList.add('hex-name-han'); han.setAttribute('lang','zh-Hant'); }
+  if(gist){ gist.classList.add('hex-gist'); }
+});
+  
   /* --- overrides loader (SAFE, scoped) --- */
   (function(){
     const OVERRIDES_BASE_PATH = './overrides';
