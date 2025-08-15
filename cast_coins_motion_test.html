@@ -155,6 +155,19 @@ h1{text-align:center;margin-top:46px}
 /* joint 박스도 같이 */
 .joint{ transition: opacity 1.0s ease, transform 1.0s ease; }
 .joint.animating{ opacity: 0; transform: translateY(6px); }
+.card.prehide .title,
+.card.prehide .gist,
+.card.prehide .metaUnder,
+.card.prehide .read{
+  opacity: 0;
+  transform: translateY(6px);
+  transition: none !important;
+}
+.joint.prehide{
+  opacity: 0;
+  transform: translateY(6px);
+  transition: none !important;
+}
       
 </style></head>
 <body>
@@ -498,11 +511,19 @@ async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo
   const joint    = document.getElementById('jointBox');
 
   // 1) 애니메이션 상태 ON (라인/텍스트/공유해석 모두 가려두기)
+  // 텍스트는 일단 '전환 없이' 즉시 숨김 → 다음 프레임에 전환 복구
   baseHex?.classList.add('animating');
   mutHex?.classList.add('animating');
-  baseCard?.classList.add('animating');
-  mutCard?.classList.add('animating');
-  joint?.classList.add('animating');
+  baseCard?.classList.add('prehide','animating');
+  mutCard?.classList.add('prehide','animating');
+  joint?.classList.add('prehide','animating');
+
+  // 다음 프레임에 전환 복구(여전히 .animating 상태라 숨김 유지)
+requestAnimationFrame(()=>{
+  baseCard?.classList.remove('prehide');
+  mutCard?.classList.remove('prehide');
+  joint?.classList.remove('prehide');
+});
 
   // 2) 두 괘를 먼저 통째로 렌더(텍스트는 .animating 때문에 보이지 않음)
   render('base', base,    changed, vals, bInfo);
