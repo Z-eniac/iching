@@ -109,29 +109,37 @@ h1{text-align:center;margin-top:46px}
 .unset .line::before{content:'';position:absolute;inset:2px;background:#162338;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
 .warn{color:#ffb6a1;font-weight:800;margin-top:8px}
 
-/* 처음엔 라인을 살짝 숨겨두고 */
-#baseHex.animating .lineWrap .line,
-#mutHex.animating .lineWrap .line{
-  opacity: 0;
-  transform: scaleX(.92);
+/* 트랜지션은 항상 걸어두기 */
+#baseHex .lineWrap .line,
+#mutHex .lineWrap .line{
   transition: opacity .28s ease, transform .28s ease;
 }
-.revealed .line{ opacity:1; transform:scaleX(1); }
-/* 보여줄 때 붙이는 클래스 */
-.revealed .line{ opacity: 1; transform: scaleX(1); }
 
-/* (선택) 톡-하고 탄성 주기 */
+/* 애니 중에, 아직 공개되지 않은 효만 숨김 */
+#baseHex.animating .lineWrap:not(.revealed) .line,
+#mutHex.animating .lineWrap:not(.revealed) .line{
+  opacity: 0;
+  transform: scaleX(.92);
+}
+
+/* 공개된 효는 보이게 + 살짝 튕김 */
 @keyframes tossPulse{
   0%{ transform: scaleX(.92); }
   60%{ transform: scaleX(1.02); }
   100%{ transform: scaleX(1); }
 }
-.revealed .line{ animation: tossPulse .28s ease-out; }
+#baseHex.animating .lineWrap.revealed .line,
+#mutHex.animating .lineWrap.revealed .line{
+  opacity: 1;
+  transform: scaleX(1);
+  animation: tossPulse .28s ease-out;
+}
 
-/* 접근성: 사용자 ‘저감 모션’ 설정 존중 */
+/* 접근성: 저감 모션 */
 @media (prefers-reduced-motion: reduce){
   #baseHex .lineWrap .line, #mutHex .lineWrap .line{ transition: none !important; }
-  .revealed .line{ animation: none !important; }
+  #baseHex.animating .lineWrap.revealed .line,
+  #mutHex.animating .lineWrap.revealed .line{ animation: none !important; }
 }
       
 </style></head>
