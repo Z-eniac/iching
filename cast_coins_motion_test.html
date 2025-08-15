@@ -110,10 +110,13 @@ h1{text-align:center;margin-top:46px}
 .warn{color:#ffb6a1;font-weight:800;margin-top:8px}
 
 /* 처음엔 라인을 살짝 숨겨두고 */
-#baseHex .lineWrap .line, #mutHex .lineWrap .line{
-  opacity: 0; transform: scaleX(.92);
+#baseHex.animating .lineWrap .line,
+#mutHex.animating .lineWrap .line{
+  opacity: 0;
+  transform: scaleX(.92);
   transition: opacity .28s ease, transform .28s ease;
 }
+.revealed .line{ opacity:1; transform:scaleX(1); }
 /* 보여줄 때 붙이는 클래스 */
 .revealed .line{ opacity: 1; transform: scaleX(1); }
 
@@ -240,8 +243,6 @@ async function cast(method){
   // 본괘 → 변괘 순서로 애니메이션
   await animateHex('base', base, changed, vals, bInfo);
   await animateHex('mut',  mutated, changed, vals, mInfo);
-
-  // 합산 해석은 마지막에 표시
   renderJoint(base, mutated, changed, vals, bInfo, mInfo);
 }
 
@@ -448,19 +449,20 @@ function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
 
 /** 한 효씩 드러내기 (아래→위) */
 async function animateHex(prefix, arr, changed, vals, info, delay=360){
-  // 1) 먼저 해당 괘를 통째로 렌더해서 DOM 생성
   render(prefix, arr, changed, vals, info);
 
-  // 2) 모두 숨김 초기화
+  const hex = document.getElementById(prefix + 'Hex');
+  hex?.classList.add('animating');
+
   const wraps = Array.from(document.querySelectorAll('#' + prefix + 'Hex .lineWrap'));
   wraps.forEach(w => w.classList.remove('revealed'));
 
-  // 3) 아래(초효) → 위(상효) 순서로 하나씩 보이기
-  const bottomUp = wraps.slice().reverse();
+  const bottomUp = wraps.slice().reverse(); // 아래→위
   for(const w of bottomUp){
     w.classList.add('revealed');
-    await sleep(delay);
+    await new Promise(r=>setTimeout(r, delay));
   }
+  hex?.classList.remove('animating');
 }
       
 </script>
