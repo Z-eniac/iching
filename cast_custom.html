@@ -6,8 +6,35 @@
 <title>주역 캐스터: 커스텀</title>
 <link rel="icon" type="image/svg+xml" href="icon/No49.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="icon/No49.png">
+<link rel="preload"
+      href="./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2"
+      as="font" type="font/woff2" crossorigin>
 <style>
 
+@font-face{
+  font-family: "NotoSerifCJK-ICHING";
+  src: url("./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2") format("woff2");
+  font-weight: 600;          /* Semibold */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 괘명(큰 한자) — 우선순위 높여 강제 적용 */
+#baseNameHan.hex-name-han,
+#mutNameHan.hex-name-han{
+  font-family: "NotoSerifCJK-ICHING","Source Han Serif K",serif !important;
+  font-weight: 600 !important;
+  font-synthesis: none;
+  letter-spacing: .02em;
+}
+
+/* 요지(한 줄 요약) */
+.hex-gist{
+  font-family: "NotoSerifCJK-ICHING","Source Han Serif K",serif;
+  font-weight: 600;
+  font-synthesis: none;
+}
+  
   :root{
     --bg:#0c111b; --card:#111a2b; --border:#22304a; --ink:#eaf0ff;
     --muted:#a8b6d7; --accent:#2b8cff; --yang:#e7eefc; --yin:#e7eefc; --mark:#ff6b6b;
@@ -159,6 +186,18 @@ h1{text-align:center;margin-top:46px}
 <div id="dbg" class="debugBox"></div>
   
 <script>
+
+/* 대상 요소에 클래스 꽂기 (한 번만 실행되면 됨) */
+['base','mut'].forEach(p=>{
+  const han  = document.getElementById(p+'NameHan');
+  const gist = document.getElementById(p+'Gist');
+  if(han){
+    han.classList.add('hex-name-han');
+    han.setAttribute('lang','zh-Hant'); // 번체 스타일 의도
+  }
+  if(gist){ gist.classList.add('hex-gist'); }
+});
+  
   /* --- overrides loader (SAFE, scoped) --- */
   (function(){
     const OVERRIDES_BASE_PATH = './overrides';
