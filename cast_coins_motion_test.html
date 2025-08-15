@@ -115,7 +115,7 @@ h1{text-align:center;margin-top:46px}
 /* 트랜지션은 항상 걸어두기 */
 #baseHex .lineWrap .line,
 #mutHex .lineWrap .line{
-  transition: opacity .28s ease, transform .28s ease;
+  transition: opacity .2s ease, transform .2s ease;
 }
 
 /* 애니 중에, 아직 공개되지 않은 효만 숨김 */
@@ -135,7 +135,7 @@ h1{text-align:center;margin-top:46px}
 #mutHex.animating .lineWrap.revealed .line{
   opacity: 1;
   transform: scaleX(1);
-  animation: tossPulse .28s ease-out;
+  animation: tossPulse .2s ease-out;
 }
 
 /* 접근성: 저감 모션 */
@@ -147,13 +147,13 @@ h1{text-align:center;margin-top:46px}
 
 /* 카드 안의 텍스트(괘명/요지/상하괘/해석)를 애니 중엔 숨겼다가 끝에 동시에 등장 */
 .card .title, .card .gist, .card .metaUnder, .card .read{
-  transition: opacity .28s ease, transform .28s ease;
+  transition: opacity .4s ease, transform .4s ease;
 }
 .card.animating .title, .card.animating .gist, .card.animating .metaUnder, .card.animating .read{
   opacity: 0; transform: translateY(6px);
 }
 /* joint 박스도 같이 */
-.joint{ transition: opacity .28s ease, transform .28s ease; }
+.joint{ transition: opacity .6s ease, transform .6s ease; }
 .joint.animating{ opacity: 0; transform: translateY(6px); }
       
 </style></head>
@@ -472,7 +472,7 @@ function stripLabelsInDetail(t){
 function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
 
 /** 한 효씩 드러내기 (아래→위) */
-async function animateHex(prefix, arr, changed, vals, info, delay=360){
+async function animateHex(prefix, arr, changed, vals, info, delay=300){
   render(prefix, arr, changed, vals, info);
 
   const hex = document.getElementById(prefix + 'Hex');
@@ -489,7 +489,7 @@ async function animateHex(prefix, arr, changed, vals, info, delay=360){
   hex?.classList.remove('animating');
 }
 
-async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo, delay=360){
+async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo, delay=300){
   // 1) 두 괘를 먼저 통째로 렌더(라인 DOM 생성). 텍스트는 CSS로 가려둘 거라 상관없음
   render('base', base, changed, vals, bInfo);
   render('mut',  mutated, changed, vals, mInfo);
