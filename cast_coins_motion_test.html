@@ -472,7 +472,7 @@ function stripLabelsInDetail(t){
 function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
 
 /** 한 효씩 드러내기 (아래→위) */
-async function animateHex(prefix, arr, changed, vals, info, delay=200){
+async function animateHex(prefix, arr, changed, vals, info, delay=250){
   render(prefix, arr, changed, vals, info);
 
   const hex = document.getElementById(prefix + 'Hex');
@@ -489,27 +489,26 @@ async function animateHex(prefix, arr, changed, vals, info, delay=200){
   hex?.classList.remove('animating');
 }
 
-async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo, delay=200){
-  // 1) 두 괘를 먼저 통째로 렌더(라인 DOM 생성). 텍스트는 CSS로 가려둘 거라 상관없음
-  render('base', base, changed, vals, bInfo);
-  render('mut',  mutated, changed, vals, mInfo);
-
-  // 2) 애니메이션 상태 ON (라인/텍스트 모두)
+async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo, delay=250){
+  // 0) 대상 노드 준비
   const baseHex = document.getElementById('baseHex');
   const mutHex  = document.getElementById('mutHex');
-  baseHex?.classList.add('animating');
-  mutHex?.classList.add('animating');
-
   const baseCard = document.getElementById('baseTitle')?.closest('.card');
   const mutCard  = document.getElementById('mutTitle')?.closest('.card');
+  const joint    = document.getElementById('jointBox');
+
+  // 1) 애니메이션 상태 ON (라인/텍스트/공유해석 모두 가려두기)
+  baseHex?.classList.add('animating');
+  mutHex?.classList.add('animating');
   baseCard?.classList.add('animating');
   mutCard?.classList.add('animating');
-
-  // joint 박스도 가려두기
-  const joint = document.getElementById('jointBox');
   joint?.classList.add('animating');
 
-  // 3) 라인들 수집 후 모두 숨김 초기화
+  // 2) 두 괘를 먼저 통째로 렌더(텍스트는 .animating 때문에 보이지 않음)
+  render('base', base,    changed, vals, bInfo);
+  render('mut',  mutated, changed, vals, mInfo);
+
+  // 3) 라인들을 수집 후 모두 숨김 초기화
   const baseWraps = Array.from(baseHex.querySelectorAll('.lineWrap')).reverse(); // 아래→위
   const mutWraps  = Array.from(mutHex.querySelectorAll('.lineWrap')).reverse();
   baseWraps.forEach(w=>w.classList.remove('revealed'));
@@ -522,11 +521,12 @@ async function animateBothInterleaved(base, mutated, changed, vals, bInfo, mInfo
     await sleep(delay);
   }
 
-  // 5) 애니메이션 상태 OFF → 텍스트/공유해석이 동시에 “뾰로롱”
+  // 5) 애니메이션 상태 OFF (두 카드 텍스트 + joint가 동시에 “뾰로롱”)
   baseHex?.classList.remove('animating');
   mutHex?.classList.remove('animating');
   baseCard?.classList.remove('animating');
   mutCard?.classList.remove('animating');
+  // joint는 cast()에서 renderJoint 직후에 풀어줌 (아래 참고)
 }
       
 </script>
