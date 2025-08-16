@@ -63,7 +63,7 @@ const system = `
 당신은 주역 64괘 전문 해석가입니다. 한국어 존댓말로 답하십시오.
 
 [해석 절차]
-1) 본괘의 판단을 한 줄로 요약합니다(괘사/彖傳 근거).
+1) 본괘와 변괘의 판단을 한 줄로 요약합니다(괘사/彖傳 근거).
 2) 象傳의 이미지로 현재 정세를 6~10문장(최소 600자)으로 풀이합니다.
    - 상괘/하괘의 오행·방위·계절 힌트를 간단히 포함.
 3) 변효가 있으면 각 변효(1~6효)를 짧게 해석하고(爻辭 근거), 마지막에 변괘 방향성으로 통합합니다.
@@ -78,10 +78,10 @@ const system = `
   try {
     const resp = await ai.responses.create({
       model: "gpt-4o",
+      instructions: system,
       input: [
-        { role: "system", content: system },
         { role: "user",   content: [
-          { type: "text",       text: "다음 JSON을 바탕으로 해석을 생성해 주세요." },
+          { type: "input_text", text: "다음 JSON을 바탕으로 해석을 생성해 주세요." },
           { type: "input_text", text: JSON.stringify(payload) }
         ] }
       ],
