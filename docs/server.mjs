@@ -31,7 +31,7 @@ const schema = {
           advice:    { type: "string" },
           cautions:  { type: "string" },
           timing:    { type: "string" },
-          score:     { type: "integer", minimum: 0, maximum: 100 },
+          score:     { type: "number", minimum: 0, maximum: 10 },
           tags:      { type: "array", items: { type: "string" } },
           line_readings: {
             type: "array",
@@ -58,11 +58,24 @@ app.post('/api/read', async (req, res) => {
   const payload = { question, method, primary, relating, changingLines }
   console.log('[REQ]', JSON.stringify(payload))
 
-  const system = `
+const system = `
 당신은 주역 64괘 전문 해석가입니다.
-- 질문 맥락 최우선, 본괘→변괘의 상징 이동과 변효(효사) 중심.
-- 단정 대신 실행 가능한 조언.
-- 정중한 존댓말.`
+출력은 한국어 존댓말을 사용하고, 질문 맥락을 최우선으로 해석합니다.
+
+[해석 절차]
+1) 본괘의 큰 판단을 한 줄로 요약합니다(괘사/彖傳 근거).
+2) 象傳(상전)의 이미지를 이용해 현재의 정세·분위기를 4~6문장으로 풀이합니다.
+   - 필요하면 상괘/하괘(오행·방위·계절) 힌트를 간단히 덧붙입니다.
+3) 변효가 있으면 각 변효(효 번호 1~6)를 짧게 해석하고(爻辭 근거),
+   마지막에 변괘가 지시하는 방향성으로 통합합니다.
+4) 실행 가능한 조언 3~5개를 불릿으로 제시합니다(질문 맥락 연결).
+5) 피해야 할 점/주의 2~3개를 불릿으로 제시합니다.
+6) 길흉 점수는 0~10점(정수 또는 0.5 단위)로 주고, 한 줄 근거를 덧붙입니다.
+
+[표현 규칙]
+- 원전의 짧은 핵심 구절은 「 」로 표시하고, 바로 옆에 한국어 풀이를 붙입니다.
+- 단정 대신 실천 지향. 중언부언 금지. 동일 문장 반복 금지.
+`
 
   try {
     const resp = await ai.responses.create({
@@ -92,8 +105,22 @@ app.post('/api/read', async (req, res) => {
   }
 
   try {
-    const prompt = `사용자 질문과 점괘 JSON이 주어집니다. 아래 스키마에 맞춘 JSON만 출력하세요.
-스키마: { "reading": { "summary": string, "advice": string, "cautions": string, "timing": string, "score": number, "tags": string[], "line_readings": [{"line": number, "meaning": string}] } }`
+    const prompt = `사용자 질문과 점괘 JSON이 주어집니다.
+아래 스키마에 맞춘 JSON만 출력하세요.
+- 원전(괘사/彖傳/象傳/爻辭)의 짧은 핵심 구절을 「 」로 인용하고 한국어 풀이를 덧붙이세요.
+- 길흉 점수는 0~10점(정수 또는 0.5 단위)입니다.
+
+스키마: {
+  "reading": {
+    "summary": string,
+    "advice": string,
+    "cautions": string,
+    "timing": string,
+    "score": number,          // 0~10
+    "tags": string[],
+    "line_readings": [{"line": number, "meaning": string}]
+  }
+}`
 
     const cc = await ai.chat.completions.create({
       model: "gpt-4o-mini",
