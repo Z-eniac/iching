@@ -634,7 +634,7 @@ requestAnimationFrame(()=>{
     s.textContent = '해석 생성 중…';
 
     try{
-      const res = await fetch('/api/read', {
+      const res = await fetch('https://iching-ai-ilo2.onrender.com/api/read', {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify(payload)
