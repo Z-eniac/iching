@@ -88,7 +88,7 @@ const system = `
         ] }
       ],
       response_format: { type: "json_schema", json_schema: schema },
-      seed: 2025
+      seed: 2025,
         max_output_tokens: 1000,        // ← 충분히 길게
         temperature: 0.6,
         frequency_penalty: 0.2,         // ← 문장 반복 완화
