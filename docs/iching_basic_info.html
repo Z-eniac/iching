@@ -1,15 +1,14 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="ko">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>DIVINA: 64괘 기초 가이드</title>
-<link rel="icon" type="image/svg+xml" href="icon/No49.svg">
-<link rel="apple-touch-icon" sizes="180x180" href="icon/No49.png">
-<link rel="preload"
-      href="./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2"
-      as="font" type="font/woff2" crossorigin>
-
+<link href="icon/No49.svg" rel="icon" type="image/svg+xml"/>
+<link href="icon/No49.png" rel="apple-touch-icon" sizes="180x180"/>
+<link as="font" crossorigin="" href="./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2" rel="preload" type="font/woff2"/>
+<!-- build: 2025-08-16 11:35:08 (merged from iching_basic_info (10)) -->
 <style>
 @font-face{
   font-family: "NotoSerifCJK-ICHING";
@@ -24,6 +23,7 @@
   --bg:#0c111b; --card:#111a2b; --border:#22304a; --ink:#eaf0ff;
   --muted:#a8b6d7; --accent:#2b8cff; --accent2:#44b3a6; --accent3:#de5776;
   --contentMax: 1100px;
+  --hexWidth: 192px; --lineHeight: 24px; --rowGap: 12px; --yinGap: 26px;
 }
 html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
   font-family:system-ui,-apple-system,'Malgun Gothic',Segoe UI,Roboto,sans-serif}
@@ -48,10 +48,10 @@ h2.page-title{margin:8px 0 14px;text-align:center;font-size:26px}
 }
 .anchorNav a:hover, .anchorNav a:focus-visible{ text-decoration:underline; outline:none }
 
-/* sections */
+/* sections (card look) */
 .section{
   background:var(--card); border:1px solid #22304a; border-radius:14px;
-  padding:18px 20px; margin:14px auto; max-width:900px; box-shadow:0 2px 10px rgba(0,0,0,.25)
+  padding:18px 20px; margin:14px auto; max-width:700px; box-shadow:0 2px 10px rgba(0,0,0,.25)
 }
 .section h3{
   margin:0 0 10px; font-size:20px; letter-spacing:.2px;
@@ -60,10 +60,6 @@ h2.page-title{margin:8px 0 14px;text-align:center;font-size:26px}
 .section p{line-height:1.9; margin:8px 0}
 .small{font-size:13px; color:#a8b6d7}
 
-/* two-col grid */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media (max-width:760px){ .grid2{grid-template-columns:1fr} }
-
 /* callouts */
 .callout{
   border:1px dashed #2a3b5a; border-radius:12px; padding:10px 12px; margin-top:8px;
@@ -71,7 +67,7 @@ h2.page-title{margin:8px 0 14px;text-align:center;font-size:26px}
 }
 
 /* CTAs */
-.ctaRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.ctaRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;justify-content:center}
 .btn{
   display:inline-block; text-decoration:none; color:#fff; font-weight:900; letter-spacing:.2px;
   padding:12px 16px; border-radius:12px; border:0; cursor:pointer;
@@ -82,7 +78,7 @@ h2.page-title{margin:8px 0 14px;text-align:center;font-size:26px}
 
 /* probability table */
 .tableWrap{overflow:auto}
-table{width:100%; border-collapse:separate; border-spacing:0; margin-top:8px}
+table{width:100%; border-collapse:separate; border-spacing:0; margin-top:8px; table-layout:fixed}
 th,td{padding:10px 12px; text-align:center; border-top:1px solid #2a3b5a; border-left:1px solid #2a3b5a}
 th:last-child, td:last-child{border-right:1px solid #2a3b5a}
 tr:last-child td{border-bottom:1px solid #2a3b5a}
@@ -90,162 +86,287 @@ th{background:#16233c; font-weight:800}
 td{background:#101a2e}
 .num{font-variant-numeric:tabular-nums}
 
-/* footer */
-.legend{margin:26px 0 8px; font-size:12px; color:#a4b2d4; text-align:center}
+/* glossary spacing */
+.section ul.glossary{line-height:2.0; padding-left:18px}
+.section ul.glossary li{margin:10px 0}
+
+/* --- Hex diagram styles (match caster look) --- */
+.lab{text-align:center;font-size:11px;color:#c2cfe9;padding-top:2px}
+.sp{width:26px;height:var(--lineHeight)}
+.hex{display:grid;grid-template-columns:26px auto 26px;row-gap:var(--rowGap);align-items:center}
+.lineWrap{position:relative;width:100%;height:var(--lineHeight);justify-self:center}
+.line{height:100%;border-radius:7px;background:#25324a;position:absolute;inset:0}
+.yang .line::before{content:'';position:absolute;inset:2px;background:#e7eefc;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
+.yin .line::before, .yin .line::after{content:'';position:absolute;top:2px;bottom:2px;width:calc(50% - (var(--yinGap)/2));background:#e7eefc;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
+.yin .line::before{left:2px} .yin .line::after{right:2px}
+.yin .gap{position:absolute;left:50%;top:2px;bottom:2px;transform:translateX(-50%);width:var(--yinGap);background:#111a2b;border-radius:4px;box-shadow:0 0 0 1px rgba(0,0,0,.12) inset}
+.chg::after{content:'變';position:absolute;right:-8px;top:-4px;background:#ff6b6b;color:#fff;font-weight:600;font-size:11px;line-height:16px;padding:0 6px;border-radius:6px;box-shadow:0 1px 6px rgba(0,0,0,.3)}
+
+/* back-to-top (show after scroll) */
+.divinaBackTop{
+  position:fixed; right:16px; bottom:18px; z-index:9999;
+  width:44px; height:44px; border-radius:999px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:#2b8cff; color:#fff; border:1px solid #1a5fb8;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+  font-weight:900; font-size:18px; cursor:pointer;
+  opacity:0; transform: translateY(6px); pointer-events:none;
+  transition: opacity .25s ease, transform .25s ease;
+}
+.divinaBackTop.show{ opacity:1; transform: translateY(0); pointer-events:auto }
+.divinaBackTop:focus-visible{ outline: 2px solid #cfe0ff; outline-offset: 2px }
+@media (prefers-reduced-motion:reduce){
+  .divinaBackTop{ transition:none !important }
+}
 
 /* accessibility */
 @media (prefers-reduced-motion:reduce){
   *{scroll-behavior:auto}
 }
+
+/* hex pair: side-by-side responsive */
+.hexPair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:flex-start}
+.hexBox{width:100%}
+.hexBox .hex{width:100%}
+.hexCaption{margin-top:6px;text-align:center;font-size:13px;color:#a8b6d7;line-height:1.6}
+
+/* gua caption hierarchy */
+.hexCaption{margin-top:8px;text-align:center}
+.hexCaption .guaTitle{
+  font-family:"NotoSerifCJK-ICHING", serif;
+  font-size:20px; line-height:1.2; color:var(--ink);
+}
+.hexCaption .guaSubtitle{font-size:12px; color:var(--muted); margin-top:2px}
+.hexCaption .gistLabel{font-size:12px; color:#9bb7ff; margin-top:8px; letter-spacing:.02em}
+.hexCaption .guaGist{font-size:16px; font-weight:700; color:#eaf0ff; margin-top:4px; letter-spacing:.2px}
 </style>
 </head>
 <body>
 <div class="mainWrap">
-  <!-- site header (click → index) -->
-  <h1><a href="index.html" style="color:inherit;text-decoration:none">Divina Studio</a></h1>
-  <h2 class="page-title">64괘 기초 가이드</h2>
-  <p class="subtitle">괘의 구조와 읽는 법, 두 점법의 원리와 확률 차이를 한눈에 보실 수 있어요.</p>
-
-  <!-- mini anchor nav -->
-  <nav class="anchorNav" aria-label="섹션 바로가기">
-    <a href="#about">64괘란?</a>
-    <a href="#reading">읽는 법</a>
-    <a href="#methods">점치는 방법</a>
-    <a href="#prob">확률과 편향</a>
-    <a href="#glossary">용어</a>
-    <a href="#advanced">심화</a>
-  </nav>
-
-  <!-- 64괘란 -->
-  <section id="about" class="section">
-    <h3>64괘란?</h3>
-    <p>64괘는 <b>팔괘(삼효)</b>를 위·아래로 결합해 만든 <b>6효 도형 64개</b>입니다. 위쪽은 <b>상괘</b>(바깥·환경), 아래쪽은 <b>하괘</b>(안·기반)로 보며, 각 괘에는 전통 명칭과 한 줄 요지가 있습니다.</p>
-    <div class="callout small">예시: 상괘가 하늘(乾), 하괘가 땅(坤)일 때는 ‘泰(태)’처럼, 상·하 조합에 따라 서로 다른 괘가 만들어집니다.</div>
-  </section>
-
-  <!-- 읽는 법 -->
-  <section id="reading" class="section">
-    <h3>괘 읽는 법</h3>
-    <div class="grid2">
-      <div>
-        <p>효(爻)의 번호는 <b>아래에서 위로</b> 1효부터 6효까지 올라갑니다.</p>
-        <p><b>양효</b>(——)와 <b>음효</b>(— —)의 배치로 괘를 읽습니다.</p>
-      </div>
-      <div>
-        <p><b>변효</b>는 다음처럼 이해하면 편합니다.</p>
-        <ul>
-          <li><b>노음</b>: 음이 <b>양으로</b> 바뀌려는 경향(개시·확장)</li>
-          <li><b>노양</b>: 양이 <b>음으로</b> 바뀌려는 경향(수렴·정리)</li>
-          <li><b>소양·소음</b>: 변화 없음</li>
-        </ul>
-      </div>
-    </div>
-    <div class="callout">해석은 <b>본괘(현재)</b>에서 <b>변괘(방향)</b>로 이어지는 흐름을 봅니다. 변효가 많을수록 국면 전환의 신호가 강해지는 편입니다.</div>
-  </section>
-
-  <!-- 점치는 방법 -->
-  <section id="methods" class="section">
-    <h3>점치는 방법</h3>
-
-    <div class="section" style="margin:10px 0 12px">
-      <h3 style="font-size:18px">4-1. 동전법(3코인)</h3>
-      <p><b>준비물</b>: 동전 3개</p>
-      <p><b>절차</b>: 동전 3개를 던져 한 줄의 결과를 기록하고, 이를 <b>아래에서 위로</b> 6회 반복합니다.</p>
-      <p class="small"><b>판정(이 섹션에서만 숫자를 사용합니다)</b> — <span class="num">6</span>(노음, 변함) / <span class="num">7</span>(소양) / <span class="num">8</span>(소음) / <span class="num">9</span>(노양, 변함)</p>
-      <div class="ctaRow">
-        <a class="btn blue" href="cast_coins.html">동전법 점치기</a>
-      </div>
-    </div>
-
-    <div class="section" style="margin:12px 0 0">
-      <h3 style="font-size:18px">4-2. 지초법(산가지)</h3>
-      <p><b>준비물</b>: 산가지(전통은 50개, 간이화도 가능합니다)</p>
-      <p><b>절차</b>: 전통적인 분지·계산 과정을 거쳐 각 효의 <b>노음·소양·소음·노양</b>을 판정합니다.</p>
-      <div class="ctaRow">
-        <a class="btn green" href="cast_yarrow.html">지초법 점치기</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- 확률과 편향 -->
-  <section id="prob" class="section">
-    <h3>확률과 편향</h3>
-    <p>아래 값은 각 줄(효)에서 한 번에 나타날 <b>노음·소양·소음·노양</b>의 분포를 뜻합니다. 표기는 <b>분수</b>가 메인이며, 괄호에 <b>% (소수점 한 자리)</b>를 보조로 표기했습니다.</p>
-
-    <div class="tableWrap">
-      <table aria-label="동전법과 지초법 비교 요약표">
-        <thead>
-          <tr>
-            <th scope="col">구분</th>
-            <th scope="col">동전법 (3코인)</th>
-            <th scope="col">지초법 (산가지)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">노음 (음 → 양)</th>
-            <td class="num"><b>1/8</b> (12.5%)</td>
-            <td class="num"><b>1/16</b> (6.3%)</td>
-          </tr>
-          <tr>
-            <th scope="row">소양 (양, 그대로)</th>
-            <td class="num"><b>3/8</b> (37.5%)</td>
-            <td class="num"><b>5/16</b> (31.3%)</td>
-          </tr>
-          <tr>
-            <th scope="row">소음 (음, 그대로)</th>
-            <td class="num"><b>3/8</b> (37.5%)</td>
-            <td class="num"><b>7/16</b> (43.8%)</td>
-          </tr>
-          <tr>
-            <th scope="row">노양 (양 → 음)</th>
-            <td class="num"><b>1/8</b> (12.5%)</td>
-            <td class="num"><b>3/16</b> (18.8%)</td>
-          </tr>
-          <tr>
-            <th scope="row">변효 총합 (노음+노양)</th>
-            <td class="num"><b>1/4</b> (25.0%)</td>
-            <td class="num"><b>1/4</b> (25.0%)</td>
-          </tr>
-          <tr>
-            <th scope="row">방향성 (노음 : 노양)</th>
-            <td class="num"><b>1 : 1</b></td>
-            <td class="num"><b>1 : 3</b></td>
-          </tr>
-          <tr>
-            <th scope="row">특징 요약</th>
-            <td>빠르고 대칭적인 분포입니다.</td>
-            <td>전통적이며 수렴 경향이 더 자주 나타납니다.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="callout small">
-      두 방식 모두 변효(노음·노양)의 총확률은 <b>1/4</b>(25.0%)로 같습니다. 다만 동전법은 개시(노음)와 수렴(노양)이 대체로 대칭이고,
+<!-- site header (click → index) -->
+<h1><a href="index.html" style="color:inherit;text-decoration:none">Divina Studio</a></h1>
+<h2 class="page-title">64괘 기초 가이드</h2>
+<p class="subtitle">괘의 구조와 읽는 법, 두 점법의 원리와 확률 차이를 한눈에 보실 수 있어요.</p>
+<!-- mini anchor nav -->
+<nav aria-label="섹션 바로가기" class="anchorNav">
+<a href="#about">1. 64괘란?</a>
+<a href="#reading">2. 괘 읽는 법</a>
+<a href="#methods">3. 점치는 방법</a>
+<a href="#prob">4. 확률과 편향</a>
+<a href="#glossary">5. 용어</a>
+<a href="#advanced">6. 심화</a>
+</nav>
+<!-- 1) 64괘란 -->
+<section class="section" id="about">
+<h3>1. 64괘란?</h3>
+<p>64괘는 <b>팔괘(八卦, 삼효)</b>를 위·아래로 결합해 만든 <b>6효 도형 64개</b>입니다. 위쪽은 <b>상괘(上卦)</b>(바깥·환경), 아래쪽은 <b>하괘(下卦)</b>(안·기반)로 보며, 각 괘에는 전통 명칭과 한 줄 요지가 있습니다.</p>
+<div class="callout small">예시: 상괘가 하늘(乾), 하괘가 땅(坤)일 때는 ‘泰(태)’처럼, 상·하 조합에 따라 서로 다른 괘가 만들어집니다.</div>
+</section>
+<!-- 2) 읽는 법 -->
+<section class="section" id="reading">
+<h3>2. 괘 읽는 법</h3>
+<div>
+<p>효(爻)의 번호는 <b>아래에서 위로</b> 1효부터 6효까지 올라갑니다. <b>양효</b>(——)와 <b>음효</b>(— —)의 배치로 괘를 읽습니다.</p>
+<p><b>변효</b>는 다음처럼 이해하면 편합니다.</p>
+<ul>
+<li><b>노음(老陰)</b>: 음이 <b>양으로</b> 바뀌려는 경향(개시·확장)</li>
+<li><b>노양(老陽)</b>: 양이 <b>음으로</b> 바뀌려는 경향(수렴·정리)</li>
+<li><b>소양(少陽)·소음(少陰)</b>: 변화 없음</li>
+</ul>
+<div class="callout">해석은 <b>본괘(本卦)</b>(현재)에서 <b>변괘(變卦)</b>(방향)로 이어지는 흐름을 봅니다.</div>
+</div>
+<!-- 예시: 세로 배치 (본괘 → 변괘) -->
+<div style="margin-top:12px">
+<p class="small"><b>예시</b> — 본괘와 변괘를 좌우로 비교합니다. (변효: 노음 2, 노양 1)</p>
+<div class="hexPair">
+<div class="hexBox">
+<div class="small" style="text-align:center;margin-bottom:6px">본괘</div>
+<div class="hex">
+<div class="lab">6</div><div class="lineWrap yang"><div class="line"></div></div><div class="sp"></div>
+<div class="lab">5</div><div class="lineWrap yin chg"><div class="line"></div><div class="gap"></div></div><div class="sp"></div>
+<div class="lab">4</div><div class="lineWrap yang"><div class="line"></div></div><div class="sp"></div>
+<div class="lab">3</div><div class="lineWrap yin chg"><div class="line"></div><div class="gap"></div></div><div class="sp"></div>
+<div class="lab">2</div><div class="lineWrap yang chg"><div class="line"></div></div><div class="sp"></div>
+<div class="lab">1</div><div class="lineWrap yin"><div class="line"></div><div class="gap"></div></div><div class="sp"></div>
+</div>
+<div class="hexCaption">
+<div class="guaTitle">火水未濟</div>
+<div class="guaSubtitle">No.64 화수미제</div>
+<div class="gistLabel">본괘 요지</div>
+<div class="guaGist">미완, 마무리 전 주의</div>
+</div>
+</div>
+<div class="hexBox">
+<div class="small" style="text-align:center;margin-bottom:6px">변괘</div>
+<div class="hex">
+<div class="lab">6</div><div class="lineWrap yang"><div class="line"></div></div><div class="sp"></div>
+<div class="lab">5</div><div class="lineWrap yang chg"><div class="line"></div></div><div class="sp"></div>
+<div class="lab">4</div><div class="lineWrap yang"><div class="line"></div></div><div class="sp"></div>
+<div class="lab">3</div><div class="lineWrap yang chg"><div class="line"></div></div><div class="sp"></div>
+<div class="lab">2</div><div class="lineWrap yin chg"><div class="line"></div><div class="gap"></div></div><div class="sp"></div>
+<div class="lab">1</div><div class="lineWrap yin"><div class="line"></div><div class="gap"></div></div><div class="sp"></div>
+</div>
+<div class="hexCaption">
+<div class="guaTitle">天山遯</div>
+<div class="guaSubtitle">No.33 천산둔</div>
+<div class="gistLabel">변괘 요지</div>
+<div class="guaGist">물러남, 때를 기다림</div>
+</div>
+</div>
+</div>
+<p class="small" style="margin-top:6px">※ 위 예시에서는 5효·3효가 노음(음→양), 2효가 노양(양→음)으로 바뀝니다.</p>
+</div>
+</section>
+<!-- 3) 점치는 방법 -->
+<section class="section" id="methods">
+<h3>3. 점치는 방법</h3>
+<div class="section" style="margin:10px 0 12px">
+<h3 style="font-size:18px">3-1. 동전법(3코인)</h3>
+<p><b>준비물</b>: 동전 3개</p>
+<p><b>원리</b>: 앞면은 <b>3</b>점, 뒷면은 <b>2</b>점으로 봅니다. 던진 동전 3개의 점수를 합한 값(<span class="num">6·7·8·9</span>)으로 한 줄의 결과를 판정합니다.</p>
+<p><b>절차</b>:</p>
+<p class="small" style="line-height:2.0; margin-top:6px">
+        ① 동전 3개를 던집니다(1효부터 시작합니다).<br/>
+        ② 앞면은 3점, 뒷면은 2점으로 하여 세 동전의 점수를 <b>합산</b>합니다.<br/>
+        ③ 합이 <span class="num">6</span>이면 노음(변함), <span class="num">7</span>이면 소양(그대로), <span class="num">8</span>이면 소음(그대로), <span class="num">9</span>이면 노양(변함)으로 기록합니다.<br/>
+        ④ 같은 과정을 <b>아래에서 위로</b> 6번 반복하여 1효→6효까지 채웁니다.<br/>
+        ⑤ 변하는 줄(노음·노양)은 표시(예: ‘變’)하고, 해당 줄을 뒤집어 <b>변괘</b>를 만듭니다.
+      </p>
+<div class="ctaRow">
+<a class="btn blue" href="cast_coins.html">동전법 점치기</a>
+</div>
+</div>
+<div class="section" style="margin:12px 0 0">
+<h3 style="font-size:18px">3-2. 지초법(산가지)</h3>
+<p><b>준비물</b>: 산가지(전통은 50개, 간이화도 가능합니다)</p>
+<p><b>원리</b>: 가지 묶음을 나누고 분지·계산을 반복하여 네 가지 결과(노음·소양·소음·노양) 중 하나를 얻습니다.</p>
+<p><b>절차</b>:</p>
+<p class="small" style="line-height:2.0; margin-top:6px">
+        ① 산가지 묶음(보통 49개를 사용합니다)을 손에 들고 마음을 가다듬습니다.<br/>
+        ② 한 번 분지하여 왼손·오른손 두 더미로 나눕니다. 오른손 더미에서 한 개를 빼 <b>손가락 사이</b>에 끼웁니다.<br/>
+        ③ 왼손 더미를 <b>4개씩</b> 세어 남는 개수를 기록하고, 오른손 더미도 동일하게 <b>4개씩</b> 세어 남는 개수를 기록합니다.<br/>
+        ④ 남은 수들을 합으로 계산해 그 회차의 값을 얻습니다. 이 과정을 총 <b>세 번</b> 반복하여 한 줄의 결과를 정합니다.<br/>
+        ⑤ 얻은 결과를 노음·소양·소음·노양 중 하나로 판정하여 기록합니다.<br/>
+        ⑥ 같은 과정을 <b>아래에서 위로</b> 6번 반복하여 1효→6효까지 채웁니다.<br/>
+        ⑦ 변하는 줄(노음·노양)은 표시하고, 해당 줄을 뒤집어 <b>변괘</b>를 만듭니다.
+      </p>
+<div class="ctaRow">
+<a class="btn green" href="cast_yarrow.html">지초법 점치기</a>
+</div>
+</div>
+</section>
+<!-- 4) 확률과 편향 -->
+<section class="section" id="prob">
+<h3>4. 확률과 편향</h3>
+<p>아래 값은 각 줄(효)에서 한 번에 나타날 <b>노음·소양·소음·노양</b>의 분포를 뜻합니다. 표기는 <b>분수</b>가 메인이며, 괄호에 <b>% (소수점 한 자리)</b>를 보조로 표기했습니다.</p>
+<div class="tableWrap">
+<table aria-label="동전법과 지초법 비교 요약표" class="probTable">
+<colgroup>
+<col style="width:34%"/>
+<col style="width:33%"/>
+<col style="width:33%"/>
+</colgroup>
+<thead>
+<tr>
+<th scope="col">구분</th>
+<th scope="col">동전법 (3코인)</th>
+<th scope="col">지초법 (산가지)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">노음 (음 → 양)</th>
+<td class="num"><b>1/8</b> (12.5%)</td>
+<td class="num"><b>1/16</b> (6.3%)</td>
+</tr>
+<tr>
+<th scope="row">소양 (양, 그대로)</th>
+<td class="num"><b>3/8</b> (37.5%)</td>
+<td class="num"><b>5/16</b> (31.3%)</td>
+</tr>
+<tr>
+<th scope="row">소음 (음, 그대로)</th>
+<td class="num"><b>3/8</b> (37.5%)</td>
+<td class="num"><b>7/16</b> (43.8%)</td>
+</tr>
+<tr>
+<th scope="row">노양 (양 → 음)</th>
+<td class="num"><b>1/8</b> (12.5%)</td>
+<td class="num"><b>3/16</b> (18.8%)</td>
+</tr>
+<tr>
+<th scope="row">변하지 않음 (소양+소음)</th>
+<td class="num"><b>3/4</b> (75.0%)</td>
+<td class="num"><b>3/4</b> (75.0%)</td>
+</tr>
+<tr>
+<th scope="row">변함 (노음+노양)</th>
+<td class="num"><b>1/4</b> (25.0%)</td>
+<td class="num"><b>1/4</b> (25.0%)</td>
+</tr>
+<tr>
+<th scope="row">방향성 (노음 : 노양)</th>
+<td class="num"><b>1 : 1</b></td>
+<td class="num"><b>1 : 3</b></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="callout small">
+      두 방식 모두 변함(노음·노양)의 총확률은 <b>1/4</b>(25.0%)로 같습니다. 다만 동전법은 개시(노음)와 수렴(노양)이 대체로 대칭이고,
       지초법은 개시 대비 수렴이 상대적으로 더 자주 나타나는 편입니다.
     </div>
-  </section>
-
-  <!-- 용어 -->
-  <section id="glossary" class="section">
-    <h3>용어</h3>
-    <ul>
-      <li><b>효</b>: 괘를 이루는 한 줄입니다. 아래부터 1효~6효로 세어 올라갑니다.</li>
-      <li><b>본괘·변괘</b>: 현재 상태와 변화 후의 경향을 각각 나타냅니다.</li>
-      <li><b>상괘·하괘</b>: 윗삼효(바깥·환경)와 아랫삼효(안·기반)를 뜻합니다.</li>
-      <li><b>노음·소양·소음·노양</b>: 변하는 음·그대로인 양·그대로인 음·변하는 양을 말합니다.</li>
-      <li><b>팔괘</b>: 건·곤·감·리·진·손·간·태를 가리킵니다.</li>
-    </ul>
-  </section>
-
-  <!-- advanced -->
-  <section id="advanced" class="section">
-    <h3>심화</h3>
-    <p>심화 문서는 추후 추가될 예정입니다. 효사·괘사 해석의 층위, 전통 주석 비교, 응용 리딩 등 더 깊은 내용을 안내드릴 계획입니다.</p>
-  </section>
-
-  <div class="legend">© 2025. Zeniac. All Rights Reserved.</div>
+</section>
+<!-- 5) 용어 -->
+<section class="section" id="glossary">
+<h3>5. 용어</h3>
+<ul class="glossary">
+<li><b>효(爻)</b>: 괘를 이루는 한 줄입니다. 아래부터 1효~6효로 세어 올라갑니다.</li>
+<li><b>본괘(本卦)·변괘(變卦)</b>: 현재 상태와 변화 후의 경향을 각각 가리킵니다.</li>
+<li><b>상괘(上卦)·하괘(下卦)</b>: 윗삼효(바깥·환경)와 아랫삼효(안·기반)를 뜻합니다.</li>
+<li><b>노음(老陰)</b>: 음의 자리에서 <b>변화가 일어나는</b> 음입니다. 해석에서는 새로운 시작·개시의 단초로 봅니다.</li>
+<li><b>소양(少陽)</b>: 양의 자리가 <b>그대로 유지되는</b> 양입니다. 현 상태의 의지·활력이 지속된다고 봅니다.</li>
+<li><b>소음(少陰)</b>: 음의 자리가 <b>그대로 유지되는</b> 음입니다. 보존·안정·내실을 뜻하는 경우가 많습니다.</li>
+<li><b>노양(老陽)</b>: 양의 자리에서 <b>변화가 일어나는</b> 양입니다. 과함의 정리·수렴·마무리의 신호로 해석합니다.</li>
+<li><b>팔괘(八卦)</b>: 건(乾)·곤(坤)·감(坎)·리(離)·진(震)·손(巽)·간(艮)·태(兌)를 가리킵니다.</li>
+</ul>
+</section>
+<!-- 6) advanced -->
+<section class="section" id="advanced">
+<h3>6. 심화</h3>
+<p>심화 문서는 추후 추가될 예정입니다. 효사·괘사 해석의 층위, 전통 주석 비교, 응용 리딩 등 더 깊은 내용을 안내드릴 계획입니다.</p>
+</section>
+<div class="legend" style="text-align:center;color:#a4b2d4;font-size:12px;margin-top:26px;">© 2025. Zeniac. All Rights Reserved.</div>
 </div>
+<!-- floating back-to-top button (single instance) -->
+<button aria-hidden="true" aria-label="맨 위로" class="divinaBackTop" id="divinaBackTop" title="맨 위로" type="button">↑</button>
+<script>
+(() => {
+  // Ensure single instance even if injected elsewhere
+  const nodes = document.querySelectorAll('#divinaBackTop, .backTop');
+  nodes.forEach((n,i)=>{ if(i>0) n.remove(); });
+
+  const btn = document.getElementById('divinaBackTop');
+  if(!btn) return;
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const scrollHandler = () => {
+    const show = window.scrollY > 120;
+    if (show) { btn.classList.add('show'); btn.setAttribute('aria-hidden','false'); }
+    else { btn.classList.remove('show'); btn.setAttribute('aria-hidden','true'); }
+  };
+
+  scrollHandler();
+  window.addEventListener('scroll', scrollHandler, {passive: true});
+
+  btn.addEventListener('click', () => {
+    if (prefersReduced) {
+      window.scrollTo(0, 0);
+    } else {
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  }, {passive: true});
+})();
+</script>
 </body>
 </html>
