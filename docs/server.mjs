@@ -25,13 +25,14 @@ const schema = {
     properties: {
       reading: {
         type: "object",
-        required: ["summary", "advice"],
+        required: ["summary", "analysis", "advice", "cautions", "timing", "score", "line_readings"],
         properties: {
           summary:   { type: "string" },
+          analysis:  { type: "string" },                    // ← 상세 해석(원전/象傳 기반)
           advice:    { type: "string" },
           cautions:  { type: "string" },
           timing:    { type: "string" },
-          score:     { type: "number", minimum: 0, maximum: 10 },
+          score:     { type: "number", minimum: 0, maximum: 10 }, // ← 10점제(소수 허용)
           tags:      { type: "array", items: { type: "string" } },
           line_readings: {
             type: "array",
@@ -39,7 +40,7 @@ const schema = {
               type: "object",
               required: ["line", "meaning"],
               properties: {
-                line: { type: "integer", minimum: 1, maximum: 6 },
+                line:    { type: "integer", minimum: 1, maximum: 6 },
                 meaning: { type: "string" }
               }
             }
@@ -88,6 +89,9 @@ const system = `
       ],
       response_format: { type: "json_schema", json_schema: schema },
       seed: 2025
+        max_output_tokens: 1000,        // ← 충분히 길게
+        temperature: 0.6,
+        frequency_penalty: 0.2,         // ← 문장 반복 완화
     })
     const parsed = resp.output_parsed
       ?? (resp.output_text ? JSON.parse(resp.output_text) : null)
@@ -123,10 +127,11 @@ const system = `
 
     const cc = await ai.chat.completions.create({
       model: "gpt-4o-mini",
-      temperature: 0.3,
+      temperature: 0.6,
+      max_tokens: 1000,               // 충분히 길게
       messages: [
-        { role: "system", content: system },
-        { role: "user", content: prompt + "\n\nJSON:\n" + JSON.stringify(payload) }
+      { role: "system", content: system },
+      { role: "user", content: prompt + "\n\nJSON:\n" + JSON.stringify(payload) }
       ]
     })
     const msg = cc.choices?.[0]?.message?.content || "{}"
