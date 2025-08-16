@@ -118,6 +118,31 @@ h1{margin-top:46px}
   .js-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
   .js-reveal.show { transition: none !important; }
 }
+
+/* reveal: 그룹 자식은 초기엔 숨김 상태로 시작 */
+[data-reveal-group] > * {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(2px);
+}
+
+/* show가 붙으면 등장 */
+[data-reveal-group] > *.show {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+  transition: opacity .6s ease, transform .6s ease, filter .6s ease;
+}
+
+/* 모션 저감 사용자는 애니 생략 */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal-group] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  [data-reveal-group] > *.show { transition: none !important; }
+}
       
 </style></head>
 <body>
@@ -134,26 +159,19 @@ h1{margin-top:46px}
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // 1) 그룹 내부(버튼들 등)는 자식들을 순차 노출
-  const groups = document.querySelectorAll('[data-reveal-group]');
-  const seq = [];
+  // 1) 순서 배열: 그룹 자식들(버튼들) → 개별 요소(.js-reveal, 예: legend)
+  const seq = [
+    ...document.querySelectorAll('[data-reveal-group] > *'),
+    ...document.querySelectorAll('.js-reveal')
+  ];
 
-  groups.forEach(group => {
-    // h1, h2 제외: 우리는 그룹 자식만 취급
-    seq.push(...Array.from(group.children));
-  });
+  // 2) 순차 등장 (딜레이는 입맛대로)
+  const baseDelay = 400;  // 헤더만 먼저 보이게 잠깐 대기
+  const step = 250;       // 항목 간 간격(ms)
 
-  // 2) 그룹 외의 단일 요소(예: legend)는 .js-reveal로 수집
-  seq.push(...document.querySelectorAll('.js-reveal'));
-
-  // 3) 초기 상태 클래스 부여
-  seq.forEach(el => el.classList.add('js-reveal'));
-
-  // 4) 순차 등장 (딜레이 조절)
-  const baseDelay = 250;      // 첫 항목까지 대기 (헤더만 잠깐 보이게)
-  const step = 140;           // 항목 간 간격
   seq.forEach((el, i) => {
     el.style.transitionDelay = `${baseDelay + i * step}ms`;
+    // 다음 페인트 프레임에 show 부여 → 자연스러운 트랜지션
     requestAnimationFrame(() => el.classList.add('show'));
   });
 });
