@@ -92,7 +92,6 @@ const system = `
       },
         max_output_tokens: 1000,        // ← 충분히 길게
         temperature: 0.6,
-        frequency_penalty: 0.2,         // ← 문장 반복 완화
     })
     const parsed = resp.output_parsed
       ?? (resp.output_text ? JSON.parse(resp.output_text) : null)
