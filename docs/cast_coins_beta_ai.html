@@ -648,7 +648,7 @@ requestAnimationFrame(()=>{
       const data = await res.json() || {};
       const reading = data.reading || {};
       const summary = reading.summary || '요약 없음';
-
+      let analysis = (reading.analysis || '').trim();
       let advice   = (reading.advice   || '').trim();
       let cautions = (reading.cautions || '').trim();
 
@@ -672,9 +672,25 @@ requestAnimationFrame(()=>{
       s.textContent = summary;
 
       const parts = [];
+      if (analysis) parts.push(analysis);
       if (advice)   parts.push(advice);
       if (cautions) parts.push('주의: ' + cautions);
+      // 효별 해석(있으면)
+      if (Array.isArray(reading.line_readings) && reading.line_readings.length) {
+        const lines = reading.line_readings
+          .map(x => `[${x.line}효] ${x.meaning}`)
+          .join('\n');
+        parts.push(lines);
+      }
 
+      // 타이밍
+      if (reading.timing) parts.push('타이밍: ' + reading.timing);
+
+      // 점수(10점제)
+      if (typeof reading.score === 'number') {
+        parts.push(`길흉 점수: ${reading.score}/10`);
+      }
+          
       d.textContent = parts.join('\n\n');
           
       // Replace "한 줄 조언" 타이틀을 요약으로 대체 + 상세 본문 렌더
