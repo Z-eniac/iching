@@ -139,6 +139,21 @@ td{background:#101a2e}
 .hexCaption .guaSubtitle{font-size:12px; color:var(--muted); margin-top:2px}
 .hexCaption .gistLabel{font-size:12px; color:#9bb7ff; margin-top:8px; letter-spacing:.02em}
 .hexCaption .guaGist{font-family:"NotoSerifCJK-ICHING", serif; font-size:16px; font-weight:700; color:#eaf0ff; margin-top:4px; letter-spacing:.2px}
+
+/* 기본: 숨김 상태 */
+#guide [data-reveal]{
+  opacity:0; transform:translateY(8px);
+  transition:opacity .28s ease, transform .28s ease;
+}
+/* 노출 */
+#guide [data-reveal].revealed{ opacity:1; transform:none; }
+/* 첫 페인트 때 깜빡임 방지 */
+html.prehide #guide [data-reveal]{ transition:none !important; }
+/* 접근성: 모션 줄이기 존중 */
+@media (prefers-reduced-motion: reduce){
+  #guide [data-reveal]{ transition:none !important; transform:none !important; }
+}
+
 </style>
 </head>
 <body>
@@ -380,6 +395,34 @@ td{background:#101a2e}
     }
   }, {passive: true});
 })();
+
+  const sleep = ms => new Promise(r=>setTimeout(r, ms));
+
+document.documentElement.classList.add('prehide');
+window.addEventListener('DOMContentLoaded', async () => {
+  const root = document.getElementById('guide');
+  if(!root) return;
+
+  // 1) 첫 번째 h2 찾기
+  const firstH2 = root.querySelector('h2');
+  if(!firstH2){ document.documentElement.classList.remove('prehide'); return; }
+
+  // 2) 첫 h2 이후의 형제 요소들에 자동으로 data-reveal 부여
+  let after = false;
+  Array.from(root.children).forEach(el=>{
+    if(after && !el.matches('script,style,link')) el.setAttribute('data-reveal','');
+    if(el === firstH2) after = true;
+  });
+
+  // 3) 한 템포 두고 순차 노출 (헤더는 처음부터 보임)
+  const items = root.querySelectorAll('[data-reveal]');
+  const delay = 180;            // 각 아이템 간격(ms)
+  const lead  = delay;          // 시작 전 한 템포
+  await sleep(lead);
+  requestAnimationFrame(()=>document.documentElement.classList.remove('prehide'));
+  for(const el of items){ el.classList.add('revealed'); await sleep(delay); }
+});
+  
 </script>
 </body>
 </html>
