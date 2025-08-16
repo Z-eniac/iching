@@ -646,50 +646,44 @@ requestAnimationFrame(()=>{
       if(my!==ctrl) return;
       if(!res.ok) throw new Error('HTTP '+res.status);
       const data = await res.json() || {};
-      const reading = data.reading || {};
-      const summary = reading.summary || '요약 없음';
-      let analysis = (reading.analysis || '').trim();
-      let advice   = (reading.advice   || '').trim();
-      let cautions = (reading.cautions || '').trim();
+      const reading  = data.reading || {};
+      const summary  = (reading.summary  || '').trim();
+      let   analysis = (reading.analysis || '').trim();   //  추가
+      let   advice   = (reading.advice   || '').trim();
+      let   cautions = (reading.cautions || '').trim();
 
-      // ① 본문(advice)이 요약으로 시작하면 앞부분 잘라내기
-      if (summary && advice.startsWith(summary)) {
-        advice = advice.slice(summary.length).trim();
-      }
+// 요약이 본문에 앞에 붙었으면 제거
+function stripLead(t){ return (summary && t.startsWith(summary)) ? t.slice(summary.length).trim() : t }
+analysis = stripLead(analysis);
+advice   = stripLead(advice);
 
-      // ② 같은 문단이 두 번 들어간 경우 제거
-      function dedupeParas(t){
-        const paras = t.split(/\n+/).map(s => s.trim()).filter(Boolean);
-        return paras.filter((p,i,a) => a.indexOf(p) === i).join('\n\n');
-      }
-      advice   = dedupeParas(advice);
-      cautions = dedupeParas(cautions);
+// 문단 중복 제거
+function dedupeParas(t){
+  const paras = t.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  return paras.filter((p,i,a)=> a.indexOf(p) === i).join('\n\n');
+}
+analysis = dedupeParas(analysis);
+advice   = dedupeParas(advice);
+cautions = dedupeParas(cautions);
 
-      // ③ 로딩 해제 + 화면 반영
-      j.classList.remove('loading');
-      d.replaceChildren();
+// 화면 반영
+s.textContent = summary || '요약 없음';
 
-      s.textContent = summary;
+const parts = [];
+if (analysis) parts.push(analysis);                     // 본문 먼저 크게
+if (advice)   parts.push('조언:\n' + advice);
+if (cautions) parts.push('주의:\n' + cautions);
 
-      const parts = [];
-      if (analysis) parts.push(analysis);
-      if (advice)   parts.push(advice);
-      if (cautions) parts.push('주의: ' + cautions);
-      // 효별 해석(있으면)
-      if (Array.isArray(reading.line_readings) && reading.line_readings.length) {
-        const lines = reading.line_readings
-          .map(x => `[${x.line}효] ${x.meaning}`)
-          .join('\n');
-        parts.push(lines);
-      }
+// 변효별
+if (Array.isArray(reading.line_readings) && reading.line_readings.length) {
+  const lines = reading.line_readings.map(x => `[${x.line}효] ${x.meaning}`).join('\n');
+  parts.push(lines);
+}
 
-      // 타이밍
-      if (reading.timing) parts.push('타이밍: ' + reading.timing);
+// 타이밍 + 점수(10점제)
+if (reading.timing) parts.push('타이밍: ' + reading.timing);
+if (typeof reading.score === 'number') parts.push(`길흉 점수: ${reading.score}/10`);
 
-      // 점수(10점제)
-      if (typeof reading.score === 'number') {
-        parts.push(`길흉 점수: ${reading.score}/10`);
-      }
           
       d.textContent = parts.join('\n\n');
           
