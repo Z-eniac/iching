@@ -402,6 +402,8 @@ function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
     try {
       window.__overrideLoad && window.__overrideLoad(bInfo.no, bInfo.no).then(ov => {
         if(!ov) return;
+            const box = document.getElementById('jointBox');
+            if (box?.classList.contains('ai-owned')) return;   // AI가 쓰는 중이면 override 금지 // ...
 s.textContent = stripLabelsInline(ov.summary || '');
 const doms = ov.domains || {};
 const body = (stripLabelsInDetail(ov.detail || '') + '\n\n'
@@ -445,6 +447,8 @@ d.appendChild(t);
   try {
     window.__overrideLoad && window.__overrideLoad(bInfo.no, mInfo.no).then(ov => {
       if(!ov) return;
+            const box = document.getElementById('jointBox');
+            if (box?.classList.contains('ai-owned')) return;   // AI가 쓰는 중이면 override 금지 // ...
 s.textContent = stripLabelsInline(ov.summary || '');
 const doms = ov.domains || {};
 const body = (stripLabelsInDetail(ov.detail || '') + '\n\n'
@@ -625,7 +629,7 @@ requestAnimationFrame(()=>{
     const s = document.getElementById('jointSummary');
     const d = document.getElementById('jointText');
     if(!j || !d) return;
-    j.classList.add('loading');
+    j.classList.add('ai-owned','loading');
     d.replaceChildren();
     const loader = document.createElement('div');
     loader.className = 'loader';
@@ -677,7 +681,7 @@ requestAnimationFrame(()=>{
       const frag = document.createDocumentFragment();
       const title = document.createElement('div');
       title.className = 'adviceTitle';
-      title.textContent = summary;
+      title.textContent = '점괘 해석';
       frag.appendChild(title);
 
       const body = document.createElement('div');
