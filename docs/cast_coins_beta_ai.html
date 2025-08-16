@@ -683,31 +683,9 @@ if (Array.isArray(reading.line_readings) && reading.line_readings.length) {
 // 타이밍 + 점수(10점제)
 if (reading.timing) parts.push('타이밍: ' + reading.timing);
 if (typeof reading.score === 'number') parts.push(`길흉 점수: ${reading.score}/10`);
-
-          
+   
       d.textContent = parts.join('\n\n');
           
-      // Replace "한 줄 조언" 타이틀을 요약으로 대체 + 상세 본문 렌더
-      const frag = document.createDocumentFragment();
-      const title = document.createElement('div');
-      title.className = 'adviceTitle';
-      title.textContent = '점괘 해석';
-      frag.appendChild(title);
-
-      const body = document.createElement('div');
-      body.className = 'detail';
-      body.style.whiteSpace = 'pre-line';
-      let out = '';
-      if (reading.advice)   out += reading.advice.trim() + '\n\n';
-      if (reading.cautions) out += '주의: ' + reading.cautions.trim() + '\n\n';
-      if (Array.isArray(reading.line_readings) && reading.line_readings.length){
-        out += reading.line_readings.map(l => '['+(l.line||'?')+'효] '+(l.meaning||'')).join('\n') + '\n\n';
-      }
-      if (reading.timing) out += '타이밍: ' + reading.timing + '\n';
-      if (typeof score === 'number') {parts.push(`길흉 점수: ${score}/10`);}
-      body.textContent = out.trim();
-      d.replaceChildren(frag, body);
-      s.textContent = summary;
     }catch(e){
         if(my!==ctrl) return;
         console.warn('AI enrich fail', e);
