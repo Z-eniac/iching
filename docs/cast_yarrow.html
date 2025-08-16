@@ -42,7 +42,7 @@
     --hexWidth: 192px; --lineHeight: 24px; --rowGap: 12px; --yinGap: 26px;
     --contentMax: 1200px;
     --cardW: 400px; --cardGap: 18px; /* more compact cards */
-    --metaCol1: 50px; --metaCol2: 75px; --metaCol3: 45px; --metaCol4: 95px; --metaCol5: 53px; /* tighter grid */
+    --metaCol1: 40px; --metaCol2: 80px; --metaCol3: 50px; --metaCol4: 100px; --metaCol5: 58px; /* tighter grid */
   }
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Malgun Gothic',Segoe UI,Roboto,sans-serif}
   .wrap{max-width:var(--contentMax);margin:0 auto;padding:90px 12px 0}
@@ -86,7 +86,7 @@ h1,
  /* Meta under hex - fixed columns, tighter */
   .metaUnder{border-top:1px dashed #2a3b5a;margin-top:8px;padding-top:6px;text-align:center;width:100%}
   .metaRow{display:grid;grid-template-columns:var(--metaCol1) var(--metaCol2) var(--metaCol3) var(--metaCol4) var(--metaCol5);align-items:center;justify-items:start;column-gap:6px;margin:2px 0}
-  .metaRow .lab2{color:#a9b8dc;justify-self:end;padding-right:2px}
+  .metaRow .lab2{color:#a9b8dc;justify-self:start;padding-right:2px}
   .metaRow .mono{font-variant-numeric:tabular-nums}
   .kw{display:none}
   .read{margin-top:8px;padding:8px 10px;border:1px solid #2a3b5a;border-radius:10px;background:#1b2b47}
