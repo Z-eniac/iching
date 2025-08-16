@@ -98,50 +98,34 @@ h1{margin-top:46px}
 .bottomNav a, .bottomNav button{background:#243552;color:#cfe0ff;border:1px solid #2a3b5a;border-radius:12px;padding:10px 16px;font-weight:700;text-decoration:none}
 .hidden{display:none}
 
-/* 순차 등장 기본 상태 */
-.js-reveal { 
-  opacity: 0;
-  transform: translateY(8px);
-  filter: blur(2px);
-}
-
-/* 보일 때 */
-.js-reveal.show {
-  opacity: 1;
-  transform: translateY(0);
-  filter: blur(0);
-  transition: opacity .6s ease, transform .6s ease, filter .6s ease;
-}
-
-/* 모션 저감 사용자의 경우 애니 생략 */
-@media (prefers-reduced-motion: reduce) {
-  .js-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
-  .js-reveal.show { transition: none !important; }
-}
-
-/* reveal: 그룹 자식은 초기엔 숨김 상태로 시작 */
+/* 순차 등장: 기본 상태(숨김) + 항상 transition 적용 */
+.js-reveal,
 [data-reveal-group] > * {
   opacity: 0;
   transform: translateY(8px);
   filter: blur(2px);
+  transition: opacity .6s ease, transform .6s ease, filter .6s ease;
+  will-change: opacity, transform, filter;
 }
 
-/* show가 붙으면 등장 */
+/* 보일 때 */
+.js-reveal.show,
 [data-reveal-group] > *.show {
   opacity: 1;
   transform: translateY(0);
   filter: blur(0);
-  transition: opacity .6s ease, transform .6s ease, filter .6s ease;
 }
 
-/* 모션 저감 사용자는 애니 생략 */
+/* 모션 저감 사용자의 경우:
+   - 이동/블러만 제거 (깜빡임 최소화)
+   - transition은 끄지만, opacity는 기본 0을 유지 → JS로 순차 노출은 그대로 */
 @media (prefers-reduced-motion: reduce) {
+  .js-reveal,
   [data-reveal-group] > * {
-    opacity: 1 !important;
     transform: none !important;
     filter: none !important;
+    transition: none !important;
   }
-  [data-reveal-group] > *.show { transition: none !important; }
 }
       
 </style></head>
@@ -159,20 +143,22 @@ h1{margin-top:46px}
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // 1) 순서 배열: 그룹 자식들(버튼들) → 개별 요소(.js-reveal, 예: legend)
-  const seq = [
+  const items = [
     ...document.querySelectorAll('[data-reveal-group] > *'),
     ...document.querySelectorAll('.js-reveal')
   ];
 
-  // 2) 순차 등장 (딜레이는 입맛대로)
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const baseDelay = 400;  // 헤더만 먼저 보이게 잠깐 대기
-  const step = 250;       // 항목 간 간격(ms)
+  const step = 200;       // 항목 간 지연(ms) — 취향껏 120~240 사이로 조절
 
-  seq.forEach((el, i) => {
-    el.style.transitionDelay = `${baseDelay + i * step}ms`;
-    // 다음 페인트 프레임에 show 부여 → 자연스러운 트랜지션
-    requestAnimationFrame(() => el.classList.add('show'));
+  items.forEach((el, i) => {
+    const delay = baseDelay + i * step;
+    setTimeout(() => {
+      // reflow로 첫 프레임 확실히 고정
+      void el.offsetWidth;
+      el.classList.add('show');  // reduce여도 순차 등장(애니 없음)
+    }, delay);
   });
 });
 </script>
