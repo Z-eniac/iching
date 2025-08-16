@@ -9,6 +9,17 @@ const app = express()
 app.use(cors())
 app.use(express.json({ limit: '1mb' }))
 
+//    server.mjs와 같은 폴더의 /public 디렉터리를 정적으로 노출
+app.use(express.static('public'))  // public/index.html, public/**.* 접근 가능
+
+// (3) API 라우트 — 정적 서빙보다 "뒤에" 있어야 해요
+app.post('/api/read', async (req, res) => {
+  // ...
+})
+
+// (4) 서버 시작
+app.listen(PORT, () => console.log(`ready on http://localhost:${PORT}`))
+
 const ai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 const schema = {
