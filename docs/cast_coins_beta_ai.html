@@ -645,6 +645,34 @@ requestAnimationFrame(()=>{
       const reading = data.reading || {};
       const summary = reading.summary || '요약 없음';
 
+      let advice   = (reading.advice   || '').trim();
+      let cautions = (reading.cautions || '').trim();
+
+      // ① 본문(advice)이 요약으로 시작하면 앞부분 잘라내기
+      if (summary && advice.startsWith(summary)) {
+        advice = advice.slice(summary.length).trim();
+      }
+
+      // ② 같은 문단이 두 번 들어간 경우 제거
+      function dedupeParas(t){
+        const paras = t.split(/\n+/).map(s => s.trim()).filter(Boolean);
+        return paras.filter((p,i,a) => a.indexOf(p) === i).join('\n\n');
+      }
+      advice   = dedupeParas(advice);
+      cautions = dedupeParas(cautions);
+
+      // ③ 로딩 해제 + 화면 반영
+      j.classList.remove('loading');
+      d.replaceChildren();
+
+      s.textContent = summary;
+
+      const parts = [];
+      if (advice)   parts.push(advice);
+      if (cautions) parts.push('주의: ' + cautions);
+
+      d.textContent = parts.join('\n\n');
+          
       // Replace "한 줄 조언" 타이틀을 요약으로 대체 + 상세 본문 렌더
       const frag = document.createDocumentFragment();
       const title = document.createElement('div');
@@ -667,15 +695,20 @@ requestAnimationFrame(()=>{
       d.replaceChildren(frag, body);
       s.textContent = summary;
     }catch(e){
-      if(my!==ctrl) return;
-      console.warn('AI enrich fail', e);
-      const note = document.createElement('div');
-      note.className = 'legend';
-      note.textContent = 'AI 해석을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.';
-      d.replaceChildren(note);
-    }finally{
-      j.classList.remove('loading');
-    }
+        if(my!==ctrl) return;
+        console.warn('AI enrich fail', e);
+
+        // ✅ 요약 영역도 명확히 실패 상태로 바꿔주기
+        s.textContent = '해석 생성 실패';
+
+        // ✅ 로더 제거 + 본문 메시지 출력
+        j.classList.remove('loading');
+        d.replaceChildren();
+        d.textContent = 'AI 해석을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.';
+      } finally{
+        // 있어도 무해(idempotent). 남겨둬도 OK
+        j.classList.remove('loading');
+      }
   }
 
   // wrap renderJoint so that AI runs after 기본 출력
