@@ -127,12 +127,36 @@ h1{margin-top:46px}
     transition: none !important;
   }
 }
+
+ /* 상단 텍스트 링크 */
+.topNav{
+  display:flex;
+  justify-content:center;
+  margin: 10px 0 6px;
+}
+.topLink{
+  display:inline-block;
+  font-weight: 600;          /* 약간의 두께 */
+  font-size: 15px;           /* 작은 텍스트 */
+  letter-spacing: .02em;
+  color: var(--ink);
+  text-decoration: none;     /* 기본은 밑줄 없음 */
+  text-underline-offset: 3px;
+}
+.topLink:hover,
+.topLink:focus-visible{
+  text-decoration: underline; /* hover/focus에만 밑줄 */
+  outline: none;
+}
       
 </style></head>
 <body>
 <div class="mainWrap">
   <h1><a href="index.html" style="color:inherit;text-decoration:none">Divina Studio</a></h1>
   <h2>64괘 점술 연구소</h2>
+  <div class="topNav" data-reveal-group>
+    <a class="topLink" href="iching_basic_info.html">64괘란?</a>
+  </div>
   <div class="stackBtns" data-reveal-group>
     <a class="btn blue"  href="cast_coins.html">동전법 점치기</a>
     <a class="btn green" href="cast_yarrow.html">지초법 점치기</a>
