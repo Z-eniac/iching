@@ -694,7 +694,7 @@ requestAnimationFrame(()=>{
         out += reading.line_readings.map(l => '['+(l.line||'?')+'효] '+(l.meaning||'')).join('\n') + '\n\n';
       }
       if (reading.timing) out += '타이밍: ' + reading.timing + '\n';
-      if (typeof reading.score === 'number') out += '길흉 점수: ' + reading.score + '/100\n';
+      if (typeof score === 'number') {parts.push(`길흉 점수: ${score}/10`);}
       body.textContent = out.trim();
       d.replaceChildren(frag, body);
       s.textContent = summary;
