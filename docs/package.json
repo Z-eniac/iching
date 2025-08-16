@@ -1,0 +1,15 @@
+{
+  "name": "iching-ai-server-debug",
+  "version": "0.1.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "openai": "^4.56.0"
+  }
+}
