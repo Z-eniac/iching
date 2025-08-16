@@ -634,7 +634,7 @@ requestAnimationFrame(()=>{
     s.textContent = '해석 생성 중…';
 
     try{
-      const res = await fetch('http://localhost:8787/api/read', {
+      const res = await fetch('/api/read', {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify(payload)
