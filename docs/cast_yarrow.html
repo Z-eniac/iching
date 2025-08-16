@@ -543,6 +543,9 @@ requestAnimationFrame(()=>{
   baseWraps.forEach(w=>w.classList.remove('revealed'));
   mutWraps.forEach(w=>w.classList.remove('revealed'));
 
+  // 3-5) 잠시 대기 (1효 간격 만큼만)
+  await sleep(delay);
+      
   // 4) 본i & 변i 를 동시에 공개 → 한 번 대기
   for(let i=0;i<6;i++){
     baseWraps[i].classList.add('revealed');
