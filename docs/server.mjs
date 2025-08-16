@@ -128,5 +128,3 @@ app.post('/api/read', async (req, res) => {
     hint: '키 권한(All), 결제/한도, 서버 로그를 확인해 주세요.'
   })
 })
-
-app.listen(PORT, () => console.log(`ready on http://localhost:${PORT}`))
