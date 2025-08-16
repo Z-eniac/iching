@@ -416,7 +416,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // 3) 한 템포 두고 순차 노출 (헤더는 처음부터 보임)
   const items = root.querySelectorAll('[data-reveal]');
-  const delay = 180;            // 각 아이템 간격(ms)
+  const delay = 350;            // 각 아이템 간격(ms)
   const lead  = delay;          // 시작 전 한 템포
   await sleep(lead);
   requestAnimationFrame(()=>document.documentElement.classList.remove('prehide'));
