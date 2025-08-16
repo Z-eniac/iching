@@ -28,11 +28,11 @@ const schema = {
         required: ["summary", "analysis", "advice", "cautions", "timing", "score", "line_readings"],
         properties: {
           summary:   { type: "string" },
-          analysis:  { type: "string" },                    // ← 상세 해석(원전/象傳 기반)
+          analysis:  { type: "string" },                     // 길고 풍부한 본문
           advice:    { type: "string" },
           cautions:  { type: "string" },
           timing:    { type: "string" },
-          score:     { type: "number", minimum: 0, maximum: 10 }, // ← 10점제(소수 허용)
+          score:     { type: "number", minimum: 0, maximum: 10 }, // 10점제
           tags:      { type: "array", items: { type: "string" } },
           line_readings: {
             type: "array",
@@ -40,7 +40,7 @@ const schema = {
               type: "object",
               required: ["line", "meaning"],
               properties: {
-                line:    { type: "integer", minimum: 1, maximum: 6 },
+                line: { type: "integer", minimum: 1, maximum: 6 },
                 meaning: { type: "string" }
               }
             }
@@ -64,17 +64,15 @@ const system = `
 
 [해석 절차]
 1) 본괘의 판단을 한 줄로 요약합니다(괘사/彖傳 근거).
-2) 象傳의 이미지를 사용해 현재 정세를 6~10문장으로 서술합니다.
+2) 象傳의 이미지로 현재 정세를 6~10문장(최소 600자)으로 풀이합니다.
    - 상괘/하괘의 오행·방위·계절 힌트를 간단히 포함.
-3) 변효가 있으면 각 변효(1~6효) 의미를 짧게 해석하고, 변괘가 지시하는 방향으로 통합합니다.
+3) 변효가 있으면 각 변효(1~6효)를 짧게 해석하고(爻辭 근거), 마지막에 변괘 방향성으로 통합합니다.
 4) 실행 가능한 조언 3~5개(불릿)와 주의 2~3개(불릿)를 제시합니다.
 5) 길흉 점수는 0~10점(정수 또는 0.5 단위)로, 한 줄 근거를 덧붙입니다.
 
 [표현 규칙]
-- 원전의 짧은 핵심 구절은 「 」로 인용하고 곧바로 한국어 풀이를 붙입니다.
-- 원전을 인용할 시 원전의 제목을 괄호 안에 병기합니다.
-- 중언부언 금지, 문장 중복 금지, 실행지향.
-- 전체 분량은 약 600~1000자.
+- 원전의 핵심 구절은 「 」로 인용하고 바로 한국어 풀이를 붙입니다.
+- 중언부언/문장 반복 금지, 실행지향. 전체 분량은 600~1000자.
 `
 
   try {
@@ -109,31 +107,22 @@ const system = `
 
   try {
     const prompt = `사용자 질문과 점괘 JSON이 주어집니다.
-아래 스키마에 맞춘 JSON만 출력하세요.
-- 원전(괘사/彖傳/象傳/爻辭)의 짧은 핵심 구절을 「 」로 인용하고 한국어 풀이를 덧붙이세요.
-- 길흉 점수는 0~10점(정수 또는 0.5 단위)입니다.
+- analysis에 600~1000자 분량의 象傳 기반 본문을 쓰세요.
+- 길흉 점수는 0~10점(정수/0.5 단위)입니다.
+스키마: { "reading": { "summary": string, "analysis": string,
+"advice": string, "cautions": string, "timing": string,
+"score": number, "tags": string[], "line_readings": [{"line": number, "meaning": string}] } }`
 
-스키마: {
-  "reading": {
-    "summary": string,
-    "advice": string,
-    "cautions": string,
-    "timing": string,
-    "score": number,          // 0~10
-    "tags": string[],
-    "line_readings": [{"line": number, "meaning": string}]
-  }
-}`
-
-    const cc = await ai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.6,
-      max_tokens: 1000,               // 충분히 길게
-      messages: [
-      { role: "system", content: system },
-      { role: "user", content: prompt + "\n\nJSON:\n" + JSON.stringify(payload) }
-      ]
-    })
+const cc = await ai.chat.completions.create({
+  model: "gpt-4o-mini",
+  temperature: 0.6,
+  max_tokens: 1000,                      // chat.completions는 max_tokens
+  messages: [
+    { role: "system", content: system },
+    { role: "user", content: prompt + "\n\nJSON:\n" + JSON.stringify(payload) }
+  ]
+})
+    
     const msg = cc.choices?.[0]?.message?.content || "{}"
     const jsonStart = msg.indexOf("{")
     const jsonEnd   = msg.lastIndexOf("}")
