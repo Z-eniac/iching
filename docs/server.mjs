@@ -90,7 +90,6 @@ const system = `
       // 기존에 선언해 둔 schema 객체( name, schema, strict 포함 )
       schema
       },
-        seed: 2025,
         max_output_tokens: 1000,        // ← 충분히 길게
         temperature: 0.6,
         frequency_penalty: 0.2,         // ← 문장 반복 완화
@@ -121,6 +120,7 @@ const cc = await ai.chat.completions.create({
   model: "gpt-4o-mini",
   temperature: 0.6,
   max_tokens: 1000,                      // chat.completions는 max_tokens
+  seed: 2025,
   messages: [
     { role: "system", content: system },
     { role: "user", content: prompt + "\n\nJSON:\n" + JSON.stringify(payload) }
