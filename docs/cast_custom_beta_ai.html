@@ -479,7 +479,7 @@ window.addEventListener('DOMContentLoaded', ()=>{ try{ wireSelects(); live(); } 
 function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
 
 /** 커스텀용: 여섯 효를 '동시에' 공개 */
-async function animateBothAllAtOnce(base, mutated, changed, vals, bInfo, mInfo, delay=300){
+async function animateBothAllAtOnce(base, mutated, changed, vals, bInfo, mInfo, delay=500){
   const baseHex  = document.getElementById('baseHex');
   const mutHex   = document.getElementById('mutHex');
   const baseCard = document.getElementById('cardBase');
