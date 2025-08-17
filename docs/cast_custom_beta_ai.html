@@ -113,7 +113,6 @@
 
     <div style="display:flex;justify-content:center;margin-top:14px;gap:10px">
       <button id="btnRun" class="btn">제출 및 점괘 실행</button>
-      <a class="btn subtle" href="index.html">돌아가기</a>
     </div>
   </section>
 
@@ -149,6 +148,10 @@
       <h4>AI 해석</h4>
       <div id="aiStatus" style="font-size:14px;color:#9fb1d4">질문과 점괘를 바탕으로 생성 중…</div>
       <div id="aiOut" style="white-space:pre-line;margin-top:8px"></div>
+    </div>
+
+    <div style="display:flex;justify-content:center;margin-top:18px">
+      <a class="btn subtle" href="index.html">돌아가기</a>
     </div>
   </section>
 
@@ -364,7 +367,7 @@ async function requestAI(payload){
       const r = await window.aiRequest(payload);
       const txt = normalizeAI(r);
       st.textContent = '완료'; out.textContent = (txt||'').trim(); return;
-    }catch(e){ log('aiRequest failed:', e.message); st.textContent = '내장 후크 실패. 폴백 시도…'; }
+    }catch(e){ log('aiRequest failed:', e && e.message ? e.message : e); st.textContent = '내장 후크 실패. 폴백 시도…'; }
   }
 
   // 2) 폴백: 내장 fetch 엔드포인트(환경에 맞게 수정)
@@ -391,7 +394,7 @@ async function requestAI(payload){
     }else{
       const text = await res.text();
       st.textContent = '서버가 JSON이 아닌 응답을 보냈어';
-      out.textContent = (text||'').slice(0,400) + ((text||'').length>400?'
+      out.textContent = (text||'').slice(0,400) + ((text||'').length>400? '
 …':'') + '
 
 ※ /api/iching/interpret 라우트가 SPA index.html 또는 404 HTML을 반환하고 있어. 백엔드에서 JSON을 반환하도록 연결해줘.';
