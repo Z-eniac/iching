@@ -99,8 +99,8 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   .prevCol{ position:relative; z-index:1; pointer-events:none;}
     .prevCol .hex{ grid-template-columns:26px auto 0 !important; }
     .prevCol .lab{ grid-column: 1;text-align:center}
-  .warn{color:#ff4b6e;font-weight:600;margin-top:10px}
-  .hidden{display:none !important}
+  .warn{color:#f52059;font-weight:400;margin-top:10px;margin-bottom:10px}
+  .hidden{display:none !important;}
 
   .panel{display:grid;grid-template-columns:auto;gap:10px;align-items:center;justify-items:center}
   .hex{display:grid;grid-template-columns:26px auto 26px;row-gap:var(--rowGap);align-items:center}
@@ -213,7 +213,7 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
       </div>
     </div>
 
-    <div id="msg" class="warn hidden">모든 효를 선택해줘. 하나라도 "선택"이면 진행되지 않아.</div>
+    <div id="msg" class="warn hidden">점괘를 모두 입력해주세요.</div>
 
     <div style="display:flex;justify-content:center;margin-top:14px;gap:10px">
       <button id="btnRun" class="btn">제출 및 점괘 실행</button>
