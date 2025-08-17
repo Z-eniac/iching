@@ -217,6 +217,27 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   /* brandWrap 자식은 기본 가로로 늘리고, 로고(anchor)만 가운데 정렬 */
 .brandWrap{ align-items: stretch; }
 .brandWrap > a{ align-self: center; }  /* 로고 링크만 가운데 */
+
+  /* 1) brandWrap 자식은 기본 가로로 늘리고, 로고(anchor)만 가운데 */
+.brandWrap{ align-items: stretch; }
+.brandWrap > a{ align-self: center; }  /* 로고 링크만 가운데 정렬 */
+
+/* 2) 섹션/디브 블록들은 폭을 부모(.wrap)까지 꽉 채우기 */
+.brandWrap > section,
+.brandWrap > div{
+  width: 100%;
+  align-self: stretch;
+}
+
+/* 3) 커스텀 페이지 결과 섹션이 혹시 매칭 안 될 경우를 대비한 직접 타겟 */
+.brandWrap > #result{ width:100%; align-self:stretch; }
+
+/* 4) 최후 보강: .row 자체에 최대폭을 지정해 중앙 정렬(부모 폭 계산이 꼬여도 옆배치 되게) */
+#result .row{
+  max-width: var(--contentMax, 1200px);
+  margin-left:auto;
+  margin-right:auto;
+}
   
 </style>
 </head>
