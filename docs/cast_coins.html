@@ -238,6 +238,14 @@ h1{text-align:center;margin-top:46px;margin-bottom:30px}
   opacity:1 !important; transform:none !important;
   transition:none !important; animation:none !important;
 }
+
+/* brandWrap 안의 실제 콘텐츠 영역은 가로 100%로 펼치기 */
+.brandWrap > #readingUI,
+.brandWrap > #landingUI{
+  align-self: stretch;
+  width: 100%;
+}
+      
 </style></head>
 <body>
 <div style="display:none"><button id="castCoins"></button><button id="castYarrow"></button><button id="customInput"></button></div>
