@@ -23,6 +23,10 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
     --contentMax: 1200px;
     --cardW: 400px; --cardGap: 18px; /* more compact cards */
     --metaCol1: 40px; --metaCol2: 80px; --metaCol3: 50px; --metaCol4: 100px; --metaCol5: 58px; /* tighter grid */
+          /* === Brand size knobs === */
+        --brandLogoSize: 140px;      /* 로고(정사각) 크기 */
+        --brandTypeWidth: 205px;     /* 로고타입(svg 글자) 가로폭 */
+        --brandGap: 12px;            /* 둘 사이 간격 */    
   }
   
   /* 요지(한 줄 요약) */
@@ -42,6 +46,22 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   a{color:inherit}
   h1{font-size:50px;text-align:center;letter-spacing:0px;margin-top:46px;margin-bottom:30px}
   .wrap{max-width:var(--contentMax);margin:0 auto;padding:0 16px 40px}
+
+  .brandWrap{
+  display:flex; flex-direction:column; align-items:center;
+  gap:var(--brandGap);
+  margin: 25px 0 6px;          /* 상단 여백 조절 */
+  }
+  .brandWrap a{ display:inline-block; text-decoration:none; }
+  .brandLogo{ width:var(--brandLogoSize); height:auto; }
+  .brandType{ width:min(var(--brandTypeWidth), 84vw); height:auto; }
+
+  /* 스크린리더/SEO용 숨김 텍스트 */
+  .sr-only{
+  position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  
   .btn{background:#de5776;color:#fff;border:0;border-radius:12px;padding:14px 20px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2);font-size:1.1rem}
   .btn.subtle{background:#243552;color:#cfe0ff;border:1px solid #2a3b5a}
   .row{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
@@ -190,7 +210,14 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
 </head>
 <body>
 <div class="wrap">
-  <h1><a href="index.html" style="text-decoration:none;color:inherit">Divina Studio</a></h1>
+  <!-- 시멘틱/SEO 유지를 위한 숨김 h1 -->
+  <h1 class="sr-only">Divina Studio</h1>
+  <!-- 브랜드 블록: 위 로고, 아래 로고타입 -->
+  <div class="brandWrap">
+  <!-- 로고: 클릭 시 index.html 이동 -->
+  <a href="index.html" aria-label="Divina Studio Home">
+    <img src="./icon/No49.svg" alt="Divina logo" class="brandLogo">
+  </a>
 
   <!-- 랜딩: 질문 + (좌)선택 / (우)본괘 미리보기 -->
   <section id="landingUI" class="intro landing">
