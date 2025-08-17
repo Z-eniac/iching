@@ -177,6 +177,14 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
 /* 첫 프레임 깜빡임 방지용 */
 .card.prehide .title, .card.prehide .gist, .card.prehide .metaUnder, .card.prehide .read,
 .joint.prehide{ opacity:0; transform:translateY(6px); transition:none !important; }
+
+  /* joint 내부 로딩 UI (점 3개) */
+.joint.loading{position:relative}
+.joint .loader{display:flex;gap:8px;justify-content:center;align-items:center;padding:12px 0}
+.joint .loader span{width:8px;height:8px;border-radius:50%;background:#8aa8ff;display:inline-block;animation:blip 1s infinite ease-in-out}
+.joint .loader span:nth-child(2){animation-delay:.15s}
+.joint .loader span:nth-child(3){animation-delay:.3s}
+@keyframes blip{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
   
 </style>
 </head>
@@ -247,16 +255,10 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
       </div>
     </div>
 
-    <div class="joint">
-      <div class="summary" id="jointSummary">해석 준비중…</div>
-      <div class="detail" id="jointText"></div>
-    </div>
-
-    <div class="ai" id="aiBox">
-      <h4>AI 해석</h4>
-      <div id="aiStatus" style="font-size:14px;color:#9fb1d4">질문과 점괘를 바탕으로 생성 중…</div>
-      <div id="aiOut" style="white-space:pre-line;margin-top:8px"></div>
-    </div>
+  <div class="joint" id="jointBox">
+    <div class="summary" id="jointSummary">해석 준비중…</div>
+    <div class="detail" id="jointText"></div>
+  </div>
 
     <div style="display:flex;justify-content:center;margin-top:18px">
       <a class="btn subtle" href="index.html">돌아가기</a>
@@ -430,7 +432,7 @@ function submitRun(){
   const b=lookup(base), m=lookup(mutated);
   
   animateBothAllAtOnce(base, mutated, changed, vv, b, m);
-  requestAI({ method:'custom', question:(document.getElementById('q').value||'').trim(), values:vv, base:b, mutated:m, changed:changed });
+//  requestAI({ method:'custom', question:(document.getElementById('q').value||'').trim(), values:vv, base:b, mutated:m, changed:changed });
 }
 document.getElementById('btnRun').addEventListener('click', submitRun);
 
@@ -538,6 +540,106 @@ async function animateBothAllAtOnce(base, mutated, changed, vals, bInfo, mInfo, 
   renderJoint(base, mutated, changed, vals, bInfo, mInfo);
   requestAnimationFrame(()=> joint?.classList.remove('animating'));
 }
+
+  // --- AI augment (wrap renderJoint) : coins 방식 그대로 ---
+(function(){
+  let ctrl = 0;
+
+  async function aiAugment(payload){
+    const my = ++ctrl;
+    const j = document.getElementById('jointBox');
+    const s = document.getElementById('jointSummary');
+    const d = document.getElementById('jointText');
+    if(!j || !d) return;
+
+    // 로딩 UI 세팅
+    j.classList.add('ai-owned','loading');
+    d.replaceChildren();
+    const loader = document.createElement('div');
+    loader.className = 'loader';
+    loader.innerHTML = '<span></span><span></span><span></span>';
+    d.appendChild(loader);
+    s.textContent = '해석 생성 중…';
+
+    try{
+      // 동전법과 동일 엔드포인트 사용
+      const res = await fetch('https://iching-ai-ilo2.onrender.com/api/read', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if(my!==ctrl) return;                 // 최신 요청만 반영
+      if(!res.ok) throw new Error('HTTP '+res.status);
+
+      const data = await res.json() || {};
+      const reading  = data.reading || {};
+      let summary    = (reading.summary || '').trim();
+      let analysis   = (reading.analysis || '').trim();
+      let advice     = (reading.advice || '').trim();
+      let cautions   = (reading.cautions || '').trim();
+
+      // 본문 앞에 요약이 중복되면 제거
+      function stripLead(t){ return (summary && t.startsWith(summary)) ? t.slice(summary.length).trim() : t; }
+      analysis = stripLead(analysis); advice = stripLead(advice);
+
+      // 문단 중복 제거(동전법과 동일)
+      function dedupeParas(t){
+        const paras = (t||'').split(/\n+/).map(s=>s.trim()).filter(Boolean);
+        return paras.filter((p,i,a)=> a.indexOf(p)===i).join('\n\n');
+      }
+      analysis = dedupeParas(analysis);
+      advice   = dedupeParas(advice);
+      cautions = dedupeParas(cautions);
+
+      // 화면 반영
+      s.textContent = summary || '요약 없음';
+      const parts = [];
+      if (analysis) parts.push(analysis);
+      if (advice)   parts.push('조언:\n' + advice);
+      if (cautions) parts.push('주의:\n' + cautions);
+      if (Array.isArray(reading.line_readings) && reading.line_readings.length){
+        const lines = reading.line_readings.map(x => `[${x.line}효] ${x.meaning}`).join('\n');
+        parts.push(lines);
+      }
+      if (reading.timing) parts.push('타이밍: ' + reading.timing);
+      if (typeof reading.score === 'number') parts.push(`길흉 점수: ${reading.score}/10`);
+      d.textContent = parts.join('\n\n');
+
+      // 로더 해제
+      j.classList.remove('loading');
+
+    }catch(e){
+      if(my!==ctrl) return;
+      console.warn('AI enrich fail', e);
+      s.textContent = '해석 생성 실패';
+      j.classList.remove('loading');
+      d.textContent = 'AI 서버 연결에 실패했어요. 잠시 후 다시 시도해 주세요.';
+    }
+  }
+
+  // renderJoint 끝난 다음 AI 실행하도록 래핑
+  if (typeof renderJoint === 'function'){
+    const orig = renderJoint;
+    renderJoint = function(base, mutated, changed, vals, bInfo, mInfo){
+      // 기본(내장) 해석 먼저 렌더
+      orig(base, mutated, changed, vals, bInfo, mInfo);
+
+      // 질문 없으면 AI 생략 (동전법과 동일 정책)
+      const q = (document.getElementById('q')?.value || '').trim();
+      if(!q) return;
+
+      const changingLines = changed.map((v,i)=> v ? (i+1) : null).filter(Boolean);
+      const payload = {
+        question: q,
+        method: 'custom',
+        primary:  { number: bInfo.no, name_han: bInfo.nameHan, name_kr: bInfo.nameKo, pattern: '' },
+        relating: { number: mInfo.no, name_han: mInfo.nameHan, name_kr: mInfo.nameKo, pattern: '' },
+        changingLines
+      };
+      aiAugment(payload);
+    };
+  }
+})();
   
 </script>
 </body>
