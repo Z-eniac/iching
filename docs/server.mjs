@@ -90,11 +90,7 @@ const system = `
           { type: "input_text", text: JSON.stringify(payload) }
         ] }
       ],
-      text: {
-      format: "json_schema",
-      // 기존에 선언해 둔 schema 객체( name, schema, strict 포함 )
-      schema
-      },
+      text: {format: "json_schema", json_schema: schema },
         max_output_tokens: 1000,        // ← 충분히 길게
         temperature: 0.6,
     })
