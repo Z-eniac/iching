@@ -625,7 +625,7 @@ async function animateBothAllAtOnce(base, mutated, changed, vals, bInfo, mInfo, 
       orig(base, mutated, changed, vals, bInfo, mInfo);
 
       // 질문 없으면 AI 생략 (동전법과 동일 정책)
-      const q = (document.getElementById('q')?.value || '').trim();
+      const q = (document.getElementById('userQuestion')?.value || '').trim();
       if(!q) return;
 
       const changingLines = changed.map((v,i)=> v ? (i+1) : null).filter(Boolean);
