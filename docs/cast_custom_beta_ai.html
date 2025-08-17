@@ -100,9 +100,16 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   .warn{color:#ff4b6e;font-weight:600;margin-top:10px}
   .hidden{display:none !important}
 
-  .panel .hex {
-  margin: 0 auto;                 /* 가운데 정렬 */
-  grid-template-columns: 26px auto 26px;  /* 결과 카드에선 기본 26|라인|26 유지 */
+  /* 결과 카드(패널) 안 육효 그리드: 중앙 배치 + 26|라인|26 트랙 유지 */
+  .panel .hex{
+  margin: 0 auto;
+  grid-template-columns: 26px auto 26px;
+  }
+
+  /* 숫자는 라인 쪽(오른쪽)으로 붙이고 살짝 여백 */
+  .panel .lab{
+  text-align: right;
+  padding-right: 6px;   /* 필요시 4~8px 사이로 미세 조정 */
   }
   .gist{margin:10px 0 8px;text-align:center}
   .gist .gistLabel{font-size:14px;color:#9fb1d4;margin-bottom:4px}
