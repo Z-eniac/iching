@@ -70,43 +70,15 @@ const system = `
 [해석 절차]
 1) 본괘와 변괘의 판단을 한 줄로 요약합니다(괘사/彖傳 근거).
 2) 象傳의 이미지로 현재 정세를 6~10문장(최소 600자)으로 풀이합니다.
-   - 상괘/하괘의 오행·방위·계절 힌트를 간단히 포함.
-3) 변효가 있으면 각 변효(1~6효)를 짧게 해석하고(爻辭 근거), 마지막에 변괘 방향성으로 통합합니다.
-4) 실행 가능한 조언 3~5개(불릿)와 주의 2~3개(불릿)를 제시합니다.
+   - 상괘(윗삼효 팔괘)/하괘(아랫삼효 팔괘)의 오행·방위·계절 힌트를 간단히 포함.
+3) 변효가 있으면 각 변효(1~6효)를 짧게 해석하고(爻辭 근거 병기), 마지막에 변괘 방향성으로 통합합니다.
+4) 실행 가능한 조언 3~5개(Bullet)와 주의할 점 2~3개(Bullet)를 제시합니다.
 5) 길흉 점수는 0~10점(정수 또는 0.5 단위)로, 한 줄 근거를 덧붙입니다.
 
 [표현 규칙]
 - 원전의 핵심 구절은 「 」로 인용하고 바로 한국어 풀이를 붙입니다.
 - 중언부언/문장 반복 금지, 실행지향. 전체 분량은 600~1000자.
 `
-
-  try {
-    const resp = await ai.responses.create({
-      model: "gpt-4o",
-      instructions: system,
-      input: [
-        { role: "user",   content: [
-          { type: "input_text", text: "다음 JSON을 바탕으로 해석을 생성해 주세요." },
-          { type: "input_text", text: JSON.stringify(payload) }
-        ] }
-      ],
-      text: {format: "json_schema", json_schema: schema },
-        max_output_tokens: 1000,        // ← 충분히 길게
-        temperature: 0.6,
-    })
-    const parsed = resp.output_parsed
-      ?? (resp.output_text ? JSON.parse(resp.output_text) : null)
-      ?? (resp.output?.[0]?.content?.[0]?.type === 'output_text'
-            ? JSON.parse(resp.output[0].content[0].text)
-            : null)
-    if (parsed?.reading) {
-      console.log('[OK responses.create]')
-      return res.json({ ...payload, reading: parsed.reading })
-    }
-    throw new Error('responses.create: no parsed.reading')
-  } catch (e) {
-    console.warn('[WARN responses.create]', e?.response?.status, e?.response?.data || e?.message)
-  }
 
   try {
     const prompt = `사용자 질문과 점괘 JSON이 주어집니다.
@@ -116,27 +88,44 @@ const system = `
 "advice": string, "cautions": string, "timing": string,
 "score": number, "tags": string[], "line_readings": [{"line": number, "meaning": string}] } }`
 
-const cc = await ai.chat.completions.create({
-  model: "gpt-4o-mini",
-  temperature: 0.6,
-  max_tokens: 1000,                      // chat.completions는 max_tokens
-  seed: 2025,
-  messages: [
-    { role: "system", content: system },
-    { role: "user", content: prompt + "\n\nJSON:\n" + JSON.stringify(payload) }
-  ]
-})
-    
-    const msg = cc.choices?.[0]?.message?.content || "{}"
-    const jsonStart = msg.indexOf("{")
-    const jsonEnd   = msg.lastIndexOf("}")
-    const slice = jsonStart >= 0 ? msg.slice(jsonStart, jsonEnd + 1) : "{}"
-    const parsed = JSON.parse(slice)
-    if (parsed?.reading) {
-      console.log('[OK chat.completions fallback]')
-      return res.json({ ...payload, reading: parsed.reading })
-    }
-    throw new Error('chat.completions: invalid JSON')
+ const cc = await ai.chat.completions.create({
+   model: "gpt-4o-mini",
+   temperature: 0.6,
+   max_tokens: 1000,
+   seed: 2025,  // 재현성 원하면 유지, 아니면 제거해도 OK
+   // ✅ Structured Outputs(스키마 강제)
+   response_format: {
+     type: "json_schema",
+     json_schema: schema   // 위에서 선언해둔 const schema 그대로 사용
+   },
+   messages: [
+     { role: "system", content: system },
+     { role: "user", content:
+       // 프롬프트를 조금 강화(길이/스코어/변효 안내)
+       prompt +
+       "\n\n출력은 위 JSON 스키마를 엄격히 따르세요." +
+       "\n- reading.analysis는 600~1000자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요." +
+       "\n- reading.score는 0~10점(정수 또는 0.5 단위)로 주세요." +
+       "\n- reading.line_readings는 변효가 없으면 생략 가능하지만, 있으면 각 효의 핵심 의미를 1~2문장으로 구체화." +
+       "\n\nJSON:\n" + JSON.stringify(payload)
+     }
+   ]
+ })
+
+ // SDK 버전에 따라 message.parsed가 올 수도, content가 JSON 문자열로 올 수도 있음
+ let parsed = cc.choices?.[0]?.message?.parsed
+ if (!parsed) {
+   const msg = cc.choices?.[0]?.message?.content ?? "{}"
+   const start = msg.indexOf("{")
+   const end   = msg.lastIndexOf("}")
+   const slice = start >= 0 ? msg.slice(start, end + 1) : "{}"
+   parsed = JSON.parse(slice)
+ }
+ if (parsed?.reading) {
+   console.log('[OK chat.completions structured]')
+   return res.json({ ...payload, reading: parsed.reading })
+ }
+ throw new Error('chat.completions: invalid JSON')
   } catch (e) {
     console.warn('[WARN chat.completions]', e?.response?.status, e?.response?.data || e?.message)
   }
