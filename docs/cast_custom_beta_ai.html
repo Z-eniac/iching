@@ -235,45 +235,64 @@ function metaRow(label,tri){ const m=TRI_META[tri];
     +'<div class="mono">'+m.arrow+' '+m.dir+'</div>'
     +'</div>';
 }
+
+
 function makeInterpretation(changed, vals, info){
-  var k=changed.filter(Boolean).length, html='<h4>해석</h4>';
-  if(k===0){
-    html+='무변(無變): 현상 유지.';
-  }else{
-    html+='<div>변효 '+k+'개</div><ul>';
-    for(var i=0;i<6;i++){
-      if(!changed[i]) continue;
-      var dir=(vals[i]===6)?'음→양(↗ 개시)':'양→음(↘ 수렴)';
+  var k = changed.filter(Boolean).length, html = '<h4>해석</h4>';
+  if (k===0){
+    html += '무변(無變): 현상 유지.';
+  } else {
+    html += '<div>변효 '+k+'개</div><ul>';
+    for (var i=0;i<6;i++){
+      if (!changed[i]) continue;
+      var dir = (vals[i]===6) ? '음→양(↗ 개시)' : '양→음(↘ 수렴)';
+      html += '<li>'+POS_LABEL[i]+' '+POS_ROLE[i]+' · '+dir+'</li>';  // ← li 복구
     }
-    html+='</ul><div style="margin-top:6px">→ 점괘 요지: '+info.summary+'</div>';
+    html += '</ul>';  // ← 요지 문장 삭제
   }
   return html;
 }
+
+
 function render(prefix, hex, changed, vals, info){
-  var hexBox=document.getElementById(prefix+'Hex');
-  var title=document.getElementById(prefix+'Title');
-  var metaUnder=document.getElementById(prefix+'Meta');
-  var readBox=document.getElementById(prefix+'Read');
-  var gist = document.getElementById(prefix+'gist');
-if (gist){
-  var label = (prefix === 'base') ? '본괘 요지' : '변괘 요지';
-  gist.innerHTML = '<div class="gistLabel">'+label+'</div>'
-                 + '<div class="gistText">'+ info.summary +'</div>';
-}
-  if(hexBox) hexBox.innerHTML=''; if(metaUnder) metaUnder.innerHTML=''; if(readBox) readBox.innerHTML=''; if(title) title.innerHTML=''; if(gist) gist.innerHTML='';
-  for(var r=5;r>=0;r--){
-    var lab=document.createElement('div'); lab.className='lab'; lab.textContent=(r+1);
-    var wrap=document.createElement('div'); wrap.className='lineWrap '+(hex[r]?'yang':'yin')+(changed[r]?' chg':'');
-    var line=document.createElement('div'); line.className='line'; wrap.appendChild(line);
+  var hexBox = document.getElementById(prefix+'Hex');
+  var title  = document.getElementById(prefix+'Title');
+  var metaUnder = document.getElementById(prefix+'Meta');
+  var readBox = document.getElementById(prefix+'Read');
+  var gist  = document.getElementById(prefix+'gist');
+
+  // 1) 먼저 비우기
+  if (hexBox)    hexBox.innerHTML = '';
+  if (metaUnder) metaUnder.innerHTML = '';
+  if (readBox)   readBox.innerHTML = '';
+  if (title)     title.innerHTML = '';
+  if (gist)      gist.innerHTML = '';
+
+  // 2) 라인 렌더
+  for (var r=5; r>=0; r--){
+    var lab  = document.createElement('div'); lab.className='lab'; lab.textContent=(r+1);
+    var wrap = document.createElement('div'); wrap.className='lineWrap '+(hex[r]?'yang':'yin')+(changed[r]?' chg':'');
+    var line = document.createElement('div'); line.className='line'; wrap.appendChild(line);
     if(!hex[r]){ var gap=document.createElement('div'); gap.className='gap'; wrap.appendChild(gap); }
     if(hexBox){ hexBox.appendChild(lab); hexBox.appendChild(wrap); var sp=document.createElement('div'); sp.className='sp'; hexBox.appendChild(sp); }
   }
-  if(info){
-    if(title) title.innerHTML=makeTitle(info);
-    if(metaUnder) metaUnder.innerHTML = metaRow('상괘', info.upper) + metaRow('하괘', info.lower);
-    if(readBox) readBox.innerHTML = makeInterpretation(changed, vals, info);
-  }else{ if(title) title.textContent='—'; }
+
+  // 3) 제목/메타/요지/해석 채우기
+  if (info){
+    if (title)     title.innerHTML = makeTitle(info);
+    if (metaUnder) metaUnder.innerHTML = metaRow('상괘', info.upper) + metaRow('하괘', info.lower);
+    if (gist){
+      var label = (prefix === 'base') ? '본괘 요지' : '변괘 요지';
+      gist.innerHTML = '<div class="gistLabel">'+label+'</div>'
+                     + '<div class="gistText">'+ info.summary +'</div>';
+    }
+    if (readBox)   readBox.innerHTML = makeInterpretation(changed, vals, info);
+  } else {
+    if (title) title.textContent = '—';
+  }
 }
+
+  
 function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
   var s=document.getElementById('jointSummary'), d=document.getElementById('jointText'); if(!s||!d) return;
   var k=changed.filter(Boolean).length, ups=0,downs=0,posArr=[],domains=[];
