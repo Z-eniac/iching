@@ -62,10 +62,25 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   .qWrap{display:flex;flex-direction:column;align-items:center;gap:10px}
   .qWrap textarea{width:min(780px, 92vw);min-height:90px;background:#0f1a2d;color:var(--ink);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:16px;line-height:1.5}
 
-  .customUI{display:grid; grid-template-columns: max-content max-content;gap:14px;width:max-content;justify-content:center;margin:10px auto 0}
-  .selCol{position: relative; z-index: 2;display:grid;grid-template-rows:repeat(6, var(--lineHeight));row-gap:var(--rowGap)}
+  .customUI{
+  display:grid;
+  grid-template-columns:max-content max-content;
+  gap:12px;
+  width:max-content;
+  margin:10px auto 0;
+  justify-content:center;
+  }
+  .selCol{
+  position:relative; z-index:2;
+  display:grid; grid-template-rows:repeat(6, var(--lineHeight));
+  row-gap:var(--rowGap);
+  justify-items:end;  /* ← 핵심 */
+  }
   .selCol select{width:var(--selW);min-width:var(--selW);max-width:var(--selW);background:#13233d;color:#e9f0ff;border:1px solid #2b3b5b;border-radius:8px;height:var(--lineHeight);font-size:13px;text-align-last:center;-moz-text-align-last:center}
-  .prevCol{position: relative; z-index: 1; pointer-events: none;display:grid;grid-template-columns:26px auto 26px}
+  .prevCol{ position:relative; z-index:1; pointer-events:none; }
+    .prevCol .hex{ grid-template-columns:auto 26px; }
+    .prevCol .lab{ grid-column:2; text-align:left; }
+    .prevCol .sp{ display:none; }
   .warn{color:#ff4b6e;font-weight:600;margin-top:10px}
   .hidden{display:none !important}
 
