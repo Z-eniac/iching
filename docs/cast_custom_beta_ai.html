@@ -95,11 +95,11 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   .panel .hex {
   margin: 0 auto;                 /* 가운데 정렬 */
   grid-template-columns: 26px auto 26px;  /* 결과 카드에선 기본 26|라인|26 유지 */
-
+  }
   .gist{margin:10px 0 8px;text-align:center}
   .gist .gistLabel{font-size:14px;color:#9fb1d4;margin-bottom:4px}
-  .gist .gistText{font-size:26px;font-weight:900;letter-spacing:.2px;color:#eaf1ff}
-  font-weight: 600;font-synthesis: none;font-size:26px;letter-spacing:.2px;color:#eaf1ff}
+  .gist .gistText{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:600; }
+  @media (max-width:560px){ .gist .gistText{font-size:22px} }
     
   .ai{margin-top:18px;padding:18px;border:1px dashed #2a3b5a;border-radius:12px;background:#0f1a2d}
   .ai h4{margin:0 0 8px}
@@ -254,7 +254,12 @@ function render(prefix, hex, changed, vals, info){
   var title=document.getElementById(prefix+'Title');
   var metaUnder=document.getElementById(prefix+'Meta');
   var readBox=document.getElementById(prefix+'Read');
-  var gist   = document.getElementById(prefix+'gist');
+  var gist = document.getElementById(prefix+'gist');
+if (gist){
+  var label = (prefix === 'base') ? '본괘 요지' : '변괘 요지';
+  gist.innerHTML = '<div class="gistLabel">'+label+'</div>'
+                 + '<div class="gistText">'+ info.summary +'</div>';
+}
   if(hexBox) hexBox.innerHTML=''; if(metaUnder) metaUnder.innerHTML=''; if(readBox) readBox.innerHTML=''; if(title) title.innerHTML=''; if(gist) gist.innerHTML='';
   for(var r=5;r>=0;r--){
     var lab=document.createElement('div'); lab.className='lab'; lab.textContent=(r+1);
@@ -266,11 +271,6 @@ function render(prefix, hex, changed, vals, info){
   if(info){
     if(title) title.innerHTML=makeTitle(info);
     if(metaUnder) metaUnder.innerHTML = metaRow('상괘', info.upper) + metaRow('하괘', info.lower);
-    if(gist){
-      var label = (prefix === 'base') ? '본괘 요지' : '변괘 요지';
-      gist.innerHTML = '<div class="gistLabel">'+label+'</div>'
-                     + '<div class="gistText">'+ info.summary +'</div>';
-    }
     if(readBox) readBox.innerHTML = makeInterpretation(changed, vals, info);
   }else{ if(title) title.textContent='—'; }
 }
