@@ -84,6 +84,25 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   .warn{color:#ff4b6e;font-weight:600;margin-top:10px}
   .hidden{display:none !important}
 
+  .panel .hex {
+  margin: 0 auto;                 /* 가운데 정렬 */
+  grid-template-columns: 26px auto 26px;  /* 결과 카드에선 기본 26|라인|26 유지 */
+
+  .core {
+  text-align: center;
+  margin: 10px 0 6px;
+  }
+  .core .coreLabel {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  }
+  .core .coreText {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  }
+    
   .ai{margin-top:18px;padding:18px;border:1px dashed #2a3b5a;border-radius:12px;background:#0f1a2d}
   .ai h4{margin:0 0 8px}
 
@@ -143,6 +162,7 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
         <div class="panel" id="panelBase">
           <div class="title" id="baseTitle"></div>
           <div class="hex" id="baseHex"></div>
+          <div class="core" id="baseCore"></div>
           <div class="metaUnder" id="baseMeta"></div>
         </div>
         <div class="read" id="baseRead"></div>
@@ -152,6 +172,7 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
         <div class="panel" id="panelMut">
           <div class="title" id="mutTitle"></div>
           <div class="hex" id="mutHex"></div>
+          <div class="core" id="mutCore"></div>
           <div class="metaUnder" id="mutMeta"></div>
         </div>
         <div class="read" id="mutRead"></div>
@@ -220,13 +241,11 @@ function makeInterpretation(changed, vals, info){
   var k=changed.filter(Boolean).length, html='<h4>해석</h4>';
   if(k===0){
     html+='무변(無變): 현상 유지.';
-    html+='<div style="margin-top:6px">→ 점괘 요지: '+info.summary+'</div>';
   }else{
     html+='<div>변효 '+k+'개</div><ul>';
     for(var i=0;i<6;i++){
       if(!changed[i]) continue;
       var dir=(vals[i]===6)?'음→양(↗ 개시)':'양→음(↘ 수렴)';
-      html+='<li>'+POS_LABEL[i]+' '+POS_ROLE[i]+' · '+dir+'</li>';
     }
     html+='</ul><div style="margin-top:6px">→ 점괘 요지: '+info.summary+'</div>';
   }
@@ -237,7 +256,8 @@ function render(prefix, hex, changed, vals, info){
   var title=document.getElementById(prefix+'Title');
   var metaUnder=document.getElementById(prefix+'Meta');
   var readBox=document.getElementById(prefix+'Read');
-  if(hexBox) hexBox.innerHTML=''; if(metaUnder) metaUnder.innerHTML=''; if(readBox) readBox.innerHTML=''; if(title) title.innerHTML='';
+  var core   = document.getElementById(prefix+'Core');
+  if(hexBox) hexBox.innerHTML=''; if(metaUnder) metaUnder.innerHTML=''; if(readBox) readBox.innerHTML=''; if(title) title.innerHTML=''; if(core) core.innerHTML='';
   for(var r=5;r>=0;r--){
     var lab=document.createElement('div'); lab.className='lab'; lab.textContent=(r+1);
     var wrap=document.createElement('div'); wrap.className='lineWrap '+(hex[r]?'yang':'yin')+(changed[r]?' chg':'');
@@ -248,6 +268,11 @@ function render(prefix, hex, changed, vals, info){
   if(info){
     if(title) title.innerHTML=makeTitle(info);
     if(metaUnder) metaUnder.innerHTML = metaRow('상괘', info.upper) + metaRow('하괘', info.lower);
+    if(core){
+      var label = (prefix === 'base') ? '본괘 요지' : '변괘 요지';
+      core.innerHTML = '<div class="coreLabel">'+label+'</div>'
+                     + '<div class="coreText">'+ info.summary +'</div>';
+    }
     if(readBox) readBox.innerHTML = makeInterpretation(changed, vals, info);
   }else{ if(title) title.textContent='—'; }
 }
