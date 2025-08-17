@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DIVINA: 커스텀 점괘 (Beta · AI)</title>
+<title>DIVINA: customize</title>
 <link rel="icon" type="image/svg+xml" href="icon/No49.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="icon/No49.png">
 <link rel="preload" href="./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2" as="font" type="font/woff2" crossorigin>
@@ -424,8 +424,8 @@ function submitRun(){
   for(let i=0;i<6;i++){ const v=vals[i]; vv.push(v); const ch=(v===6||v===9), ln=(v===7||v===9)?1:0; base.push(ln); changed.push(ch); }
   const mutated=base.map((l,i)=> changed[i] ? (l^1) : l);
 
-  document.getElementById('landing').classList.add('hidden');
-  document.getElementById('result').classList.remove('hidden');
+  document.getElementById('landingUI')?.classList.add('hidden');
+  document.getElementById('result')?.classList.remove('hidden');
 
   const b=lookup(base), m=lookup(mutated);
   
