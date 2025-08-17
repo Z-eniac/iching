@@ -60,6 +60,13 @@
   .brandLogo{ width:var(--brandLogoSize); height:auto; }
   .brandType{ width:min(var(--brandTypeWidth), 84vw); height:auto; }
 
+/* brandWrap 안의 실제 콘텐츠 영역은 가로 100%로 펼치기 */
+.brandWrap > #readingUI,
+.brandWrap > #landingUI{
+  align-self: stretch;
+  width: 100%;
+}
+
   /* 스크린리더/SEO용 숨김 텍스트 */
   .sr-only{
   position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
