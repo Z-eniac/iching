@@ -261,7 +261,7 @@ function makeInterpretation(changed, vals, info){
       var dir = (vals[i]===6) ? '음→양(↗ 개시)' : '양→음(↘ 수렴)';
       html += '<li>'+POS_LABEL[i]+' '+POS_ROLE[i]+' · '+dir+'</li>';  // ← li 복구
     }
-    html += '</ul><div style="margin-top:6px">';  // ← 요지 문장 삭제
+    html += '</ul>';  // ← 요지 문장 삭제
   }
   return html;
 }
