@@ -358,22 +358,69 @@ async function requestAI(payload){
   const out= document.getElementById('aiOut');
   st.textContent = '질문과 점괘를 바탕으로 생성 중…'; out.textContent='';
 
-  // 1) 전역 후크가 있으면 우선 사용 (프로젝트에서 쓰는 공용 헬퍼)
+  // 1) 전역 후크가 있으면 우선 사용 (프로젝트 공용 훅)
   if(typeof window.aiRequest === 'function'){
     try{
-      const txt = await window.aiRequest(payload); // 문자열 반환 가정
+      const r = await window.aiRequest(payload);
+      const txt = normalizeAI(r);
       st.textContent = '완료'; out.textContent = (txt||'').trim(); return;
     }catch(e){ log('aiRequest failed:', e.message); st.textContent = '내장 후크 실패. 폴백 시도…'; }
   }
 
-  // 2) 폴백: 내장 fetch 엔드포인트(수정해서 사용)
+  // 2) 폴백: 내장 fetch 엔드포인트(환경에 맞게 수정)
   try{
     const res = await fetch('/api/iching/interpret',{
-      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify(payload)
     });
-    const data = await res.json();
-    st.textContent = '완료'; out.textContent = (data && (data.text||data.message||'')) || '';
-  }catch(e){ st.textContent = 'AI 호출 실패'; out.textContent = '설정된 후크나 API 엔드포인트가 없어. requestAI() 내부를 네 환경에 맞게 연결해줘.'; log('fallback error', e.message); }
+
+    const ct = (res.headers.get('content-type')||'').toLowerCase();
+
+    // HTTP 에러 핸들링
+    if(!res.ok){
+      const errBody = ct.includes('application/json') ? JSON.stringify(await res.json()) : (await res.text());
+      throw new Error('HTTP '+res.status+' '+res.statusText+' — '+errBody.slice(0,300));
+    }
+
+    // JSON이면 파싱, 아니면 텍스트로 노출 (HTML 반환 시 원인 추적 도움)
+    if(ct.includes('application/json')){
+      const data = await res.json();
+      const txt = normalizeAI(data);
+      st.textContent = '완료'; out.textContent = (txt||'').trim();
+    }else{
+      const text = await res.text();
+      st.textContent = '서버가 JSON이 아닌 응답을 보냈어';
+      out.textContent = (text||'').slice(0,400) + ((text||'').length>400?'
+…':'') + '
+
+※ /api/iching/interpret 라우트가 SPA index.html 또는 404 HTML을 반환하고 있어. 백엔드에서 JSON을 반환하도록 연결해줘.';
+    }
+  }catch(e){
+    st.textContent = 'AI 호출 실패';
+    out.textContent = '요청 실패: '+ (e && e.message ? e.message : e) + '
+
+• 원인: 엔드포인트가 JSON을 돌려주지 않음(대개 404/리다이렉트/SPA HTML).
+• 해결:
+  1) window.aiRequest(payload) 전역 후크 구현, 또는
+  2) /api/iching/interpret 가 JSON {text:string} 를 반환하도록 백엔드 라우팅.';
+    log('fallback error detail', e && (e.stack || e.message));
+  }
+
+  function normalizeAI(x){
+    if(typeof x === 'string') return x;
+    if(!x) return '';
+    if(x.text) return x.text;
+    if(x.message) return x.message;
+    try{
+      if(Array.isArray(x.choices) && x.choices[0]){
+        const c = x.choices[0];
+        if(c.message && c.message.content) return c.message.content;
+        if(c.text) return c.text;
+      }
+    }catch(_){/* noop */}
+    return typeof x === 'object' ? JSON.stringify(x) : String(x);
+  }
 }
 
 /*************************
