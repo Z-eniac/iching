@@ -121,6 +121,51 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
     .card{flex-basis:100%;max-width:480px}
     .joint{width:auto}
   }
+
+  /* ---- lines reveal animation (coins와 동일) ---- */
+#baseHex .lineWrap .line,
+#mutHex  .lineWrap .line{
+  transition: opacity .28s ease, transform .28s ease;
+}
+
+/* 애니 중엔 숨김 — revealed 붙은 것만 보이게 */
+#baseHex.animating .lineWrap:not(.revealed) .line,
+#mutHex.animating  .lineWrap:not(.revealed) .line{
+  opacity: 0;
+  transform: scaleX(.92);
+}
+
+/* 변효 뱃지도 공개될 때 같이 */
+.lineWrap.chg::after{
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .28s ease, transform .28s ease;
+}
+.lineWrap.revealed.chg::after{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 살짝 튕김 */
+@keyframes tossPulse{
+  0%{transform:scaleX(.92)} 60%{transform:scaleX(1.02)} 100%{transform:scaleX(1)}
+}
+#baseHex.animating .lineWrap.revealed .line,
+#mutHex.animating  .lineWrap.revealed .line{
+  opacity:1; transform:scaleX(1); animation:tossPulse .28s ease-out;
+}
+
+/* 카드/공유해석 텍스트는 애니 끝에 한꺼번에 나타나게 */
+.card .title, .card .gist, .card .metaUnder, .card .read{ transition: opacity 1s ease, transform 1s ease; }
+.card.animating .title, .card.animating .gist, .card.animating .metaUnder, .card.animating .read{ opacity:0; transform:translateY(6px); }
+
+.joint{ transition: opacity 1s ease, transform 1s ease; }
+.joint.animating{ opacity:0; transform:translateY(6px); }
+
+/* 첫 프레임 깜빡임 방지용 */
+.card.prehide .title, .card.prehide .gist, .card.prehide .metaUnder, .card.prehide .read,
+.joint.prehide{ opacity:0; transform:translateY(6px); transition:none !important; }
+  
 </style>
 </head>
 <body>
@@ -371,10 +416,8 @@ function submitRun(){
   document.getElementById('result').classList.remove('hidden');
 
   const b=lookup(base), m=lookup(mutated);
-  render('base',base,changed,vv,b);
-  render('mut',mutated,changed,vv,m);
-  renderJoint(base,mutated,changed,vv,b,m);
-
+  
+  animateBothAllAtOnce(base, mutated, changed, vv, b, m);
   requestAI({ method:'custom', question:(document.getElementById('q').value||'').trim(), values:vv, base:b, mutated:m, changed:changed });
 }
 document.getElementById('btnRun').addEventListener('click', submitRun);
@@ -429,9 +472,61 @@ async function requestAI(payload){
     return typeof x==='object'? JSON.stringify(x): String(x);
   }
 }
-
+  
 /******** 초기화 ********/
 window.addEventListener('DOMContentLoaded', ()=>{ try{ wireSelects(); live(); } catch(e){ log('init error', e && (e.message||e)); }});
+
+function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+/** 커스텀용: 여섯 효를 '동시에' 공개 */
+async function animateBothAllAtOnce(base, mutated, changed, vals, bInfo, mInfo, delay=300){
+  const baseHex  = document.getElementById('baseHex');
+  const mutHex   = document.getElementById('mutHex');
+  const baseCard = document.getElementById('cardBase');
+  const mutCard  = document.getElementById('cardMut');
+  const joint    = document.querySelector('.joint');
+
+  // 텍스트/라인 준비: 숨김 상태 세팅
+  baseHex?.classList.add('animating');
+  mutHex?.classList.add('animating');
+  baseCard?.classList.add('prehide','animating');
+  mutCard?.classList.add('prehide','animating');
+  joint?.classList.add('prehide','animating');
+
+  // 전환 복구(다음 프레임부터 트랜지션 활성)
+  requestAnimationFrame(()=>{
+    baseCard?.classList.remove('prehide');
+    mutCard?.classList.remove('prehide');
+    joint?.classList.remove('prehide');
+  });
+
+  // 둘 다 먼저 렌더(텍스트는 아직 가림)
+  render('base', base,    changed, vals, bInfo);
+  render('mut',  mutated, changed, vals, mInfo);
+
+  // 라인들 초기화 → 동시에 공개
+  const baseWraps = Array.from(baseHex.querySelectorAll('.lineWrap'));
+  const mutWraps  = Array.from(mutHex.querySelectorAll('.lineWrap'));
+  baseWraps.forEach(w=>w.classList.remove('revealed'));
+  mutWraps.forEach(w=>w.classList.remove('revealed'));
+
+  await sleep(10);                    // 한 틱 대기(transition 적용)
+  baseWraps.forEach(w=>w.classList.add('revealed'));
+  mutWraps.forEach(w=>w.classList.add('revealed'));
+
+  await sleep(delay + 150);           // 라인 ‘툭’ 등장 시간만큼 기다림
+
+  // 라인 애니 종료 → 카드 텍스트/공유해석 일괄 등장
+  baseHex?.classList.remove('animating');
+  mutHex?.classList.remove('animating');
+  baseCard?.classList.remove('animating');
+  mutCard?.classList.remove('animating');
+
+  // 공유 해석 채우고 "뾰로롱"
+  renderJoint(base, mutated, changed, vals, bInfo, mInfo);
+  requestAnimationFrame(()=> joint?.classList.remove('animating'));
+}
+  
 </script>
 </body>
 </html>
