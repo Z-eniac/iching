@@ -6,7 +6,16 @@
 <title>DIVINA: 커스텀 점괘 (Beta · AI)</title>
 <link rel="icon" type="image/svg+xml" href="icon/No49.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="icon/No49.png">
+<link rel="preload" href="./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+  @font-face{
+  font-family:"NotoSerifCJK-ICHING";
+  src:url("./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2") format("woff2");
+  font-weight:600; font-style:normal; font-display:swap;
+}
+h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:600; }
+.title .han{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; }
+  
   :root{
     --bg:#0c111b; --card:#111a2b; --border:#22304a; --ink:#eaf0ff; --muted:#a8b6d7; --accent:#2b8cff; --mark:#ff3b5c;
     --contentMax: 1200px;
@@ -53,10 +62,10 @@
   .qWrap{display:flex;flex-direction:column;align-items:center;gap:10px}
   .qWrap textarea{width:min(780px, 92vw);min-height:90px;background:#0f1a2d;color:var(--ink);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:16px;line-height:1.5}
 
-  .customUI{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;justify-content:center;margin-top:10px}
-  .selCol{display:grid;grid-template-rows:repeat(6, var(--lineHeight));row-gap:var(--rowGap);align-items:center}
+  .customUI{display:grid;grid-template-columns:auto 1fr;gap:14px;width:max-content;justify-content:center;margin:10px auto 0}
+  .selCol{display:grid;grid-template-rows:repeat(6, var(--lineHeight));row-gap:var(--rowGap);align-items:center;justify-items:center}
   .selCol select{width:var(--selW);min-width:var(--selW);max-width:var(--selW);background:#13233d;color:#e9f0ff;border:1px solid #2b3b5b;border-radius:8px;height:var(--lineHeight);font-size:13px;text-align-last:center;-moz-text-align-last:center}
-  .prevCol{display:grid;grid-template-columns:26px auto 26px}
+  .prevCol{display:grid;grid-template-columns:26px auto 26px;justify-items:center}
   .warn{color:#ff4b6e;font-weight:600;margin-top:10px}
   .hidden{display:none !important}
 
