@@ -135,13 +135,21 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   transform: scaleX(.92);
 }
 
-/* 변효 뱃지도 공개될 때 같이 */
+/* 기본: 배지는 항상 보임 */
 .lineWrap.chg::after{
-  opacity: 0;
-  transform: translateY(-4px);
+  opacity: 1;
+  transform: none;
   transition: opacity .28s ease, transform .28s ease;
 }
-.lineWrap.revealed.chg::after{
+
+/* 결과 카드 애니메이션 중에만 숨겼다가 revealed 때 보이게 */
+#baseHex.animating .lineWrap.chg::after,
+#mutHex.animating  .lineWrap.chg::after{
+  opacity: 0;
+  transform: translateY(-4px);
+}
+#baseHex.animating .lineWrap.revealed.chg::after,
+#mutHex.animating  .lineWrap.revealed.chg::after{
   opacity: 1;
   transform: translateY(0);
 }
