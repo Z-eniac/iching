@@ -65,8 +65,20 @@ app.post('/api/read', async (req, res) => {
   console.log('[REQ]', JSON.stringify(payload))
 
 const system = `
-당신은 주역 64괘 전문 해석가입니다. 한국어 존댓말로 답하십시오.
+당신은 주역 64괘 전문 해석가입니다. 원전에 충실한 해석을 한국어 존댓말로 답하십시오.
 
+[편향 교정] (매우 중요)
+- 일반론적 자기계발 어휘(꾸준함·루틴·마인드셋·동기부여·생산성·자기관리) 사용 금지.
+- 위로성 완곡 표현 금지. 불리할 땐 명확히 ‘불리/흉’로 판정.
+
+[점수 루브릭]
+- 대길: 9–10 (근거에 「元亨」「利涉大川」 등 길문이 뚜렷)
+- 길: 7–8.5
+- 소길: 6–6.5
+- 미지/중립: 4.5–5.5
+- 소흉: 3–4.5
+- 흉: 1–2.5 (「凶」「吝」「悔」 우세, 변효 3개↑가 불리 방향)
+- 대흉: 0–1 (중대한 금기·재앙 암시)
 [해석 절차]
 1) 본괘와 변괘의 판단을 한 줄로 요약합니다(괘사/彖傳 근거).
 2) 象傳의 이미지로 현재 정세를 6~10문장(최소 600자)으로 풀이합니다.
@@ -80,7 +92,6 @@ const system = `
 - 원전의 핵심 구절은 「 」로 인용하고 바로 한국어 풀이를 붙입니다.
 - 중언부언/문장 반복 금지, 실행지향. 전체 분량은 600~1000자.
 - 상괘, 하괘를 각각 본괘, 변괘와 혼용하지 말고 "본괘"와 "변괘"로 통일.
-- 일반론·자기계발 조언 금지: “꾸준함/루틴/마인드셋/계획 세우세요/자기관리” 류 표현 금지.
 - 모든 해석·조언은 철저하게 점괘가 말하는 것을 위주로 작성할 것.
 - 위로/무난한 결론 금지: 나쁠 땐 분명히 나쁘다고 말하기. “그럼에도” 화법 남발 금지.
 - 길흉점수 규칙(0~10, 0.5 단위):
@@ -92,6 +103,7 @@ const system = `
 
   try {
     const prompt = `사용자 질문과 점괘 JSON이 주어집니다.
+- 질문(question) 문자열 맨 앞에 [오더: ...] 블록이 있을 수 있음. 있으면 그 지시(금지어/점수분포/톤 등)를 **최우선**으로 반영하세요.
 - analysis에 600~1000자 분량의 象傳 기반 본문을 쓰세요.
 - 길흉 점수는 0~10점(정수/0.5 단위)입니다.
 스키마: { "reading": { "summary": string, "analysis": string,
@@ -100,9 +112,12 @@ const system = `
 
  const cc = await ai.chat.completions.create({
    model: "gpt-4o-mini",
-   temperature: 0.6,
-   max_tokens: 1000,
-   seed: 2025,  // 재현성 원하면 유지, 아니면 제거해도 OK
+   temperature: 0.8,
+   top_p: 0.9,
+   presence_penalty: 0.2,
+   frequency_penalty: 0.2,
+   n: 2,                // 두 안 생성 후 클라이언트에서 더 날 것 선택
+   max_tokens: 1200,
    // ✅ Structured Outputs(스키마 강제)
    response_format: {
      type: "json_schema",
@@ -122,6 +137,32 @@ const system = `
    ]
  })
 
+const BAN = /(루틴|꾸준|마인드셋|자기관리|생산성|동기부여|정리하세요|계획하세요|습관화)/g;
+const genericScore = (txt) => (txt.match(BAN)||[]).length;
+
+if (parsed?.reading) {
+  const g = genericScore(
+    parsed.reading.analysis + parsed.reading.advice + parsed.reading.cautions
+  );
+  const scoreTooSafe = parsed.reading.score && parsed.reading.score >= 6 && /凶|吝|悔/.test(parsed.reading.analysis);
+  if (g > 0 || scoreTooSafe) {
+    // 두 번째 패스: “일반론 제거+루브릭 재적용” 지시
+    const redo = await ai.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.7,
+      response_format: { type: "json_schema", json_schema: schema },
+      messages: [
+        { role:"system", content: system + "\n이전 출력은 상투어/점수편향이 있어 재작성합니다." },
+        { role:"user", content:
+          "다음 초안을 상투어 제거, 루브릭에 따라 점수 재산정, 모든 조언에 근거 표기하여 다시 써라.\n" +
+          JSON.stringify({ question, method, primary, relating, changingLines })
+        }
+      ]
+    });
+    // redo.parsed 읽어서 대체
+  }
+}
+    
  // SDK 버전에 따라 message.parsed가 올 수도, content가 JSON 문자열로 올 수도 있음
  let parsed = cc.choices?.[0]?.message?.parsed
  if (!parsed) {
