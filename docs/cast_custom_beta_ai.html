@@ -42,7 +42,7 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   a{color:inherit}
   h1{font-size:50px;text-align:center;letter-spacing:-.5px;margin-top:46px;margin-bottom:30px}
   .wrap{max-width:var(--contentMax);margin:0 auto;padding:0 16px 40px}
-  .btn{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:14px 20px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2);font-size:1.1rem}
+  .btn{background:#de5776;color:#fff;border:0;border-radius:12px;padding:14px 20px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2);font-size:1.1rem}
   .btn.subtle{background:#243552;color:#cfe0ff;border:1px solid #2a3b5a}
   .row{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
   .card{flex:0 1 400px;max-width:480px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
@@ -74,7 +74,9 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   .joint .summary{font-size:25px;font-weight:800;margin:0 0 20px;text-align:center}
   .joint .detail{font-size:17px;line-height:2.0;white-space:pre-line}
   
-  .landing{margin:18px 0 24px}
+  .landing{color:#a9b8dc;display:flex;flex-direction:column;align-items:center;text-align:center;}
+  .landing .small{color:#fff;display:block;font-size:20px;font-weight:700;text-align:center}
+  .landing .center{display:flex;justify-content:center}
   .qWrap{display:flex;flex-direction:column;align-items:center;gap:10px}
   .qWrap textarea{width:min(780px, 92vw);min-height:90px;background:#0f1a2d;color:var(--ink);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:16px;line-height:1.5}
 
@@ -181,11 +183,11 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   <h1><a href="index.html" style="text-decoration:none;color:inherit">Divina Studio</a></h1>
 
   <!-- 랜딩: 질문 + (좌)선택 / (우)본괘 미리보기 -->
-  <section id="landing" class="landing">
-    <div class="qWrap">
-      <textarea id="q" placeholder="점칠 질문을 입력해줘. (예: 이번 프로젝트의 방향을 어떻게 잡아야 할까?)"></textarea>
-      <div style="font-size:12px;color:#9fb1d4">질문은 선택 사항이지만, AI 해석 품질이 좋아져.</div>
-    </div>
+  <section id="landingUI" class="intro landing">
+    <p>상황과 질문을 상세히 입력해 주세요.<br>미입력 시 기본 점괘 해석만 제공됩니다.<br></p>
+    <label class="small" for="userQuestion">질문 입력</label>
+    <textarea id="userQuestion" placeholder="예: 이번 이직 제안이 내게 유리할까? 연봉 협상에서 유의점은?"></textarea>
+    <div class="center" style="margin-top:10px;margin-bottom:20px">
 
     <div id="customUI" class="customUI">
       <!-- (좌) 선택란: 정적 6개(6→1효) -->
@@ -216,6 +218,7 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
     <div style="display:flex;justify-content:center;margin-top:14px;gap:10px">
       <button id="btnRun" class="btn">제출 및 점괘 실행</button>
     </div>
+       <div class="legend" style="text-align:center;margin-top:18px;font-size:12px;color:#a4b2d4">© 2025. Zeniac. All Rights Reserved.</div>
   </section>
 
   <!-- 결과 -->
