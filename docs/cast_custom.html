@@ -209,9 +209,14 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   /* brandWrap 안의 실제 콘텐츠 영역은 가로 100%로 펼치기 */
 .brandWrap > #readingUI,
 .brandWrap > #landingUI{
+.brandWrap > #result{ 
   align-self: stretch;
   width: 100%;
 }
+
+  /* brandWrap 자식은 기본 가로로 늘리고, 로고(anchor)만 가운데 정렬 */
+.brandWrap{ align-items: stretch; }
+.brandWrap > a{ align-self: center; }  /* 로고 링크만 가운데 */
   
 </style>
 </head>
