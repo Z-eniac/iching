@@ -24,7 +24,7 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   }
   
   /* 요지(한 줄 요약) */
-  .hex-core{
+  .hex-gist{
   font-family: "NotoSerifCJK-ICHING","Source Han Serif K",serif;
   font-weight: 600;
   font-synthesis: none;
@@ -96,9 +96,9 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   margin: 0 auto;                 /* 가운데 정렬 */
   grid-template-columns: 26px auto 26px;  /* 결과 카드에선 기본 26|라인|26 유지 */
 
-  .core { text-align: center;margin: 10px 0 8px; }
-  .core .coreLabel { font-size:14px;color:#9fb1d4;margin-bottom:4px }
-  .core .coreText {font-family: "NotoSerifCJK-ICHING","Source Han Serif K",serif;
+  .gist{margin:10px 0 8px;text-align:center}
+  .gist .gistLabel{font-size:14px;color:#9fb1d4;margin-bottom:4px}
+  .gist .gistText{font-size:26px;font-weight:900;letter-spacing:.2px;color:#eaf1ff}
   font-weight: 600;font-synthesis: none;font-size:26px;letter-spacing:.2px;color:#eaf1ff}
     
   .ai{margin-top:18px;padding:18px;border:1px dashed #2a3b5a;border-radius:12px;background:#0f1a2d}
@@ -160,7 +160,7 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
         <div class="panel" id="panelBase">
           <div class="title" id="baseTitle"></div>
           <div class="hex" id="baseHex"></div>
-          <div class="core" id="baseCore"></div>
+          <div class="gist" id="basegist"></div>
           <div class="metaUnder" id="baseMeta"></div>
         </div>
         <div class="read" id="baseRead"></div>
@@ -170,7 +170,7 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
         <div class="panel" id="panelMut">
           <div class="title" id="mutTitle"></div>
           <div class="hex" id="mutHex"></div>
-          <div class="core" id="mutCore"></div>
+          <div class="gist" id="mutgist"></div>
           <div class="metaUnder" id="mutMeta"></div>
         </div>
         <div class="read" id="mutRead"></div>
@@ -254,8 +254,8 @@ function render(prefix, hex, changed, vals, info){
   var title=document.getElementById(prefix+'Title');
   var metaUnder=document.getElementById(prefix+'Meta');
   var readBox=document.getElementById(prefix+'Read');
-  var core   = document.getElementById(prefix+'Core');
-  if(hexBox) hexBox.innerHTML=''; if(metaUnder) metaUnder.innerHTML=''; if(readBox) readBox.innerHTML=''; if(title) title.innerHTML=''; if(core) core.innerHTML='';
+  var gist   = document.getElementById(prefix+'gist');
+  if(hexBox) hexBox.innerHTML=''; if(metaUnder) metaUnder.innerHTML=''; if(readBox) readBox.innerHTML=''; if(title) title.innerHTML=''; if(gist) gist.innerHTML='';
   for(var r=5;r>=0;r--){
     var lab=document.createElement('div'); lab.className='lab'; lab.textContent=(r+1);
     var wrap=document.createElement('div'); wrap.className='lineWrap '+(hex[r]?'yang':'yin')+(changed[r]?' chg':'');
@@ -266,10 +266,10 @@ function render(prefix, hex, changed, vals, info){
   if(info){
     if(title) title.innerHTML=makeTitle(info);
     if(metaUnder) metaUnder.innerHTML = metaRow('상괘', info.upper) + metaRow('하괘', info.lower);
-    if(core){
+    if(gist){
       var label = (prefix === 'base') ? '본괘 요지' : '변괘 요지';
-      core.innerHTML = '<div class="coreLabel">'+label+'</div>'
-                     + '<div class="coreText">'+ info.summary +'</div>';
+      gist.innerHTML = '<div class="gistLabel">'+label+'</div>'
+                     + '<div class="gistText">'+ info.summary +'</div>';
     }
     if(readBox) readBox.innerHTML = makeInterpretation(changed, vals, info);
   }else{ if(title) title.textContent='—'; }
