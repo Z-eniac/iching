@@ -43,9 +43,29 @@
     --contentMax: 1200px;
     --cardW: 400px; --cardGap: 18px; /* more compact cards */
     --metaCol1: 40px; --metaCol2: 80px; --metaCol3: 50px; --metaCol4: 100px; --metaCol5: 58px; /* tighter grid */
+          /* === Brand size knobs === */
+        --brandLogoSize: 140px;      /* 로고(정사각) 크기 */
+        --brandTypeWidth: 205px;     /* 로고타입(svg 글자) 가로폭 */
+        --brandGap: 12px;            /* 둘 사이 간격 */
   }
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Malgun Gothic',Segoe UI,Roboto,sans-serif}
   .wrap{max-width:var(--contentMax);margin:0 auto;padding:90px 12px 0}
+
+  .brandWrap{
+  display:flex; flex-direction:column; align-items:center;
+  gap:var(--brandGap);
+  margin: 25px 0 6px;          /* 상단 여백 조절 */
+  }
+  .brandWrap a{ display:inline-block; text-decoration:none; }
+  .brandLogo{ width:var(--brandLogoSize); height:auto; }
+  .brandType{ width:min(var(--brandTypeWidth), 84vw); height:auto; }
+
+  /* 스크린리더/SEO용 숨김 텍스트 */
+  .sr-only{
+  position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+      
   h1{font-size:50px;margin:0 0 0px;text-align:center;letter-spacing:-1.0px} /* 1.5x */
       /* 사이트 공통 헤더(h1) */
 h1,
@@ -197,11 +217,39 @@ h1{text-align:center;margin-top:46px;margin-bottom:30px}
 .intro textarea{text-align:left}
 
 .landing.hidden{display:none !important}
+
+:root{
+  /* 서브 페이지 로고 크기/여백 */
+  --subLogoSize: 140px; /* 로고 크기 */
+  --subLogoTop: 18px;                     /* 위 여백 */
+  --subLogoBottom: 12px;                  /* 아래 여백 */
+}
+
+.brandWrap--sub{
+  display:flex; justify-content:center; align-items:center;
+  margin: var(--subLogoTop) 0 var(--subLogoBottom);
+}
+.brandWrap--sub .brandLogo{
+  width: var(--subLogoSize); height:auto;
+}
+
+/* 혹시 전역 페이드가 상속되면 즉시 표시로 강제 */
+.brandWrap--sub, .brandWrap--sub *{
+  opacity:1 !important; transform:none !important;
+  transition:none !important; animation:none !important;
+}
 </style></head>
 <body>
 <div style="display:none"><button id="castCoins"></button><button id="castYarrow"></button><button id="customInput"></button></div>
 <div class="mainWrap">
-  <h1><a href="index.html" style="color:inherit;text-decoration:none">Divina Studio</a></h1>
+  <!-- 시멘틱/SEO 유지를 위한 숨김 h1 -->
+  <h1 class="sr-only">Divina Studio</h1>
+  <!-- 브랜드 블록: 위 로고, 아래 로고타입 -->
+  <div class="brandWrap">
+  <!-- 로고: 클릭 시 index.html 이동 -->
+  <a href="index.html" aria-label="Divina Studio Home">
+    <img src="./icon/No49.svg" alt="Divina logo" class="brandLogo">
+  </a>
   <!-- Landing UI (입장시 노출) -->
   <section id="landingUI" class="intro landing">
     <p>상황과 질문을 상세히 입력해 주세요.<br>미입력 시 기본 점괘 해석만 제공됩니다.<br></p>
