@@ -276,6 +276,46 @@ window.addEventListener('keydown',e=>{ if(e.shiftKey && e.key.toLowerCase()==='d
 </script>
 
 <script>
+
+  /* --- overrides loader (coins와 동일) --- */
+(function(){
+  const OVERRIDES_BASE_PATH = './overrides';
+  const BUILD_VERSION = 'v2'; // 캐시 갱신용
+
+  const pad2 = n => String(n).padStart(2, '0');
+
+  async function __overrideLoad(baseNo, targetNo){
+    const url = `${OVERRIDES_BASE_PATH}/overrides_base_${pad2(baseNo)}_domains.json?v=${BUILD_VERSION}`;
+    try{
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const data = await res.json();
+      return data[String(targetNo)] || null;   // 없으면 null
+    }catch(e){
+      console.warn('override fetch fail', e);
+      return null;
+    }
+  }
+  // 전역 노출(안전 범위)
+  window.__overrideLoad = __overrideLoad;
+})();
+
+/* 라벨 제거 유틸(동전법과 동일) */
+function stripLabelsInline(t){
+  // 요약 한 줄에서 " · 핵심: …", " · 상세: …" 꼬리 제거
+  return (t||'').replace(/\s*[·•]?\s*(핵심|상세)\s*:\s*[^\n\r]*/g, '')
+                .replace(/\s{2,}/g,' ')
+                .trim();
+}
+function stripLabelsInDetail(t){
+  // 본문에서 "핵심:" 줄은 통째로 제거, "상세:"는 라벨만 지우고 뒤 내용 보존
+  if(!t) return '';
+  return t.split(/\r?\n/).map(l=>{
+    if(/^\s*[·•]?\s*핵심\s*:/.test(l)) return '';
+    return l.replace(/^\s*[·•]?\s*상세\s*:\s*/, '');
+  }).filter(Boolean).join('\n');
+}
+  
 /******** 데이터 & 유틸 ********/
 const TRIS=['坤','震','坎','兌','艮','離','巽','乾'];
 const TRIS_KO={'坤':'곤','震':'진','坎':'감','艮':'간','巽':'손','離':'리','兌':'태','乾':'건'};
@@ -366,21 +406,87 @@ function render(prefix, hex, changed, vals, info){
 
   
 function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
-  var s=document.getElementById('jointSummary'), d=document.getElementById('jointText'); if(!s||!d) return;
-  var k=changed.filter(Boolean).length, ups=0,downs=0,posArr=[],domains=[];
-  for(var i=0;i<6;i++){ if(changed[i]){ posArr.push((i+1)+'효'); domains.push(POS_DOMAIN[i]); if(vals[i]===6) ups++; else downs++; } }
-  var trend=(ups>downs)?'기세가 열림(↗)':(downs>ups)?'기세가 닫힘(↘)':'균형 전환(→)';
-  if(k===0){
-    s.textContent='변화 없음 — 현상 유지, 내실을 다질 때';
-    d.textContent='현재 #'+bInfo.no+' '+(TRI_MEAN_HAN[bInfo.upper]+TRI_MEAN_HAN[bInfo.lower]+bInfo.nameHan)+'('+TRI_ATTR_KO[bInfo.upper]+TRI_ATTR_KO[bInfo.lower]+bInfo.nameKo+')의 기운이 계속됩니다.\n급변보다는 안정과 보수에 초점을 두세요.'; return;
+  const s=document.getElementById('jointSummary');
+  const d=document.getElementById('jointText');
+  if(!s||!d) return;
+
+  const k = changed.filter(Boolean).length;
+  let ups=0, downs=0, posArr=[], domains=[];
+  for(let i=0;i<6;i++){
+    if(changed[i]){
+      posArr.push((i+1)+'효'); domains.push(POS_DOMAIN[i]);
+      if(vals[i]===6) ups++; else downs++;
+    }
   }
-  s.textContent='변효 '+k+'개 — '+trend+' · 핵심: '+posArr.join(', ');
-  var parts=[];
+  const trend = (ups>downs)?'기세가 열림(↗)':(downs>ups)?'기세가 닫힘(↘)':'균형 전환(→)';
+
+  if(k===0){
+    // 기본 문구 먼저 출력
+    s.textContent = '변화 없음 — 현상 유지, 내실을 다질 때';
+    d.textContent = '현재 #'+bInfo.no+' '+(TRI_MEAN_HAN[bInfo.upper]+TRI_MEAN_HAN[bInfo.lower]+bInfo.nameHan)
+      +'('+TRI_ATTR_KO[bInfo.upper]+TRI_ATTR_KO[bInfo.lower]+bInfo.nameKo+')의 기운이 계속됩니다.\n'
+      +'급변보다는 안정과 보수에 초점을 두세요.';
+
+    // ⬇️ overrides (no-change) — 있으면 요약/본문을 덮어쓰기
+    try{
+      window.__overrideLoad && window.__overrideLoad(bInfo.no, bInfo.no).then(ov=>{
+        if(!ov) return;
+        const box = document.getElementById('jointBox');
+        if (box?.classList.contains('ai-owned')) return; // AI가 쓰는 중이면 덮어쓰지 않음
+
+        s.textContent = stripLabelsInline(ov.summary || '');
+
+        const doms = ov.domains || {};
+        const body = (stripLabelsInDetail(ov.detail || '') + '\n\n'
+          + '· 연애: ' + (doms['연애'] || '') + '\n'
+          + '· 사업: ' + (doms['사업'] || '') + '\n'
+          + '· 공부: ' + (doms['공부'] || '') + '\n'
+          + '· 건강: ' + (doms['건강'] || '')).trim();
+
+        // 안전하게 교체
+        d.replaceChildren();
+        body.split(/\n+/).filter(Boolean).forEach(p=>{
+          const el=document.createElement('p'); el.textContent=p; d.appendChild(el);
+        });
+      });
+    }catch(e){ console.warn(e); }
+
+    return;  // ← 여기서 종료 (변괘 분기로 떨어지지 않게)
+  }
+
+  // (k>0) 기본 요약/본문
+  s.textContent = '변효 '+k+'개 — '+trend+' · 핵심: '+posArr.join(', ');
+  let parts=[];
   parts.push('현재 본괘 '+bInfo.nameKo+'(#'+bInfo.no+', '+TRI_ATTR_KO[bInfo.upper]+TRI_ATTR_KO[bInfo.lower]+')는 "'+bInfo.summary+'"을(를) 뜻합니다.');
   parts.push('변화를 거쳐 변괘 '+mInfo.nameKo+'(#'+mInfo.no+', '+TRI_ATTR_KO[mInfo.upper]+TRI_ATTR_KO[mInfo.lower]+')로 향하며 "'+mInfo.summary+'"의 국면으로 이동합니다.');
   parts.push('이번 변화는 '+domains.join('·')+' 영역에서 두드러집니다.');
-  parts.push( (ups>downs)?'막히던 것이 열리거나 새로운 시작의 신호가 강합니다.':(downs>ups?'과함을 줄이고 정리·수렴하는 흐름이 우세합니다.':'팽팽한 균형 속에서 방향 전환의 여지가 큽니다.') );
-  d.textContent=parts.join('\n');
+  parts.push( (ups>downs)?'막히던 것이 열리거나 새로운 시작의 신호가 강합니다.'
+                         : (downs>ups?'과함을 줄이고 정리·수렴하는 흐름이 우세합니다.'
+                                   :'팽팽한 균형 속에서 방향 전환의 여지가 큽니다.') );
+  d.textContent = parts.join('\n');
+
+  // ⬇️ overrides (changed) — 있으면 덮어쓰기
+  try{
+    window.__overrideLoad && window.__overrideLoad(bInfo.no, mInfo.no).then(ov=>{
+      if(!ov) return;
+      const box = document.getElementById('jointBox');
+      if (box?.classList.contains('ai-owned')) return;  // AI가 쓰는 중이면 패스
+
+      s.textContent = stripLabelsInline(ov.summary || '');
+
+      const doms = ov.domains || {};
+      const body = (stripLabelsInDetail(ov.detail || '') + '\n\n'
+        + '· 연애: ' + (doms['연애'] || '') + '\n'
+        + '· 사업: ' + (doms['사업'] || '') + '\n'
+        + '· 공부: ' + (doms['공부'] || '') + '\n'
+        + '· 건강: ' + (doms['건강'] || '')).trim();
+
+      d.replaceChildren();
+      body.split(/\n+/).filter(Boolean).forEach(p=>{
+        const el=document.createElement('p'); el.textContent=p; d.appendChild(el);
+      });
+    });
+  }catch(e){ console.warn(e); }
 }
 
 /******** 랜딩: 커스텀 선택 & 미리보기 ********/
