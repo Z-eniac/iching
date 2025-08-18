@@ -238,8 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const baseDelay = 600;  // 헤더만 먼저 보이게 잠깐 대기
-  const step = 250;       // 항목 간 지연(ms) — 취향껏 120~240 사이로 조절
+  const baseDelay = 800;  // 헤더만 먼저 보이게 잠깐 대기
+  const step = 200;       // 항목 간 지연(ms) — 취향껏 120~240 사이로 조절
 
   items.forEach((el, i) => {
     const delay = baseDelay + i * step;
