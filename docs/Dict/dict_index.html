@@ -50,21 +50,21 @@ h1{font-family:"NotoSerifCJK-ICHING",serif;font-size:3rem;margin:.2em 0 .1em}
 .index{list-style:none;margin:10px;padding:0;display:grid;gap:12px;
   grid-template-columns:repeat(var(--cols),minmax(0,1fr))}
 @media (max-width:1200px){ :root{--cols:6} }
-@media (max-width:900px){ :root{--cols:4} }
+@media (max-width:850px){ :root{--cols:4} }
 @media (max-width:560px){ :root{--cols:2} }
 
 .index li{
   position:relative;border:1px solid var(--border);background:var(--surface);
-  border-radius:18px;overflow:hidden;min-height:84px;aspect-ratio: 2.3 / 1;
+  border-radius:18px;overflow:hidden;min-height:68px;aspect-ratio: 2 / 1;
   transition:border-color .15s ease, transform .08s ease;
 }
-.index li:hover{transform:translateY(-1px);border-color:#2b3a5b}
+.index li:hover{transform:translateY(-2px);border-color:#2b3a5b}
 .index a{display:block;position:relative;width:100%;height:100%;padding:10px 14px}
 
 /* number badge */
 .badge{
-  position:absolute;left:10px;top:10px;display:inline-grid;place-items:center;
-  min-width:34px;height:28px;border-radius:10px;border:1px solid var(--border);
+  position:absolute;left:4px;top:0px;display:inline-grid;place-items:center;
+  min-width:34px;height:28px;border-radius:10px;
   background:#0f182a;color:#dbe7ff;font-weight:700;font-variant-numeric:tabular-nums;
   font-size:16px;letter-spacing:.2px;
 }
