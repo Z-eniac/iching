@@ -13,6 +13,9 @@ app.use(express.json({ limit: '1mb' }))
 app.use(express.static('public'))  // public/index.html, public/**.* 접근 가능
 
 // 헬스체크 라우트 추가
+app.get("/", (req, res) => {
+  res.status(200).send("OK");
+});
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
