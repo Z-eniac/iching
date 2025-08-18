@@ -50,8 +50,8 @@ h1{font-family:"NotoSerifCJK-ICHING",serif;font-size:3rem;margin:.2em 0 .1em}
 .index{list-style:none;margin:10px;padding:0;display:grid;gap:12px;
   grid-template-columns:repeat(var(--cols),minmax(0,1fr))}
 @media (max-width:1200px){ :root{--cols:6} }
-@media (max-width:850px){ :root{--cols:4} }
-@media (max-width:560px){ :root{--cols:2} }
+@media (max-width:920px){ :root{--cols:4} }
+@media (max-width:620px){ :root{--cols:2} }
 
 .index li{
   position:relative;border:1px solid var(--border);background:var(--surface);
@@ -72,8 +72,8 @@ h1{font-family:"NotoSerifCJK-ICHING",serif;font-size:3rem;margin:.2em 0 .1em}
 /* glyph & hangul */
 .glyph{
   font-family:"NotoSerifCJK-ICHING",serif; font-weight:600;
-  font-size:40px; line-height:1; text-align:center;
-  position:absolute; left:0; right:0; top:47%; transform:translateY(-50%);
+  font-size:clamp(40px, 4vw, 50px); line-height:1; text-align:center;
+  position:absolute; left:0; right:0; top:47.5%; transform:translateY(-50%);
   pointer-events:none; user-select:none;
 }
 .ko{
