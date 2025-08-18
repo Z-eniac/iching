@@ -245,6 +245,27 @@ h1{text-align:center;margin-top:46px;margin-bottom:30px}
   align-self: stretch;
   width: 100%;
 }
+
+ /* 텍스트 링크 */
+.topNav{
+  display:flex;
+  justify-content:center;
+  margin: 10px 0 6px;
+}
+.topLink{
+  display:inline-block;
+  font-weight: 400;          /* 약간의 두께 */
+  font-size: 15px;           /* 작은 텍스트 */
+  letter-spacing: .02em;
+  color:#566fd1;
+  text-decoration: none;     /* 기본은 밑줄 없음 */
+  text-underline-offset: 3px;
+}
+.topLink:hover,
+.topLink:focus-visible{
+  text-decoration: underline; /* hover/focus에만 밑줄 */
+  outline: none;
+}
       
 </style></head>
 <body>
@@ -266,6 +287,9 @@ h1{text-align:center;margin-top:46px;margin-bottom:30px}
     <div class="center" style="margin-top:10px;margin-bottom:20px">
       <button id="btnRunLanding" class="run">제출 및 점괘 실행</button>
     </div>
+  <div class="topNav" data-reveal-group>
+    <a class="topLink" href="iching_basic_info.html">◆ 동전법이란? ◆</a>
+  </div>
        <div class="legend">© 2025. 妙公 (Myo Gong). All Rights Reserved.</div>
 
   </section>
