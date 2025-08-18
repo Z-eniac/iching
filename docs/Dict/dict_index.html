@@ -98,6 +98,36 @@ body.icons .index li::after{
 .brandWrap a{ display:inline-block; text-decoration:none; }
 .brandLogo{ width:140px; height:auto; }
 .brandType{ width:300px; height:auto; }
+
+/* 순차 등장: 기본 상태(숨김) + 항상 transition 적용 */
+.js-reveal,
+[data-reveal-group] > * {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(2px);
+  transition: opacity .6s ease, transform .6s ease, filter .6s ease;
+  will-change: opacity, transform, filter;
+}
+
+/* 보일 때 */
+.js-reveal.show,
+[data-reveal-group] > *.show {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 모션 저감 사용자의 경우:
+   - 이동/블러만 제거 (깜빡임 최소화)
+   - transition은 끄지만, opacity는 기본 0을 유지 → JS로 순차 노출은 그대로 */
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal,
+  [data-reveal-group] > * {
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}
   
 /* ===== End styles ===== */
 </style>
@@ -108,17 +138,17 @@ body.icons .index li::after{
   <a href="/index.html" aria-label="Divina Studio Home">
     <img src="/icon/No49.svg" alt="Divina logo" class="brandLogo">
   </a>
-  <a href="dict_index.html" aria-label="Divina Dictionary Home">
+  <a class="js-reveal" href="dict_index.html" aria-label="Divina Dictionary Home">
     <img src="/icon/Divina_dict_type.svg" alt="Divina Dictionary wordmark" class="brandType">
   </a>
 </div>
-  <h2>64괘 색인</h2>
+  <h2 class="js-reveal">64괘 색인</h2>
 <div class="wrap">
-  <div class="head">
+  <div class="head js-reveal">
     <div class="sub">원전 풀이와 함께 각 괘에 대한<br>상세 내용을 볼 수 있어요.</div>
   </div>
 
-  <div class="toolbar" role="toolbar" aria-label="도구 막대">
+  <div class="toolbar js-reveal" role="toolbar" aria-label="도구 막대">
     <a class="btn" href="/index.html">홈으로</a>
     <input id="q" class="search" type="search" placeholder="검색(번호, 한글, 한자)..." aria-label="검색">
     <label class="switch" aria-label="문양 보기 토글">
@@ -128,7 +158,7 @@ body.icons .index li::after{
     </label>
   </div>
 
-  <ol id="list" class="index">
+  <ol id="list" class="index js-reveal">
     <!-- 1~64: data-no로 아이콘 경로 자동 주입 -->
     <li data-no="01"><a href="hex_01_건.html" aria-label="01 건 乾"><span class="badge">01</span><span class="glyph">乾</span><span class="ko">건</span></a></li>
     <li data-no="02"><a href="hex_02_곤.html" aria-label="02 곤 坤"><span class="badge">02</span><span class="glyph">坤</span><span class="ko">곤</span></a></li>
@@ -230,6 +260,27 @@ toggle?.addEventListener('change', () => {
   document.body.classList.toggle('icons', toggle.checked);
   label.textContent = toggle.checked ? '문자 보기' : '문양 보기';
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const items = [
+    ...document.querySelectorAll('.js-reveal') /*,
+    ...document.querySelectorAll('[data-reveal-group] > *') */
+  ];
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const baseDelay = 800;  // 헤더만 먼저 보이게 잠깐 대기
+  const step = 200;       // 항목 간 지연(ms) — 취향껏 120~240 사이로 조절
+
+  items.forEach((el, i) => {
+    const delay = baseDelay + i * step;
+    setTimeout(() => {
+      // reflow로 첫 프레임 확실히 고정
+      void el.offsetWidth;
+      el.classList.add('show');  // reduce여도 순차 등장(애니 없음)
+    }, delay);
+  });
+});
+  
 </script>
 </body>
 </html>
