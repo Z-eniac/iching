@@ -2,8 +2,9 @@
 <html lang="ko">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Divina Dictionary — 64괘 색인</title>
+<title>Divina Dictionary</title>
 <link rel="icon" type="image/svg+xml" href="/icon/No49.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/icon/No49.png">
 <link rel="preload" href="/assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2" as="font" type="font/woff2" crossorigin>
 
 <style>
@@ -87,14 +88,33 @@ body.icons .index li::after{
   content:""; position:absolute; inset:14% 12%;
   background-image: var(--icon-url); background-repeat:no-repeat; background-size:contain; background-position:center;
 }
+
+.brandWrap{
+  display:flex; flex-direction:column; align-items:center;gap:12px;
+  margin: 25px 0 6px;
+}
+.brandWrap a{ display:inline-block; text-decoration:none; }
+.brandLogo{ width:140px; height:auto; }
+.brandType{ width:300px; height:auto; }
+  
 /* ===== End styles ===== */
 </style>
 
 <body>
+
+<div class="brandWrap">
+  <a href="/index.html" aria-label="Divina Studio Home">
+    <img src="/icon/No49.svg" alt="Divina logo" class="brandLogo">
+  </a>
+  <a href="dict_index.html" aria-label="Divina Dictionary Home">
+    <img src="/icon/Divina_dict_type.svg" alt="Divina Dictionary wordmark" class="brandType">
+  </a>
+</div>
+  
 <div class="wrap">
   <div class="head">
     <h1>64괘 색인</h1>
-    <div class="sub">문자 보기 / 문양 보기 전환 가능</div>
+    <div class="sub">원전 풀이와 함께 각 괘에 대한<br>상세 내용을 볼 수 있어요.</div>
   </div>
 
   <div class="toolbar" role="toolbar" aria-label="도구 막대">
