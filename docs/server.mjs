@@ -18,7 +18,7 @@ app.get("/health", (req, res) => {
 });
 
 // (4) 서버 시작
-app.listen(PORT, () => console.log(`ready on http://localhost:${PORT}`))
+app.listen(PORT, "0.0.0.0", () => console.log(`ready on http://localhost:${PORT}`))
 
 const ai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
