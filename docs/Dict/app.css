@@ -1,0 +1,109 @@
+/* ===== Divina Dict common styles (app.css) ===== */
+@font-face{
+  font-family: "NotoSerifCJK-ICHING";
+  src: url("./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+:root{ 
+  --bg:#0c111b; 
+  --card:#101827; 
+  --ink:#eaf0ff; 
+  --muted:#9fb1d4; 
+  --border:#22304a; 
+  --yang:#e7eefc;
+  --yin:#e7eefc; 
+  --quote:#2f3b4f; 
+  --yinGap:26px;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,'Malgun Gothic',Pretendard,Segoe UI,Roboto,sans-serif
+}
+a{color:inherit;text-underline-offset:2px}
+
+.brandWrap{
+  display:flex; flex-direction:column; align-items:center;gap:12px;
+  margin: 25px 0 6px;
+}
+.brandWrap a{ display:inline-block; text-decoration:none; }
+.brandLogo{ width:140px; height:auto; }
+.brandType{ width:300px; height:auto; }
+
+.wrap{
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+  padding:20px 16px 56px
+}
+
+/* ---------- Card (Top) ---------- */
+.cardTop{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 22px;
+  box-shadow:0 2px 10px rgba(0,0,0,.25);max-width:400px;width:100%
+}
+.bigHan{
+  font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif;
+  font-weight:600;font-size:45px;letter-spacing:1px;margin:2px 0 6px
+}
+.smallKo{font-size:14px;color:var(--muted);margin:0 0 8px}
+.hex.center{display:grid;grid-auto-rows:24px;row-gap:12px;align-items:center;justify-items:center;margin:6px 0 10px}
+
+/* hexagram lines */
+.lineWrap{position:relative;width:200px;height:24px}
+.line{height:100%;border-radius:7px;background:#25324a;position:absolute;inset:0}
+.yang .line::before{
+  content:'';position:absolute;inset:2px;background:var(--yang);border-radius:5px;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)
+}
+/* yin (broken) line */
+.yin .line{background:transparent; position:relative}
+.yin .line::before,
+.yin .line::after{
+  content:'';position:absolute;top:2px;bottom:2px;
+  width:calc(50% - (var(--yinGap)/2));background:var(--yin);border-radius:5px;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)
+}
+.yin .line::before{left:2px}
+.yin .line::after{right:2px}
+
+.label{font-size:12px;color:var(--muted);margin-top:4px}
+.topGist{font-size:22px;font-weight:900;letter-spacing:.2px;margin-top:2px}
+
+/* ---------- Word body ---------- */
+.wordBody{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 12px;
+  box-shadow:0 2px 10px rgba(0,0,0,.25);max-width:700px;width:100%
+}
+.wordBody h1{
+  font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif;
+  font-weight:600;font-size:4.0rem;margin:.3em 0 1.0em;text-align:center
+}
+.wordBody h1 sub{font-size:1.6rem}
+.wordBody h2{font-weight:700;font-size:1.25rem;margin:1.6em 0 .3em;}
+.wordBody p{font-weight:200;margin:11px 0 0 22px;line-height:1.6}
+.wordBody p b{font-weight:500;}
+.wordBody p pt{font-weight:600;margin:11px 0 0 0px}
+.wordBody p qu{font-weight:300;margin:11px 0 0 12px}
+
+/* Body gist styling */
+.bodyGist{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;margin:14px 0 20px
+}
+.bodyGist .qOpen{
+  font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif;
+  content:'“';display:block;font-size:70px;line-height:.3;color:var(--quote);margin-bottom:8px
+}
+.bodyGist .qClose{
+  font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif;
+  content:'”';display:block;font-size:70px;line-height:.6;color:var(--quote);margin-top:8px
+}
+.bodyGist .gist{
+  font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif;
+  font-size:24px;font-weight:600;letter-spacing:.1px;margin-bottom:27px;display:block
+}
+
+/* Legend (fixed position under wordBody) */
+.legend{margin-top:12px;margin-bottom:20px;font-size:12px;color:#a4b2d4;text-align:center}
+/* ===== End common styles ===== */
