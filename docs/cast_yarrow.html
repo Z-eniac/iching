@@ -225,6 +225,37 @@ h1{text-align:center;margin-top:46px;margin-bottom:30px}
 
 .landing.hidden{display:none !important}
 
+/* 순차 등장: 기본 상태(숨김) + 항상 transition 적용 */
+.js-reveal,
+[data-reveal-group] > * {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(2px);
+  transition: opacity .6s ease, transform .6s ease, filter .6s ease;
+  will-change: opacity, transform, filter;
+}
+
+/* 보일 때 */
+.js-reveal.show,
+[data-reveal-group] > *.show {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 모션 저감 사용자의 경우:
+   - 이동/블러만 제거 (깜빡임 최소화)
+   - transition은 끄지만, opacity는 기본 0을 유지 → JS로 순차 노출은 그대로 */
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal,
+  [data-reveal-group] > * {
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}
+
+
  /* 텍스트 링크 */
 .topNav{
   display:flex;
@@ -259,17 +290,17 @@ h1{text-align:center;margin-top:46px;margin-bottom:30px}
     <img src="./icon/No49.svg" alt="Divina logo" class="brandLogo">
   </a>
   <!-- Landing UI (입장시 노출) -->
-  <section id="landingUI" class="intro landing">
+  <section id="landingUI" class="intro landing js-reveal">
     <p>상황과 질문을 상세히 입력해 주세요.<br>미입력 시 기본 점괘 해석만 제공됩니다.<br></p>
-    <label class="small" for="userQuestion">질문 입력</label>
-    <textarea id="userQuestion" placeholder="예: 이번 이직 제안이 내게 유리할까? 연봉 협상에서 유의점은?"></textarea>
-    <div class="center" style="margin-top:10px;margin-bottom:0">
+    <label class="small js-reveal" for="userQuestion">질문 입력</label>
+    <textarea class="js-reveal" id="userQuestion" placeholder="예: 이번 이직 제안이 내게 유리할까? 연봉 협상에서 유의점은?"></textarea>
+    <div class="center js-reveal" style="margin-top:10px;margin-bottom:0">
       <button id="btnRunLanding" class="run">제출 및 점괘 실행</button>
     </div>
-  <div class="topNav" data-reveal-group>
+  <div class="topNav js-reveal" data-reveal-group>
     <a class="topLink" href="iching_basic_info.html#methods">◆ 지초법이란? ◆</a>
   </div>
-       <div class="legend">© 2025. 妙公 (Myo Gong). All Rights Reserved.</div>
+       <div class="legend js-reveal">© 2025. 妙公 (Myo Gong). All Rights Reserved.</div>
 
   </section>
 
@@ -783,6 +814,27 @@ if (typeof reading.score === 'number') parts.push(`길흉 점수: ${reading.scor
     };
   }
 })();
+
+      document.addEventListener('DOMContentLoaded', () => {
+  const items = [
+    ...document.querySelectorAll('.js-reveal') /*,
+    ...document.querySelectorAll('[data-reveal-group] > *') */
+  ];
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const baseDelay = 800;  // 헤더만 먼저 보이게 잠깐 대기
+  const step = 200;       // 항목 간 지연(ms) — 취향껏 120~240 사이로 조절
+
+  items.forEach((el, i) => {
+    const delay = baseDelay + i * step;
+    setTimeout(() => {
+      // reflow로 첫 프레임 확실히 고정
+      void el.offsetWidth;
+      el.classList.add('show');  // reduce여도 순차 등장(애니 없음)
+    }, delay);
+  });
+});
+      
 </script>
 
 </body></html>
