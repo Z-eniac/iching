@@ -162,6 +162,7 @@ td{background:#101a2e}
 .hexCaption .gistLabel{font-size:12px; color:#9bb7ff; margin-top:8px; letter-spacing:.02em}
 .hexCaption .guaGist{font-family:"NotoSerifCJK-ICHING", serif; font-size:16px; font-weight:700; color:#eaf0ff; margin-top:4px; letter-spacing:.2px}
 
+  
 /* 기본: 숨김 상태 */
 #guide [data-reveal]{
   opacity:0; transform:translateY(8px);
@@ -176,6 +177,35 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
   #guide [data-reveal]{ transition:none !important; transform:none !important; }
 }
 
+  /* 순차 등장: 기본 상태(숨김) + 항상 transition 적용 */
+.js-reveal,
+[data-reveal-group] > * {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(2px);
+  transition: opacity .6s ease, transform .6s ease, filter .6s ease;
+  will-change: opacity, transform, filter;
+}
+
+/* 보일 때 */
+.js-reveal.show,
+[data-reveal-group] > *.show {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 모션 저감 사용자의 경우:
+   - 이동/블러만 제거 (깜빡임 최소화)
+   - transition은 끄지만, opacity는 기본 0을 유지 → JS로 순차 노출은 그대로 */
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal,
+  [data-reveal-group] > * {
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -189,10 +219,10 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
   <a href="index.html" aria-label="Divina Studio Home">
     <img src="./icon/No49.svg" alt="Divina logo" class="brandLogo">
   </a>
-<h2 class="page-title">Divina 기초 안내서</h2>
-<p class="subtitle" data-reveal>64괘의 기초 정보부터 원리와 읽는 법까지,<br>하나씩 차근 차근 알려드릴게요.</p>
+<h2 class="page-title js-reveal">Divina 기초 안내서</h2>
+<p class="subtitle js-reveal">64괘의 기초 정보부터 원리와 읽는 법까지,<br>하나씩 차근 차근 알려드릴게요.</p>
 <!-- mini anchor nav -->
-<nav aria-label="섹션 바로가기" class="anchorNav" data-reveal>
+<nav aria-label="섹션 바로가기" class="anchorNav js-reveal">
 <a href="#introduction">0. Divina 소개</a>
 <a href="#about">1. 64괘란?</a>
 <a href="#reading">2. 괘 읽는 법</a>
@@ -202,7 +232,7 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
 <a href="#advanced">6. 심화</a>
 </nav>
 <!-- 0) Divina의 간략한 소개 -->
-<section class="section" id="introduction" data-reveal>
+<section class="section" id="introduction js-reveal">
 <h3>0. Divina 소개</h3>
 <p>
     <b><em>Divina</em></b>는 주역 점술의 현대화를 꿈꾸는 당찬 프로젝트입니다.
@@ -217,7 +247,7 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
 </p>    
 </section>
 <!-- 1) 64괘란 -->
-<section class="section" id="about" data-reveal>
+<section class="section" id="about js-reveal">
 <h3>1. 64괘란?</h3>
 <p>
     64괘(卦)는 동아시아에서 전해 내려온 가장 오래된 점술 체계 가운데 하나로,
@@ -239,7 +269,7 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
   </p>
 </section>
 <!-- 2) 읽는 법 -->
-<section class="section" id="reading" data-reveal>
+<section class="section" id="reading js-reveal">
 <h3>2. 괘 읽는 법</h3>
 <div>
 <p>
@@ -342,7 +372,7 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
 </div>
 </section>
 <!-- 3) 점치는 방법 -->
-<section class="section" id="methods" data-reveal>
+<section class="section" id="methods js-reveal">
 <h3>3. 점치는 방법</h3>
   <p>
   점을 치는 방법에는 <b>지초법</b>과 <b>동전법</b> 두 가지가 있습니다.
@@ -418,7 +448,7 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
   
 </section>
 <!-- 4) 확률과 편향 -->
-<section class="section" id="prob" data-reveal>
+<section class="section" id="prob js-reveal">
 <h3>4. 확률과 편향</h3>
 <p>아래 값은 각 줄(효)에서 한 번에 나타날 <b>노음·소양·소음·노양</b>의 분포를 뜻합니다.</p>
 <div class="tableWrap">
@@ -470,7 +500,7 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
     </div>
 </section>
 <!-- 5) 용어 -->
-<section class="section" id="glossary" data-reveal>
+<section class="section" id="glossary js-reveal">
 <h3>5. 용어</h3>
 <ul class="glossary">
 <li><b>효(爻)</b>: <br>괘를 이루는 한 줄입니다. 아래부터 1효~6효로 세어 올라갑니다. 1효와 6효는 각각 초효(初爻), 상효(上爻)라고도 부릅니다.</li>
@@ -484,12 +514,12 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
 </ul>
 </section>
 <!-- 6) advanced -->
-<section class="section" id="advanced" data-reveal>
+<section class="section" id="advanced js-reveal">
 <h3>6. 심화</h3>
   <p><b><a href="./Dict/Dict_index.html">64괘 사전</a></b></p>
   <p>심화 문서는 추후 추가될 예정입니다. 효사·괘사 해석의 층위, 전통 주석 비교, 응용 리딩 등 더 깊은 내용을 안내드릴 계획입니다.</p>
 </section>
-<div class="legend" style="text-align:center;color:#a4b2d4;font-size:12px;margin-top:26px;">© 2025. 妙公 (Myo Gong). All Rights Reserved.</div>
+<div class="legend js-reveal" style="text-align:center;color:#a4b2d4;font-size:12px;margin-top:26px;">© 2025. 妙公 (Myo Gong). All Rights Reserved.</div>
 </div>
 <!-- floating back-to-top button (single instance) -->
 <button aria-hidden="true" aria-label="맨 위로" class="divinaBackTop" id="divinaBackTop" title="맨 위로" type="button">↑</button>
@@ -521,6 +551,7 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
   }, {passive: true});
 })();
 
+  /*
   const sleep = ms => new Promise(r=>setTimeout(r, ms));
 
 document.documentElement.classList.add('prehide');
@@ -541,13 +572,33 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // 3) 한 템포 두고 순차 노출 (헤더는 처음부터 보임)
   const items = root.querySelectorAll('[data-reveal]');
-  const delay = 500;            // 각 아이템 간격(ms)
+  const delay = 250;            // 각 아이템 간격(ms)
   const lead  = 500;          // 시작 전 한 템포
   await sleep(lead);
   requestAnimationFrame(()=>document.documentElement.classList.remove('prehide'));
   for(const el of items){ el.classList.add('revealed'); await sleep(delay); }
 });
-  
+*/
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const items = [
+    ...document.querySelectorAll('.js-reveal') /*,
+    ...document.querySelectorAll('[data-reveal-group] > *') */
+  ];
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const baseDelay = 800;  // 헤더만 먼저 보이게 잠깐 대기
+  const step = 200;       // 항목 간 지연(ms) — 취향껏 120~240 사이로 조절
+
+  items.forEach((el, i) => {
+    const delay = baseDelay + i * step;
+    setTimeout(() => {
+      // reflow로 첫 프레임 확실히 고정
+      void el.offsetWidth;
+      el.classList.add('show');  // reduce여도 순차 등장(애니 없음)
+    }, delay);
+  });
+});
 </script>
 </body>
 </html>
