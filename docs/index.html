@@ -233,8 +233,8 @@ h1{margin-top:46px}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const items = [
-    ...document.querySelectorAll('[data-reveal-group] > *'),
-    ...document.querySelectorAll('.js-reveal')
+    ...document.querySelectorAll('.js-reveal'),
+    ...document.querySelectorAll('[data-reveal-group] > *')
   ];
 
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
