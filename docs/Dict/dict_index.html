@@ -6,9 +6,85 @@
 <link rel="icon" type="image/svg+xml" href="/icon/No49.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="/icon/No49.png">
 <link rel="preload" href="/assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="app.css">
+<style>
+/* ===== Divina Dict — Single-file styles ===== */
+@font-face{
+  font-family: "NotoSerifCJK-ICHING";
+  src: url("/assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2") format("woff2");
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+:root{
+  --bg:#0c111b; --card:#101827; --ink:#eaf0ff; --muted:#9fb1d4; --border:#22304a;
+  --accent:#7aa2ff; --ink-dim:#cdd7ef;
+  --radius:14px; --gap:12px; --cols:8; /* desktop 기본 8열 */
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,'Malgun Gothic',Pretendard,Segoe UI,Roboto,sans-serif}
+a{color:inherit;text-underline-offset:2px}
+
+/* Brand */
+.brandWrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin:24px 0 8px}
+.brandWrap a{display:inline-block;text-decoration:none}
+.brandLogo{width:140px;height:auto}
+.brandType{width:300px;height:auto}
+
+/* Page wrap */
+.wrap{display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px 16px 56px}
+
+/* Card */
+.wordBody{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 14px;box-shadow:0 2px 10px rgba(0,0,0,.25);max-width:1100px;width:100%}
+.wordBody h1{font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif;
+  font-weight:600;font-size:3.1rem;margin:.3em 0 .75em;text-align:center}
+.legend{margin-top:10px;margin-bottom:20px;font-size:12px;color:#a4b2d4;text-align:center}
+
+/* Toolbar */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 10px;justify-content:center;margin:-2px 0 14px}
+.toolbar .btn, .toolbar .chip{
+  border:1px solid var(--border);background:var(--card);color:var(--ink);border-radius:10px;
+  padding:8px 12px;text-decoration:none;display:inline-flex;align-items:center;gap:8px
+}
+.toolbar input[type="search"]{
+  -webkit-appearance:none;appearance:none;border:1px solid var(--border);background:#0e1524;
+  color:var(--ink);border-radius:10px;padding:9px 12px;min-width:220px;outline:none
+}
+.toolbar label{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-dim)}
+.toolbar input[type="checkbox"]{accent-color:var(--accent)}
+
+/* Grid index */
+.index{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:10px}
+.index li{border:1px solid var(--border);border-radius:12px;padding:10px 10px;position:relative;
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.02));
+  transition:transform .08s ease, border-color .12s ease, background-color .12s ease}
+.index li:hover{transform:translateY(-1px);border-color:#2b3a5b}
+.index a{display:flex;gap:8px;align-items:center;text-decoration:none}
+.badge{min-width:30px;height:26px;border:1px solid var(--border);border-radius:8px;display:grid;
+  place-items:center;font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink);background:#0f182a}
+.label{display:flex;flex-direction:column;min-width:0}
+.title{font-size:14px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{font-size:12px;color:var(--muted);line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Compact mode */
+body.compact .index li{padding:8px 8px}
+body.compact .badge{min-width:26px;height:22px;border-radius:7px;font-size:12px}
+body.compact .title{font-size:13px}
+body.compact .meta{display:none}
+
+/* Responsive columns */
+@media (max-width:1200px){ :root{ --cols:6; } }
+@media (max-width:900px){ :root{ --cols:4; } }
+@media (max-width:560px){ :root{ --cols:2; } .brandType{width:240px} }
+
+/* Subtle fade-in */
+@keyframes dd-in { from { opacity:.001; transform: translateY(4px);} to { opacity:1; transform: translateY(0);} }
+.brandWrap,.wordBody,.legend{animation:dd-in .5s ease both}
+/* ===== End single-file styles ===== */
+</style>
+
 <body>
 
+<!-- Brand -->
 <div class="brandWrap">
   <a href="/index.html" aria-label="Divina Studio Home">
     <img src="/icon/No49.svg" alt="Divina logo" class="brandLogo">
@@ -19,19 +95,107 @@
 </div>
 
 <div class="wrap">
-
   <div class="wordBody">
-    <h1 class="style-본문" style="margin-top:.2em">64괘 색인</h1>
-    <p class="style-본문" style="text-align:center;margin:0 0 14px">
-      <a href="index.html" style="display:inline-block;border:1px solid var(--border);background:var(--card);padding:8px 14px;border-radius:10px;text-decoration:none">홈으로</a>
-    </p>
-    <ol style="margin:10px 24px 20px; line-height:1.9">
-      <li><a href="hex_01_건.html">01 건(乾)</a></li><li><a href="hex_02_곤.html">02 곤(坤)</a></li><li><a href="hex_03_둔.html">03 둔(屯)</a></li><li><a href="hex_04_몽.html">04 몽(蒙)</a></li><li><a href="hex_05_수.html">05 수(需)</a></li><li><a href="hex_06_송.html">06 송(訟)</a></li><li><a href="hex_07_사.html">07 사(師)</a></li><li><a href="hex_08_비.html">08 비(比)</a></li><li><a href="hex_09_소축.html">09 소축(小畜)</a></li><li><a href="hex_10_리.html">10 리(履)</a></li><li><a href="hex_11_태.html">11 태(泰)</a></li><li><a href="hex_12_비.html">12 비(否)</a></li><li><a href="hex_13_동인.html">13 동인(同人)</a></li><li><a href="hex_14_대유.html">14 대유(大有)</a></li><li><a href="hex_15_겸.html">15 겸(謙)</a></li><li><a href="hex_16_예.html">16 예(豫)</a></li><li><a href="hex_17_수.html">17 수(隨)</a></li><li><a href="hex_18_고.html">18 고(蠱)</a></li><li><a href="hex_19_임.html">19 임(臨)</a></li><li><a href="hex_20_관.html">20 관(觀)</a></li><li><a href="hex_21_서합.html">21 서합(噬嗑)</a></li><li><a href="hex_22_비.html">22 비(賁)</a></li><li><a href="hex_23_박.html">23 박(剝)</a></li><li><a href="hex_24_복.html">24 복(復)</a></li><li><a href="hex_25_무망.html">25 무망(無妄)</a></li><li><a href="hex_26_대축.html">26 대축(大畜)</a></li><li><a href="hex_27_이.html">27 이(頤)</a></li><li><a href="hex_28_대과.html">28 대과(大過)</a></li><li><a href="hex_29_감.html">29 감(坎)</a></li><li><a href="hex_30_리.html">30 리(離)</a></li><li><a href="hex_31_함.html">31 함(咸)</a></li><li><a href="hex_32_항.html">32 항(恆)</a></li><li><a href="hex_33_둔.html">33 둔(遯)</a></li><li><a href="hex_34_대장.html">34 대장(大壯)</a></li><li><a href="hex_35_진.html">35 진(晉)</a></li><li><a href="hex_36_명이.html">36 명이(明夷)</a></li><li><a href="hex_37_가인.html">37 가인(家人)</a></li><li><a href="hex_38_규.html">38 규(睽)</a></li><li><a href="hex_39_건.html">39 건(蹇)</a></li><li><a href="hex_40_해.html">40 해(解)</a></li><li><a href="hex_41_손.html">41 손(損)</a></li><li><a href="hex_42_익.html">42 익(益)</a></li><li><a href="hex_43_쾌.html">43 쾌(夬)</a></li><li><a href="hex_44_구.html">44 구(姤)</a></li><li><a href="hex_45_췌.html">45 췌(萃)</a></li><li><a href="hex_46_승.html">46 승(升)</a></li><li><a href="hex_47_곤.html">47 곤(困)</a></li><li><a href="hex_48_정.html">48 정(井)</a></li><li><a href="hex_49_혁.html">49 혁(革)</a></li><li><a href="hex_50_정.html">50 정(鼎)</a></li><li><a href="hex_51_진.html">51 진(震)</a></li><li><a href="hex_52_간.html">52 간(艮)</a></li><li><a href="hex_53_점.html">53 점(漸)</a></li><li><a href="hex_54_귀매.html">54 귀매(歸妹)</a></li><li><a href="hex_55_풍.html">55 풍(豐)</a></li><li><a href="hex_56_여.html">56 여(旅)</a></li><li><a href="hex_57_손.html">57 손(巽)</a></li><li><a href="hex_58_태.html">58 태(兌)</a></li><li><a href="hex_59_환.html">59 환(渙)</a></li><li><a href="hex_60_절.html">60 절(節)</a></li><li><a href="hex_61_중부.html">61 중부(中孚)</a></li><li><a href="hex_62_소과.html">62 소과(小過)</a></li><li><a href="hex_63_기제.html">63 기제(既濟)</a></li><li><a href="hex_64_미제.html">64 미제(未濟)</a></li>
+
+    <h1>64괘 색인</h1>
+
+    <!-- Toolbar: 홈 / 검색 / 밀도 -->
+    <div class="toolbar" role="toolbar">
+      <a class="btn" href="/index.html">홈으로</a>
+      <input id="q" type="search" placeholder="검색(번호, 한글, 한자)..." aria-label="검색">
+      <label><input id="dense" type="checkbox"> 컴팩트 보기</label>
+    </div>
+
+    <!-- 번호순 인덱스: 8→6→4→2열 반응형 -->
+    <ol id="list" class="index">
+      <li><a href="hex_01_건.html"><span class="badge">01</span><span class="label"><span class="title">건</span><span class="meta">乾 · Qian</span></span></a></li>
+      <li><a href="hex_02_곤.html"><span class="badge">02</span><span class="label"><span class="title">곤</span><span class="meta">坤 · Kun</span></span></a></li>
+      <li><a href="hex_03_둔.html"><span class="badge">03</span><span class="label"><span class="title">둔</span><span class="meta">屯 · Zhun</span></span></a></li>
+      <li><a href="hex_04_몽.html"><span class="badge">04</span><span class="label"><span class="title">몽</span><span class="meta">蒙 · Meng</span></span></a></li>
+      <li><a href="hex_05_수.html"><span class="badge">05</span><span class="label"><span class="title">수</span><span class="meta">需 · Xu</span></span></a></li>
+      <li><a href="hex_06_송.html"><span class="badge">06</span><span class="label"><span class="title">송</span><span class="meta">訟 · Song</span></span></a></li>
+      <li><a href="hex_07_사.html"><span class="badge">07</span><span class="label"><span class="title">사</span><span class="meta">師 · Shi</span></span></a></li>
+      <li><a href="hex_08_비.html"><span class="badge">08</span><span class="label"><span class="title">비</span><span class="meta">比 · Bi</span></span></a></li>
+      <li><a href="hex_09_소축.html"><span class="badge">09</span><span class="label"><span class="title">소축</span><span class="meta">小畜</span></span></a></li>
+      <li><a href="hex_10_리.html"><span class="badge">10</span><span class="label"><span class="title">리</span><span class="meta">履</span></span></a></li>
+      <li><a href="hex_11_태.html"><span class="badge">11</span><span class="label"><span class="title">태</span><span class="meta">泰</span></span></a></li>
+      <li><a href="hex_12_비.html"><span class="badge">12</span><span class="label"><span class="title">비</span><span class="meta">否</span></span></a></li>
+      <li><a href="hex_13_동인.html"><span class="badge">13</span><span class="label"><span class="title">동인</span><span class="meta">同人</span></span></a></li>
+      <li><a href="hex_14_대유.html"><span class="badge">14</span><span class="label"><span class="title">대유</span><span class="meta">大有</span></span></a></li>
+      <li><a href="hex_15_겸.html"><span class="badge">15</span><span class="label"><span class="title">겸</span><span class="meta">謙</span></span></a></li>
+      <li><a href="hex_16_예.html"><span class="badge">16</span><span class="label"><span class="title">예</span><span class="meta">豫</span></span></a></li>
+      <li><a href="hex_17_수.html"><span class="badge">17</span><span class="label"><span class="title">수</span><span class="meta">隨</span></span></a></li>
+      <li><a href="hex_18_고.html"><span class="badge">18</span><span class="label"><span class="title">고</span><span class="meta">蠱</span></span></a></li>
+      <li><a href="hex_19_임.html"><span class="badge">19</span><span class="label"><span class="title">임</span><span class="meta">臨</span></span></a></li>
+      <li><a href="hex_20_관.html"><span class="badge">20</span><span class="label"><span class="title">관</span><span class="meta">觀</span></span></a></li>
+      <li><a href="hex_21_서합.html"><span class="badge">21</span><span class="label"><span class="title">서합</span><span class="meta">噬嗑</span></span></a></li>
+      <li><a href="hex_22_비.html"><span class="badge">22</span><span class="label"><span class="title">비</span><span class="meta">賁</span></span></a></li>
+      <li><a href="hex_23_박.html"><span class="badge">23</span><span class="label"><span class="title">박</span><span class="meta">剝</span></span></a></li>
+      <li><a href="hex_24_복.html"><span class="badge">24</span><span class="label"><span class="title">복</span><span class="meta">復</span></span></a></li>
+      <li><a href="hex_25_무망.html"><span class="badge">25</span><span class="label"><span class="title">무망</span><span class="meta">無妄</span></span></a></li>
+      <li><a href="hex_26_대축.html"><span class="badge">26</span><span class="label"><span class="title">대축</span><span class="meta">大畜</span></span></a></li>
+      <li><a href="hex_27_이.html"><span class="badge">27</span><span class="label"><span class="title">이</span><span class="meta">頤</span></span></a></li>
+      <li><a href="hex_28_대과.html"><span class="badge">28</span><span class="label"><span class="title">대과</span><span class="meta">大過</span></span></a></li>
+      <li><a href="hex_29_감.html"><span class="badge">29</span><span class="label"><span class="title">감</span><span class="meta">坎</span></span></a></li>
+      <li><a href="hex_30_리.html"><span class="badge">30</span><span class="label"><span class="title">리</span><span class="meta">離</span></span></a></li>
+      <li><a href="hex_31_함.html"><span class="badge">31</span><span class="label"><span class="title">함</span><span class="meta">咸</span></span></a></li>
+      <li><a href="hex_32_항.html"><span class="badge">32</span><span class="label"><span class="title">항</span><span class="meta">恆</span></span></a></li>
+      <li><a href="hex_33_둔.html"><span class="badge">33</span><span class="label"><span class="title">둔</span><span class="meta">遯</span></span></a></li>
+      <li><a href="hex_34_대장.html"><span class="badge">34</span><span class="label"><span class="title">대장</span><span class="meta">大壯</span></span></a></li>
+      <li><a href="hex_35_진.html"><span class="badge">35</span><span class="label"><span class="title">진</span><span class="meta">晉</span></span></a></li>
+      <li><a href="hex_36_명이.html"><span class="badge">36</span><span class="label"><span class="title">명이</span><span class="meta">明夷</span></span></a></li>
+      <li><a href="hex_37_가인.html"><span class="badge">37</span><span class="label"><span class="title">가인</span><span class="meta">家人</span></span></a></li>
+      <li><a href="hex_38_규.html"><span class="badge">38</span><span class="label"><span class="title">규</span><span class="meta">睽</span></span></a></li>
+      <li><a href="hex_39_건.html"><span class="badge">39</span><span class="label"><span class="title">건</span><span class="meta">蹇</span></span></a></li>
+      <li><a href="hex_40_해.html"><span class="badge">40</span><span class="label"><span class="title">해</span><span class="meta">解</span></span></a></li>
+      <li><a href="hex_41_손.html"><span class="badge">41</span><span class="label"><span class="title">손</span><span class="meta">損</span></span></a></li>
+      <li><a href="hex_42_익.html"><span class="badge">42</span><span class="label"><span class="title">익</span><span class="meta">益</span></span></a></li>
+      <li><a href="hex_43_쾌.html"><span class="badge">43</span><span class="label"><span class="title">쾌</span><span class="meta">夬</span></span></a></li>
+      <li><a href="hex_44_구.html"><span class="badge">44</span><span class="label"><span class="title">구</span><span class="meta">姤</span></span></a></li>
+      <li><a href="hex_45_췌.html"><span class="badge">45</span><span class="label"><span class="title">췌</span><span class="meta">萃</span></span></a></li>
+      <li><a href="hex_46_승.html"><span class="badge">46</span><span class="label"><span class="title">승</span><span class="meta">升</span></span></a></li>
+      <li><a href="hex_47_곤.html"><span class="badge">47</span><span class="label"><span class="title">곤</span><span class="meta">困</span></span></a></li>
+      <li><a href="hex_48_정.html"><span class="badge">48</span><span class="label"><span class="title">정</span><span class="meta">井</span></span></a></li>
+      <li><a href="hex_49_혁.html"><span class="badge">49</span><span class="label"><span class="title">혁</span><span class="meta">革</span></span></a></li>
+      <li><a href="hex_50_정.html"><span class="badge">50</span><span class="label"><span class="title">정</span><span class="meta">鼎</span></span></a></li>
+      <li><a href="hex_51_진.html"><span class="badge">51</span><span class="label"><span class="title">진</span><span class="meta">震</span></span></a></li>
+      <li><a href="hex_52_간.html"><span class="badge">52</span><span class="label"><span class="title">간</span><span class="meta">艮</span></span></a></li>
+      <li><a href="hex_53_점.html"><span class="badge">53</span><span class="label"><span class="title">점</span><span class="meta">漸</span></span></a></li>
+      <li><a href="hex_54_귀매.html"><span class="badge">54</span><span class="label"><span class="title">귀매</span><span class="meta">歸妹</span></span></a></li>
+      <li><a href="hex_55_풍.html"><span class="badge">55</span><span class="label"><span class="title">풍</span><span class="meta">豐</span></span></a></li>
+      <li><a href="hex_56_여.html"><span class="badge">56</span><span class="label"><span class="title">여</span><span class="meta">旅</span></span></a></li>
+      <li><a href="hex_57_손.html"><span class="badge">57</span><span class="label"><span class="title">손</span><span class="meta">巽</span></span></a></li>
+      <li><a href="hex_58_태.html"><span class="badge">58</span><span class="label"><span class="title">태</span><span class="meta">兌</span></span></a></li>
+      <li><a href="hex_59_환.html"><span class="badge">59</span><span class="label"><span class="title">환</span><span class="meta">渙</span></span></a></li>
+      <li><a href="hex_60_절.html"><span class="badge">60</span><span class="label"><span class="title">절</span><span class="meta">節</span></span></a></li>
+      <li><a href="hex_61_중부.html"><span class="badge">61</span><span class="label"><span class="title">중부</span><span class="meta">中孚</span></span></a></li>
+      <li><a href="hex_62_소과.html"><span class="badge">62</span><span class="label"><span class="title">소과</span><span class="meta">小過</span></span></a></li>
+      <li><a href="hex_63_기제.html"><span class="badge">63</span><span class="label"><span class="title">기제</span><span class="meta">既濟</span></span></a></li>
+      <li><a href="hex_64_미제.html"><span class="badge">64</span><span class="label"><span class="title">미제</span><span class="meta">未濟</span></span></a></li>
     </ol>
   </div>
 
   <div class="legend">© 2025. 妙公 (Myo Gong). All Rights Reserved.</div>
 </div>
+
+<script>
+/* ===== tiny interactions: search & density ===== */
+const q = document.getElementById('q');
+const list = document.getElementById('list');
+const dense = document.getElementById('dense');
+
+q?.addEventListener('input', () => {
+  const term = q.value.trim().toLowerCase();
+  for (const li of list.children) {
+    const text = li.textContent.toLowerCase();
+    li.style.display = text.includes(term) ? '' : 'none';
+  }
+});
+
+dense?.addEventListener('change', () => {
+  document.body.classList.toggle('compact', dense.checked);
+});
+</script>
 
 </body>
 </html>
