@@ -250,6 +250,7 @@ ${JSON.stringify(payload)}
 
     const response = { ok: true, source: "openai", ...payload, reading: parsed.reading };
     setCache(key, response);
+    console.log("[USAGE]", JSON.stringify(dayUsage));
     return res.json(response);
   } catch (e) {
     console.warn("[WARN chat.completions]", e?.response?.status, e?.response?.data || e?.message);
