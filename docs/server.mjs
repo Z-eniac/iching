@@ -191,3 +191,7 @@ const genericScore = (txt) => (txt.match(BAN)||[]).length;
     hint: '키 권한(All), 결제/한도, 서버 로그를 확인해 주세요.'
   })
 })
+
+import OpenAI from "openai";
+console.log("[OPENAI BASE]", process.env.OPENAI_BASE_URL || "(default: api.openai.com)");
+console.log("[RESP ID]", cc?.id); // 보통 OpenAI면 'chatcmpl-...' 로 시작
