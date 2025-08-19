@@ -56,6 +56,7 @@ const schema = {
   }
 }
 
+app.get('/health', (req,res)=> res.json({ ok:true, port: PORT }))
 app.post('/echo', (req,res)=> res.json({ ok:true, body: req.body }))
 
 app.post('/api/read', async (req, res) => {
@@ -115,7 +116,7 @@ const system = `
    top_p: 0.9,
    presence_penalty: 0.2,
    frequency_penalty: 0.2,
-   n: 1,                // 두 안 생성 후 클라이언트에서 더 날 것 선택
+   n: 2,                // 두 안 생성 후 클라이언트에서 더 날 것 선택
    max_tokens: 1200,
    // ✅ Structured Outputs(스키마 강제)
    response_format: {
@@ -138,26 +139,8 @@ const system = `
 
 const BAN = /(루틴|꾸준|마인드셋|자기관리|생산성|동기부여|정리하세요|계획하세요|습관화)/g;
 const genericScore = (txt) => (txt.match(BAN)||[]).length;
-    
- // SDK 버전에 따라 message.parsed가 올 수도, content가 JSON 문자열로 올 수도 있음
- let parsed = cc.choices?.[0]?.message?.parsed
- if (!parsed) {
-   const msg = cc.choices?.[0]?.message?.content ?? "{}"
-   const start = msg.indexOf("{")
-   const end   = msg.lastIndexOf("}")
-   const slice = start >= 0 ? msg.slice(start, end + 1) : "{}"
-   parsed = JSON.parse(slice)
- }
- if (parsed?.reading) {
-   console.log('[OK chat.completions structured]')
-   return res.json({ ...payload, reading: parsed.reading })
- }
- throw new Error('chat.completions: invalid JSON')
-  } catch (e) {
-    console.warn('[WARN chat.completions]', e?.response?.status, e?.response?.data || e?.message)
-  }
 
-  if (parsed?.reading) {
+if (parsed?.reading) {
   const g = genericScore(
     parsed.reading.analysis + parsed.reading.advice + parsed.reading.cautions
   );
@@ -179,6 +162,24 @@ const genericScore = (txt) => (txt.match(BAN)||[]).length;
     // redo.parsed 읽어서 대체
   }
 }
+    
+ // SDK 버전에 따라 message.parsed가 올 수도, content가 JSON 문자열로 올 수도 있음
+ let parsed = cc.choices?.[0]?.message?.parsed
+ if (!parsed) {
+   const msg = cc.choices?.[0]?.message?.content ?? "{}"
+   const start = msg.indexOf("{")
+   const end   = msg.lastIndexOf("}")
+   const slice = start >= 0 ? msg.slice(start, end + 1) : "{}"
+   parsed = JSON.parse(slice)
+ }
+ if (parsed?.reading) {
+   console.log('[OK chat.completions structured]')
+   return res.json({ ...payload, reading: parsed.reading })
+ }
+ throw new Error('chat.completions: invalid JSON')
+  } catch (e) {
+    console.warn('[WARN chat.completions]', e?.response?.status, e?.response?.data || e?.message)
+  }
 
   return res.status(500).json({
     error: 'ai_read_failed',
