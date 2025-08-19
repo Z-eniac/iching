@@ -95,8 +95,9 @@ const schema = {
 
 app.post('/echo', (req,res)=> res.json({ ok:true, body: req.body }))
 
-app.post('/api/read', async (req, res) => {
-
+app.post(['/api/read', '/api/ai'], async (req, res) => {
+  console.log('[HIT] /api/read', new Date().toISOString());
+  
 // 1) 테스트 모드면 즉시 폴백
 if (!AI_ON) {
   return res.json({ ok: true, source: 'stub', text: '테스트 모드: OpenAI 호출 안 함.' });
@@ -118,9 +119,10 @@ if (cached) {
 
 // 4) 일일 예산 확인
 _rollDay();
-if (_usageState.spent >= Number(process.env.DAILY_BUDGET_USD || 0)) {
-  _inflight = false;
-  return res.status(429).json({ ok: false, error: '일일 AI 예산 한도 초과' });
+const budget = process.env.DAILY_BUDGET_USD ? Number(process.env.DAILY_BUDGET_USD) || Infinity;
+if (_usageState.spent >= budget) {
+  _inflight = false; // finally 안 쓰면 여기서도 해제
+  return res.status(429).json({ ok:false, error:'일일 AI 예산 한도 초과' });
 }
 
   
@@ -167,7 +169,6 @@ const system = `
 
   try {
     const prompt = `사용자 질문과 점괘 JSON이 주어집니다.
-- 질문(question) 문자열 맨 앞에 [오더: ...] 블록이 있을 수 있음. 있으면 그 지시(금지어/점수분포/톤 등)를 **최우선**으로 반영하세요.
 - analysis에 600~1000자 분량의 象傳 기반 본문을 쓰세요.
 - 길흉 점수는 0~10점(정수/0.5 단위)입니다.
 스키마: { "reading": { "summary": string, "analysis": string,
@@ -190,12 +191,12 @@ const userContent =
     
  const cc = await ai.chat.completions.create({
    model: "gpt-4o-mini",
-   temperature: 0.7,
+   temperature: 0.8,
    top_p: 0.9,
    presence_penalty: 0.2,
    frequency_penalty: 0.2,
    n: 1,                // 두 안 생성 후 클라이언트에서 더 날 것 선택
-   max_tokens: 500,
+   max_tokens: 1200,
    // ✅ Structured Outputs(스키마 강제)
    response_format: {
      type: "json_schema",
@@ -207,7 +208,7 @@ const userContent =
        // 프롬프트를 조금 강화(길이/스코어/변효 안내)
        prompt +
        "\n\n출력은 위 JSON 스키마를 엄격히 따르세요." +
-       "\n- reading.analysis는 300~500자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요." +
+       "\n- reading.analysis는 600~1000자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요." +
        "\n- reading.score는 0~10점(정수 또는 0.5 단위)로 주세요." +
        "\n- reading.line_readings는 변효가 없으면 현상 유지 방안을, 있으면 각 효의 핵심 의미를 1~2문장으로 구체화." +
        "\n\nJSON:\n" + JSON.stringify(payload)
@@ -231,8 +232,10 @@ const genericScore = (txt) => (txt.match(BAN)||[]).length;
    parsed = JSON.parse(slice)
  }
  if (parsed?.reading) {
-   console.log('[OK chat.completions structured]')
-   return res.json({ ...payload, reading: parsed.reading })
+  console.log('[OK chat.completions structured]');
+  const response = { ...payload, reading: parsed.reading };
+  _inflight = false;                // 또는 finally에서 처리(아래 참고)
+  return res.json(response);
  }
  throw new Error('chat.completions: invalid JSON')
   } catch (e) {
@@ -262,6 +265,7 @@ const genericScore = (txt) => (txt.match(BAN)||[]).length;
   }
 }
 
+  _inflight = false;
   return res.status(500).json({
     error: 'ai_read_failed',
     message: 'AI 해석을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
