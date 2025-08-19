@@ -200,17 +200,67 @@ h1{margin-top:46px}
   text-decoration: underline; /* hover/focus에만 밑줄 */
   outline: none;
 }
+
+  .logo-spin svg { display:inline-block; }
+
+  /* 모든 그룹 공통: 중심 좌표 (512x512 뷰박스 → 중앙은 256,256) */
+  .logo-spin #outer,
+  .logo-spin #mid,
+  .logo-spin #inner {
+    transform-box: view-box;
+    transform-origin: 256px 256px;
+    animation-name: spin-hold;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+    animation-timing-function: cubic-bezier(.32,.02,.24,1);
+  }
+
+  /* 그룹별 개별 설정 */
+  #outer { --angle: 360deg; --dur: 2600ms; --hold: 45%; animation-duration: var(--dur); animation-delay: 0ms; }
+  #mid   { --angle: 360deg; --dur: 2400ms; --hold: 50%; animation-duration: var(--dur); animation-delay: 90ms; }
+  #inner { --angle: 360deg; --dur: 2200ms; --hold: 55%; animation-duration: var(--dur); animation-delay: 170ms; }
+
+  @keyframes spin-hold {
+    0% { transform: rotate(0deg); }
+    calc(100% - var(--hold)) { transform: rotate(var(--angle)); }
+    100% { transform: rotate(var(--angle)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logo-spin #outer, .logo-spin #mid, .logo-spin #inner { animation: none; }
+  }
       
 </style></head>
+
+
+      
 <body>
 <div class="mainWrap">
   <h1 class="sr-only">Divina Studio</h1>
       <!-- 브랜드 블록: 위 로고, 아래 로고타입 -->
     <div class="brandWrap">
         <!-- 로고: 클릭 시 index.html 이동 -->
-        <a href="index.html" aria-label="Divina Studio Home">
-          <img src="./icon/No49.svg" alt="Divina logo" class="brandLogo">
-        </a>
+        <div class="logo-spin">
+  <svg viewBox="0 0 512 512" width="200" height="200">
+    <!-- 바깥 사각형 -->
+    <g id="outer" fill="#E7EEFC">
+      <path class="st0" d="M461.19,258.83l-86.11,86.11c-1.56,1.56-1.56,4.09,0,5.66l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l104.47-104.47c1.56-1.56,1.56-4.09,0-5.66l-104.47-104.47c-1.56-1.56-4.09-1.56-5.66,0l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l86.11,86.11c1.56,1.56,1.56,4.09,0,5.66h0Z"/>
+      <path class="st0" d="M253.17,14.11L14.11,253.17c-1.56,1.56-1.56,4.09,0,5.66l239.07,239.07c1.56,1.56,4.09,1.56,5.66,0l104.47-104.47c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-86.11,86.11c-1.56,1.56-4.09,1.56-5.66,0L50.81,258.83c-1.56-1.56-1.56-4.09,0-5.66L253.17,50.81c1.56-1.56,4.09-1.56,5.66,0l86.11,86.11c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66L258.83,14.11c-1.56-1.56-4.09-1.56-5.66,0h0Z"/>
+    </g>
+
+    <!-- 중간 사각형 -->
+    <g id="mid" fill="#E7EEFC">
+      <path class="st0" d="M191.99,344.48l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l73.88,73.88c1.56,1.56,4.09,1.56,5.66,0l73.88-73.88c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-55.52,55.52c-1.56,1.56-4.09,1.56-5.66,0l-55.52-55.52c-1.56-1.56-4.09-1.56-5.66,0Z"/>
+      <path class="st0" d="M344.48,320.01l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l73.88-73.88c1.56-1.56,1.56-4.09,0-5.66l-177.89-177.89c-1.56-1.56-4.09-1.56-5.66,0L75.29,253.17c-1.56,1.56-1.56,4.09,0,5.66l73.88,73.88c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66l-55.52-55.52c-1.56-1.56-1.56-4.09,0-5.66L253.17,111.99c1.56-1.56,4.09-1.56,5.66,0l141.18,141.18c1.56,1.56,1.56,4.09,0,5.66l-55.52,55.52c-1.56,1.56-1.56,4.09,0,5.66h0Z"/>
+    </g>
+
+    <!-- 안쪽 사각형 -->
+    <g id="inner" fill="#E7EEFC">
+      <path class="st0" d="M302.12,179.75l-43.29-43.29c-1.56-1.56-4.09-1.56-5.66,0l-116.7,116.7c-1.56,1.56-1.56,4.09,0,5.66l116.7,116.7c1.56,1.56,4.09,1.56,5.66,0l43.29-43.29c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-24.93,24.93c-1.56,1.56-4.09,1.56-5.66,0l-80-80c-1.56-1.56-1.56-4.09,0-5.66l80-80c1.56-1.56,4.09-1.56,5.66,0l24.93,24.93c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66v.04Z"/>
+      <path class="st0" d="M338.82,258.83l-24.93,24.93c-1.56,1.56-1.56,4.09,0,5.66l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l43.29-43.29c1.56-1.56,1.56-4.09,0-5.66l-43.29-43.29c-1.56-1.56-4.09-1.56-5.66,0l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l24.93,24.93c1.56,1.56,1.56,4.09,0,5.66Z"/>
+    </g>
+  </svg>
+</div>
   <!-- 로고타입(글자): 클릭 시 index.html 이동 -->
       <a href="index.html" aria-label="Divina Studio Home">
           <img src="./icon/Divina_01.svg" alt="Divina wordmark" class="brandType js-reveal">
