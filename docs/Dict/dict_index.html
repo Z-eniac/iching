@@ -254,7 +254,7 @@ const label = document.getElementById('toggleLabel');
 /* 각 li에 --icon-url 주입 (경로 규칙: /icon/NoNN.svg) */
 for (const li of list.children) {
   const nn = li.getAttribute('data-no');
-  li.style.setProperty('--icon-url', `url('/icon/${nn}.svg')`);
+  li.style.setProperty('--icon-url', `url('./SVG/${nn}.svg')`);
 }
 toggle?.addEventListener('change', () => {
   document.body.classList.toggle('icons', toggle.checked);
