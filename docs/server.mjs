@@ -4,6 +4,40 @@ import express from 'express'
 import cors from 'cors'
 import OpenAI from 'openai'
 
+// === AI 사용 안전장치 공통 ===
+const AI_ON = String(process.env.AI_ENABLED ?? 'true') !== 'false';
+
+// 일일 예산 누적
+const _usageState = { spent: 0, day: new Date().toDateString() };
+function _rollDay() {
+  const d = new Date().toDateString();
+  if (_usageState.day !== d) { _usageState.day = d; _usageState.spent = 0; }
+}
+function _costUSD(inTok = 0, outTok = 0) {
+  const pin  = Number(process.env.PRICE_IN_PER_KTOKENS || 0) / 1000;
+  const pout = Number(process.env.PRICE_OUT_PER_KTOKENS || 0) / 1000;
+  return inTok * pin + outTok * pout;
+}
+
+// 중복 호출/연타 방지
+let _inflight = false;
+
+// 간단 캐시 (같은 점법/괘/질문은 3일 재사용)
+const _LRU = new Map();
+function _key({ method, primary, relating, question }) {
+  const hex = `${primary?.number||''}-${relating?.number||''}`;
+  return `${method}__${hex}__${(question||'').trim()}`;
+}
+function _getCache(k) {
+  const hit = _LRU.get(k);
+  if (!hit || Date.now() > hit.exp) return null;
+  return hit.val;
+}
+function _setCache(k, v, ttlMs = 1000 * 60 * 60 * 24 * 3) {
+  _LRU.set(k, { val: v, exp: Date.now() + ttlMs });
+}
+
+
 const PORT = process.env.PORT || 8787
 const app = express()
 app.use(cors())
@@ -62,6 +96,34 @@ const schema = {
 app.post('/echo', (req,res)=> res.json({ ok:true, body: req.body }))
 
 app.post('/api/read', async (req, res) => {
+
+// 1) 테스트 모드면 즉시 폴백
+if (!AI_ON) {
+  return res.json({ ok: true, source: 'stub', text: '테스트 모드: OpenAI 호출 안 함.' });
+}
+
+// 2) 연타 방지
+if (_inflight) {
+  return res.status(429).json({ ok: false, error: '이미 처리 중입니다.' });
+}
+_inflight = true;
+
+// 3) 캐시 키 만들고 조회
+const cacheKey = _key(req.body || {});
+const cached = _getCache(cacheKey);
+if (cached) {
+  _inflight = false;
+  return res.json({ ok: true, source: 'cache', ...cached });
+}
+
+// 4) 일일 예산 확인
+_rollDay();
+if (_usageState.spent >= Number(process.env.DAILY_BUDGET_USD || 0)) {
+  _inflight = false;
+  return res.status(429).json({ ok: false, error: '일일 AI 예산 한도 초과' });
+}
+
+  
   const { question = "", method = "coin", primary = {}, relating = {}, changingLines = [] } = req.body || {}
   const payload = { question, method, primary, relating, changingLines }
   console.log('[REQ]', JSON.stringify(payload))
@@ -112,14 +174,28 @@ const system = `
 "advice": string, "cautions": string, "timing": string,
 "score": number, "tags": string[], "line_readings": [{"line": number, "meaning": string}] } }`
 
+function _truncate(s, max = 1600) {
+  return s && s.length > max ? (s.slice(0, max) + ' …(trimmed)') : s;
+}
+
+const userContent =
+  _truncate(
+    prompt +
+    "\n\n출력은 위 JSON 스키마를 엄격히 따르세요." +
+    "\n- reading.analysis는 600~800자로 요약." +
+    "\n- reading.score는 0~10점(0.5 단위 허용)." +
+    "\n- reading.line_readings는 각 효 핵심을 1~2문장으로." +
+    "\n\nJSON:\n" + JSON.stringify(payload)
+  );
+    
  const cc = await ai.chat.completions.create({
    model: "gpt-4o-mini",
-   temperature: 0.8,
+   temperature: 0.7,
    top_p: 0.9,
    presence_penalty: 0.2,
    frequency_penalty: 0.2,
    n: 1,                // 두 안 생성 후 클라이언트에서 더 날 것 선택
-   max_tokens: 1200,
+   max_tokens: 500,
    // ✅ Structured Outputs(스키마 강제)
    response_format: {
      type: "json_schema",
@@ -131,13 +207,13 @@ const system = `
        // 프롬프트를 조금 강화(길이/스코어/변효 안내)
        prompt +
        "\n\n출력은 위 JSON 스키마를 엄격히 따르세요." +
-       "\n- reading.analysis는 600~1000자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요." +
+       "\n- reading.analysis는 300~500자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요." +
        "\n- reading.score는 0~10점(정수 또는 0.5 단위)로 주세요." +
        "\n- reading.line_readings는 변효가 없으면 현상 유지 방안을, 있으면 각 효의 핵심 의미를 1~2문장으로 구체화." +
        "\n\nJSON:\n" + JSON.stringify(payload)
      }
    ]
- })
+ });
     console.log("[OPENAI BASE]", process.env.OPENAI_BASE_URL || "(default: api.openai.com)");
     console.log("[RESP ID]", cc?.id); // 보통 OpenAI면 'chatcmpl-...' 로 시작
     console.log("=== USAGE ===", cc.usage);
