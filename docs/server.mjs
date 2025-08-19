@@ -116,7 +116,7 @@ const system = `
    top_p: 0.9,
    presence_penalty: 0.2,
    frequency_penalty: 0.2,
-   n: 2,                // 두 안 생성 후 클라이언트에서 더 날 것 선택
+   n: 1,                // 두 안 생성 후 클라이언트에서 더 날 것 선택
    max_tokens: 1200,
    // ✅ Structured Outputs(스키마 강제)
    response_format: {
