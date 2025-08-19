@@ -217,6 +217,16 @@ h1{text-align:center;margin-top:46px;margin-bottom:30px}
 .joint .loader span:nth-child(2){animation-delay:.15s} .joint .loader span:nth-child(3){animation-delay:.3s}
 @keyframes blip{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
 
+/* rotating-square loader (scoped) */
+.joint .loader svg{ display:inline-block; }
+.joint .loader .sq-outer,
+.joint .loader .sq-mid,
+.joint .loader .sq-inner{
+  transform-box: view-box;          /* SVG transform 기준 */
+  transform-origin: 256px 256px;    /* viewBox가 0 0 512 512 → 중앙 */
+  will-change: transform;
+}
+      
 /* Landing: center all elements; textarea text left */
 .landing{font-weight:300;line-height:1.6;color:#a9b8dc;display:flex;flex-direction:column;align-items:center;text-align:center;}
 .landing .small{color:#fff;display:block;font-size:20px;font-weight:700;text-align:center}
@@ -723,12 +733,58 @@ requestAnimationFrame(()=>{
     if(!j || !d) return;
     j.classList.add('ai-owned','loading');
     d.replaceChildren();
+        
     const loader = document.createElement('div');
     loader.className = 'loader';
-    loader.innerHTML = '<span></span><span></span><span></span>';
+        
+    loader.innerHTML = `
+  <svg viewBox="0 0 512 512" width="45" height="45" aria-hidden="true">
+    <!-- 바깥 사각형 -->
+    <g id="sq-outer" fill="#E7EEFC">
+      <path class="st0" d="M461.19,258.83l-86.11,86.11c-1.56,1.56-1.56,4.09,0,5.66l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l104.47-104.47c1.56-1.56,1.56-4.09,0-5.66l-104.47-104.47c-1.56-1.56-4.09-1.56-5.66,0l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l86.11,86.11c1.56,1.56,1.56,4.09,0,5.66h0Z"/>
+      <path class="st0" d="M253.17,14.11L14.11,253.17c-1.56,1.56-1.56,4.09,0,5.66l239.07,239.07c1.56,1.56,4.09,1.56,5.66,0l104.47-104.47c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-86.11,86.11c-1.56,1.56-4.09,1.56-5.66,0L50.81,258.83c-1.56-1.56-1.56-4.09,0-5.66L253.17,50.81c1.56-1.56,4.09-1.56,5.66,0l86.11,86.11c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66L258.83,14.11c-1.56-1.56-4.09-1.56-5.66,0h0Z"/>
+    </g>
+
+    <!-- 중간 사각형 -->
+    <g id="sq-mid" fill="#E7EEFC">
+      <path class="st0" d="M191.99,344.48l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l73.88,73.88c1.56,1.56,4.09,1.56,5.66,0l73.88-73.88c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-55.52,55.52c-1.56,1.56-4.09,1.56-5.66,0l-55.52-55.52c-1.56-1.56-4.09-1.56-5.66,0Z"/>
+      <path class="st0" d="M344.48,320.01l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l73.88-73.88c1.56-1.56,1.56-4.09,0-5.66l-177.89-177.89c-1.56-1.56-4.09-1.56-5.66,0L75.29,253.17c-1.56,1.56-1.56,4.09,0,5.66l73.88,73.88c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66l-55.52-55.52c-1.56-1.56-1.56-4.09,0-5.66L253.17,111.99c1.56-1.56,4.09-1.56,5.66,0l141.18,141.18c1.56,1.56,1.56,4.09,0,5.66l-55.52,55.52c-1.56,1.56-1.56,4.09,0,5.66h0Z"/>
+    </g>
+
+    <!-- 안쪽 사각형 -->
+    <g id="sq-inner" fill="#E7EEFC">
+      <path class="st0" d="M302.12,179.75l-43.29-43.29c-1.56-1.56-4.09-1.56-5.66,0l-116.7,116.7c-1.56,1.56-1.56,4.09,0,5.66l116.7,116.7c1.56,1.56,4.09,1.56,5.66,0l43.29-43.29c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-24.93,24.93c-1.56,1.56-4.09,1.56-5.66,0l-80-80c-1.56-1.56-1.56-4.09,0-5.66l80-80c1.56-1.56,4.09-1.56,5.66,0l24.93,24.93c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66v.04Z"/>
+      <path class="st0" d="M338.82,258.83l-24.93,24.93c-1.56,1.56-1.56,4.09,0,5.66l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l43.29-43.29c1.56-1.56,1.56-4.09,0-5.66l-43.29-43.29c-1.56-1.56-4.09-1.56-5.66,0l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l24.93,24.93c1.56,1.56,1.56,4.09,0,5.66Z"/>
+    </g>
+  </svg>
+          `;
     d.appendChild(loader);
     s.textContent = '해석 생성 중…';
 
+    // ✅ 누적 회전 루프 (각자 다른 각도/속도/휴식/시작지연)
+    const ease = 'cubic-bezier(.32,.02,.24,1)';
+    const sleep = ms => new Promise(r=>setTimeout(r, ms));
+    const alive = () => loader.isConnected && my===ctrl;
+
+    async function spinLoop(el, step, spin, hold, delay){
+      if(!el) return;
+      if(delay) await sleep(delay);
+      let angle = 0;
+      while(alive()){
+        el.style.transition = `transform ${spin}ms ${ease}`;
+        angle += step;                          // 누적 회전
+        el.style.transform = `rotate(${angle}deg)`;
+        await sleep(spin);
+        if(!alive()) break;
+        await sleep(hold);                      // 멈춤 구간
+      }
+    }  
+
+    // 네가 맞춰둔 값 그대로 사용(예: 270/180/360)
+    spinLoop(loader.querySelector('.sq-outer'), 180,  900, 500, 750);
+    spinLoop(loader.querySelector('.sq-mid')  , 270, 1200, 200, 300);
+    spinLoop(loader.querySelector('.sq-inner'),  90,  600, 800, 600);  
+        
     try{
       const res = await fetch('https://iching-ai-ilo2.onrender.com/api/read', {
         method: 'POST',
