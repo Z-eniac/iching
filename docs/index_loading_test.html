@@ -204,30 +204,15 @@ h1{margin-top:46px}
   .logo-spin svg { display:inline-block; }
 
   /* 모든 그룹 공통: 중심 좌표 (512x512 뷰박스 → 중앙은 256,256) */
-  .logo-spin #outer,
-  .logo-spin #mid,
-  .logo-spin #inner {
+.logo-spin svg { display:inline-block }
+  /* 중심 고정 (viewBox가 0 0 512 512 라면 중앙은 256,256) */
+  #outer, #mid, #inner {
     transform-box: view-box;
     transform-origin: 256px 256px;
-    animation-name: spin-hold;
-    animation-iteration-count: infinite;
-    animation-fill-mode: both;
-    animation-timing-function: cubic-bezier(.32,.02,.24,1);
+    will-change: transform;
   }
-
-  /* 그룹별 개별 설정 */
-  #outer { --angle: 270deg; --dur: 2600ms; --hold: 65%; animation-duration: var(--dur); animation-delay: 0ms; }
-  #mid   { --angle: 450deg; --dur: 2600ms; --hold: 80%; animation-duration: var(--dur); animation-delay: 120ms; }
-  #inner { --angle: 360deg; --dur: 2600ms; --hold: 72.5%; animation-duration: var(--dur); animation-delay: 180ms; }
-
-  @keyframes spin-hold {
-    0% { transform: rotate(0deg); }
-    calc(100% - var(--hold)) { transform: rotate(var(--angle)); }
-    100% { transform: rotate(var(--angle)); }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .logo-spin #outer, .logo-spin #mid, .logo-spin #inner { animation: none; }
+    #outer, #mid, #inner { transition: none !important; transform: none !important; }
   }
       
 </style></head>
@@ -301,5 +286,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }, delay);
   });
 });
+
+        // 레이어별 회전 스텝(각도), 회전 시간(ms), 멈춤 시간(ms), 초기 지연(ms)
+  const layers = [
+    { sel: '#outer', step: 180, spin: 200, hold: 1200, delay: 150 },
+    { sel: '#mid',   step: 360, spin: 300, hold: 1100, delay: 450 },
+    { sel: '#inner', step: 270, spin: 160, hold: 1240, delay: 300 },
+  ];
+
+  const ease = 'cubic-bezier(.32,.02,.24,1)';
+
+  function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+  async function spinLoop(el, step, spin, hold, delay){
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let angle = 0;
+    if (delay) await sleep(delay);
+    while(true){
+      // 회전 구간
+      el.style.transition = `transform ${spin}ms ${ease}`;
+      angle += step; // 누적 회전
+      el.style.transform = `rotate(${angle}deg)`;
+      await sleep(spin);
+
+      // 멈춤 구간
+      // transition 유지해도 되지만 확실히 멈춘 느낌을 주려면 아래 줄 주석 해제
+      // el.style.transition = 'none';
+      await sleep(hold);
+    }
+  }
+
+  layers.forEach(({sel, step, spin, hold, delay})=>{
+    const el = document.querySelector(sel);
+    if (el) spinLoop(el, step, spin, hold, delay);
+  });
+      
 </script>
 </body></html>
