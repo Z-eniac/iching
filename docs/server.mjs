@@ -203,25 +203,19 @@ app.post(["/api/read", "/api/ai"], async (req, res) => {
 
 const messages = [
   { role: "system", content: systemPrompt },
-  { role: "user", content:
-      taskPrompt +
-      "
+  { role: "user", content: `
+${taskPrompt}
 
-출력은 위 JSON 스키마를 엄격히 따르세요." +
-      "
-- reading.analysis는 600~1000자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요." +
-      "
-- reading.score는 0~10점(정수 또는 0.5 단위)로 주세요." +
-      "
-- reading.line_readings는 변효가 없으면 현상 유지 방안을, 있으면 각 효의 핵심 의미를 1~2문장으로 구체화." +
-      "
+출력은 위 JSON 스키마를 엄격히 따르세요.
+- reading.analysis는 600~1000자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요.
+- reading.score는 0~10점(정수 또는 0.5 단위)로 주세요.
+- reading.line_readings는 변효가 없으면 현상 유지 방안을, 있으면 각 효의 핵심 의미를 1~2문장으로 구체화.
 
-질문:" + (question ? ` ${question}` : " (없음)") +
-      "
+질문: ${question ? question : "(없음)"}
 
 JSON 입력:
-" + JSON.stringify(payload)
-  }
+${JSON.stringify(payload)}
+` }
 ];
 
     const cc = await ai.chat.completions.create({
