@@ -154,7 +154,7 @@ body.icons .index li::after{
     <label class="switch" aria-label="문양 보기 토글">
       <input id="toggle" type="checkbox">
       <span class="slider" aria-hidden="true"></span>
-      <span id="toggleLabel" class="labeltext">문양 보기</span>
+      <span id="toggleLabel" class="labeltext">문양으로 보기</span>
     </label>
   </div>
 
@@ -258,7 +258,6 @@ for (const li of list.children) {
 }
 toggle?.addEventListener('change', () => {
   document.body.classList.toggle('icons', toggle.checked);
-  label.textContent = toggle.checked ? '문자 보기' : '문양 보기';
 });
 
 document.addEventListener('DOMContentLoaded', () => {
