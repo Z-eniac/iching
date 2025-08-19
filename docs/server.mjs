@@ -138,7 +138,8 @@ const system = `
      }
    ]
  })
-    
+    console.log("[OPENAI BASE]", process.env.OPENAI_BASE_URL || "(default: api.openai.com)");
+    console.log("[RESP ID]", cc?.id); // 보통 OpenAI면 'chatcmpl-...' 로 시작
     console.log("=== USAGE ===", cc.usage);
 
 const BAN = /(루틴|꾸준|마인드셋|자기관리|생산성|동기부여|정리하세요|계획하세요|습관화)/g;
@@ -192,6 +193,3 @@ const genericScore = (txt) => (txt.match(BAN)||[]).length;
   })
 })
 
-import OpenAI from "openai";
-console.log("[OPENAI BASE]", process.env.OPENAI_BASE_URL || "(default: api.openai.com)");
-console.log("[RESP ID]", cc?.id); // 보통 OpenAI면 'chatcmpl-...' 로 시작
