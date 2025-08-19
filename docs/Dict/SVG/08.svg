@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="I Ching Hexagram">
+  <rect x="48" y="420" width="168.0" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+  <rect x="296.0" y="420" width="168.0" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+  <rect x="48" y="348" width="168.0" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+  <rect x="296.0" y="348" width="168.0" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+  <rect x="48" y="276" width="168.0" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+  <rect x="296.0" y="276" width="168.0" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+  <rect x="48" y="204" width="168.0" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+  <rect x="296.0" y="204" width="168.0" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+  <rect x="48" y="132" width="416" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+  <rect x="48" y="60" width="168.0" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+  <rect x="296.0" y="60" width="168.0" height="44" rx="10" ry="10" fill="#EAF0FF"/>
+</svg>
