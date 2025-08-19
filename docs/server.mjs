@@ -138,6 +138,8 @@ const system = `
      }
    ]
  })
+    
+    console.log("=== USAGE ===", cc.usage);
 
 const BAN = /(루틴|꾸준|마인드셋|자기관리|생산성|동기부여|정리하세요|계획하세요|습관화)/g;
 const genericScore = (txt) => (txt.match(BAN)||[]).length;
