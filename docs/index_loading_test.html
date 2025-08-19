@@ -226,7 +226,7 @@ h1{margin-top:46px}
     <div class="brandWrap">
         <!-- 로고: 클릭 시 index.html 이동 -->
         <div class="logo-spin">
-  <svg viewBox="0 0 512 512" width="60" height="60" aria-hidden="true">
+  <svg viewBox="0 0 512 512" width="45" height="45" aria-hidden="true">
     <!-- 바깥 사각형 -->
     <g id="outer" fill="#E7EEFC">
       <path class="st0" d="M461.19,258.83l-86.11,86.11c-1.56,1.56-1.56,4.09,0,5.66l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l104.47-104.47c1.56-1.56,1.56-4.09,0-5.66l-104.47-104.47c-1.56-1.56-4.09-1.56-5.66,0l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l86.11,86.11c1.56,1.56,1.56,4.09,0,5.66h0Z"/>
@@ -289,9 +289,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 레이어별 회전 스텝(각도), 회전 시간(ms), 멈춤 시간(ms), 초기 지연(ms)
   const layers = [
-    { sel: '#outer', step: 270, spin: 1100, hold: 700, delay: 750 },
-    { sel: '#mid',   step: 360, spin: 1400, hold: 400, delay: 300 },
-    { sel: '#inner', step: 180, spin: 800, hold: 1000, delay: 600 },
+    { sel: '#outer', step: 270, spin: 1000, hold: 500, delay: 750 },
+    { sel: '#mid',   step: 360, spin: 1300, hold: 200, delay: 300 },
+    { sel: '#inner', step: 180, spin: 700, hold: 800, delay: 600 },
   ];
 
   const ease = 'cubic-bezier(.32,.02,.24,1)';
