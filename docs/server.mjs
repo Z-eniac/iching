@@ -1,136 +1,77 @@
+// server.mjs — Render/Node용 안정화 버전
+// - /api/read, /api/ai 둘 다 지원
+// - 예산 가드(미설정 시 무제한), 연타 방지, 간단 캐시, 일일 사용량 카운터(UTC 자정 리셋)
+// - USE_OPENAI=false 로 테스트 모드(과금/호출 차단)
+// - /api/usage?key=ADMIN_KEY 로 남은 토큰/호출 확인(개인용)
 
-import 'dotenv/config'
-import express from 'express'
-import cors from 'cors'
-import OpenAI from 'openai'
+import express from "express";
+import cors from "cors";
+import OpenAI from "openai";
 
-// === AI 사용 안전장치 공통 ===
-const AI_ON = String(process.env.AI_ENABLED ?? 'true') !== 'false';
+// ============= 기본 서버 설정 =============
+const app = express();
+app.use(cors());
+app.use(express.json({ limit: "1mb" }));
 
-// 일일 예산 누적
-const _usageState = { spent: 0, day: new Date().toDateString() };
-function _rollDay() {
-  const d = new Date().toDateString();
-  if (_usageState.day !== d) { _usageState.day = d; _usageState.spent = 0; }
-}
-function _costUSD(inTok = 0, outTok = 0) {
-  const pin  = Number(process.env.PRICE_IN_PER_KTOKENS || 0) / 1000;
-  const pout = Number(process.env.PRICE_OUT_PER_KTOKENS || 0) / 1000;
-  return inTok * pin + outTok * pout;
-}
+// Health check (Render에서 사용)
+app.get("/healthz", (_, res) => res.status(200).send("ok"));
 
-// 중복 호출/연타 방지
-let _inflight = false;
+// 루트 확인용 (정적 사이트가 따로 있으면 이 경로는 써도 됨)
+app.get("/", (_, res) => res.status(200).send("OK"));
 
-// 간단 캐시 (같은 점법/괘/질문은 3일 재사용)
-const _LRU = new Map();
-function _key({ method, primary, relating, question }) {
-  const hex = `${primary?.number||''}-${relating?.number||''}`;
-  return `${method}__${hex}__${(question||'').trim()}`;
-}
-function _getCache(k) {
-  const hit = _LRU.get(k);
-  if (!hit || Date.now() > hit.exp) return null;
-  return hit.val;
-}
-function _setCache(k, v, ttlMs = 1000 * 60 * 60 * 24 * 3) {
-  _LRU.set(k, { val: v, exp: Date.now() + ttlMs });
-}
+// ============= ENV & 안전장치 =============
+const AI_ON = String(process.env.USE_OPENAI ?? "true") === "true"; // 기본 on, Render에서 false로 테스트
+const ADMIN_KEY = process.env.ADMIN_KEY || ""; // /api/usage 보호키
 
+// 예산(USD) — 미설정/잘못된 값이면 무제한
+const DAILY_BUDGET_USD = Number(process.env.DAILY_BUDGET_USD) || Infinity;
 
-const PORT = process.env.PORT || 8787
-const app = express()
-app.use(cors())
-app.use(express.json({ limit: '1mb' }))
+// 단가(1M tokens 기준) — gpt-4o-mini
+const PRICE_IN_PER_M = Number(process.env.PRICE_IN_PER_M ?? 0.15);   // 입력 $/1M tok
+const PRICE_OUT_PER_M = Number(process.env.PRICE_OUT_PER_M ?? 0.60); // 출력 $/1M tok
 
-//    server.mjs와 같은 폴더의 /public 디렉터리를 정적으로 노출
-app.use(express.static('public'))  // public/index.html, public/**.* 접근 가능
-
-// 헬스체크 라우트 추가
-app.get("/", (req, res) => {
-  res.status(200).send("OK");
-});
-app.get("/health", (req, res) => {
-  res.status(200).send("OK");
-});
-
-// (4) 서버 시작
-app.listen(PORT, "0.0.0.0", () => console.log(`ready on http://localhost:${PORT}`))
-
-const ai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-const schema = {
-  name: "IChingReading",
-  schema: {
-    type: "object",
-    required: ["reading"],
-    properties: {
-      reading: {
-        type: "object",
-        required: ["summary", "analysis", "advice", "cautions", "timing", "score", "line_readings"],
-        properties: {
-          summary:   { type: "string" },
-          analysis:  { type: "string" },                     // 길고 풍부한 본문
-          advice:    { type: "string" },
-          cautions:  { type: "string" },
-          timing:    { type: "string" },
-          score:     { type: "number", minimum: 0, maximum: 10 }, // 10점제
-          tags:      { type: "array", items: { type: "string" } },
-          line_readings: {
-            type: "array",
-            items: {
-              type: "object",
-              required: ["line", "meaning"],
-              properties: {
-                line: { type: "integer", minimum: 1, maximum: 6 },
-                meaning: { type: "string" }
-              }
-            }
-          }
-        }
-      }
-    }
+// 일일 사용량(UTC 기준 자정 리셋)
+const dayUsage = { day: utcDay(), tokens: 0, calls: 0, spent: 0 };
+function utcDay() { return new Date().toISOString().slice(0, 10); }
+function rollDay() {
+  const d = utcDay();
+  if (dayUsage.day !== d) {
+    dayUsage.day = d; dayUsage.tokens = 0; dayUsage.calls = 0; dayUsage.spent = 0;
   }
 }
 
-app.post('/echo', (req,res)=> res.json({ ok:true, body: req.body }))
-
-app.post(['/api/read', '/api/ai'], async (req, res) => {
-  console.log('[HIT] /api/read', new Date().toISOString());
-  
-// 1) 테스트 모드면 즉시 폴백
-if (!AI_ON) {
-  return res.json({ ok: true, source: 'stub', text: '테스트 모드: OpenAI 호출 안 함.' });
+// 간단 메모리 캐시 (3일)
+const CACHE_TTL = 1000 * 60 * 60 * 24 * 3;
+const LRU = new Map();
+const now = () => Date.now();
+function setCache(key, val, ttl = CACHE_TTL) { LRU.set(key, { val, exp: now() + ttl }); }
+function getCache(key) { const h = LRU.get(key); if (!h) return null; if (now() > h.exp) { LRU.delete(key); return null; } return h.val; }
+function cacheKeyOf({ method, primary, relating, question }) {
+  const hex = `${primary?.number ?? ''}-${relating?.number ?? ''}`;
+  return `${method || ''}|${hex}|${(question || '').trim()}`;
 }
 
-// 2) 연타 방지
-if (_inflight) {
-  return res.status(429).json({ ok: false, error: '이미 처리 중입니다.' });
-}
-_inflight = true;
+// 연타 방지
+let inflight = false;
 
-// 3) 캐시 키 만들고 조회
-const cacheKey = _key(req.body || {});
-const cached = _getCache(cacheKey);
-if (cached) {
-  _inflight = false;
-  return res.json({ ok: true, source: 'cache', ...cached });
-}
+// OpenAI 클라이언트
+const ai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  // baseURL: process.env.OPENAI_BASE_URL || undefined, // 필요 시 프록시 설정
+});
 
-// 4) 일일 예산 확인
-_rollDay();
-const budget = process.env.DAILY_BUDGET_USD ? Number(process.env.DAILY_BUDGET_USD) || Infinity;
-if (_usageState.spent >= budget) {
-  _inflight = false; // finally 안 쓰면 여기서도 해제
-  return res.status(429).json({ ok:false, error:'일일 AI 예산 한도 초과' });
+// ============= 유틸 =============
+function truncate(str = "", max = 1600) {
+  return str.length > max ? str.slice(0, max) + " …(trimmed)" : str;
+}
+function costUSD(inTok = 0, outTok = 0) {
+  const perTokIn = PRICE_IN_PER_M / 1_000_000;  // $/token
+  const perTokOut = PRICE_OUT_PER_M / 1_000_000; // $/token
+  return +(inTok * perTokIn + outTok * perTokOut);
 }
 
-  
-  const { question = "", method = "coin", primary = {}, relating = {}, changingLines = [] } = req.body || {}
-  const payload = { question, method, primary, relating, changingLines }
-  console.log('[REQ]', JSON.stringify(payload))
-
-const system = `
+// 시스템 프롬프트
+const systemPrompt = `
 당신은 주역 64괘 전문 해석가입니다. 원전에 충실한 해석을 한국어 존댓말로 답하십시오.
 
 [편향 교정] (매우 중요)
@@ -165,111 +106,147 @@ const system = `
   ‘凶/吝/悔’·불리 문구가 우세하면 5 이하로 내릴 것. 극단값(0~1, 9~10)도 허용.
 - 조언 3~5개는 전부 효사/象傳에 앵커: “무엇을/언제/어떻게” + (근거: …)
 - 타이밍은 팔괘 계절·방위로 표시. (예: 내괘 坎→겨울·북 / 외괘 震→봄·동)
-`
 
-  try {
-    const prompt = `사용자 질문과 점괘 JSON이 주어집니다.
-- analysis에 600~1000자 분량의 象傳 기반 본문을 쓰세요.
-- 길흉 점수는 0~10점(정수/0.5 단위)입니다.
-스키마: { "reading": { "summary": string, "analysis": string,
-"advice": string, "cautions": string, "timing": string,
-"score": number, "tags": string[], "line_readings": [{"line": number, "meaning": string}] } }`
+`;
 
-function _truncate(s, max = 1600) {
-  return s && s.length > max ? (s.slice(0, max) + ' …(trimmed)') : s;
-}
+// Structured Outputs 스키마
+const schema = {
+  name: "iching_reading",
+  strict: true,
+  schema: {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      reading: {
+        type: "object",
+        additionalProperties: true,
+        properties: {
+          analysis: { type: "string" },
+          score: { type: "number" },
+          line_readings: { type: "array", items: { type: "string" } }
+        },
+        required: ["analysis", "score", "line_readings"]
+      }
+    },
+    required: ["reading"]
+  }
+};
 
-const userContent =
-  _truncate(
-    prompt +
-    "\n\n출력은 위 JSON 스키마를 엄격히 따르세요." +
-    "\n- reading.analysis는 600~800자로 요약." +
-    "\n- reading.score는 0~10점(0.5 단위 허용)." +
-    "\n- reading.line_readings는 각 효 핵심을 1~2문장으로." +
-    "\n\nJSON:\n" + JSON.stringify(payload)
-  );
-    
- const cc = await ai.chat.completions.create({
-   model: "gpt-4o-mini",
-   temperature: 0.8,
-   top_p: 0.9,
-   presence_penalty: 0.2,
-   frequency_penalty: 0.2,
-   n: 1,                // 두 안 생성 후 클라이언트에서 더 날 것 선택
-   max_tokens: 1200,
-   // ✅ Structured Outputs(스키마 강제)
-   response_format: {
-     type: "json_schema",
-     json_schema: schema   // 위에서 선언해둔 const schema 그대로 사용
-   },
-   messages: [
-     { role: "system", content: system },
-     { role: "user", content:
-       // 프롬프트를 조금 강화(길이/스코어/변효 안내)
-       prompt +
-       "\n\n출력은 위 JSON 스키마를 엄격히 따르세요." +
-       "\n- reading.analysis는 600~1000자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요." +
-       "\n- reading.score는 0~10점(정수 또는 0.5 단위)로 주세요." +
-       "\n- reading.line_readings는 변효가 없으면 현상 유지 방안을, 있으면 각 효의 핵심 의미를 1~2문장으로 구체화." +
-       "\n\nJSON:\n" + JSON.stringify(payload)
-     }
-   ]
- });
-    console.log("[OPENAI BASE]", process.env.OPENAI_BASE_URL || "(default: api.openai.com)");
-    console.log("[RESP ID]", cc?.id); // 보통 OpenAI면 'chatcmpl-...' 로 시작
-    console.log("=== USAGE ===", cc.usage);
+// ============= 조회용(개인) =============
+app.get("/api/usage", (req, res) => {
+  if (ADMIN_KEY && req.query.key !== ADMIN_KEY) {
+    return res.status(403).json({ ok: false, error: "forbidden" });
+  }
+  rollDay();
+  res.json({ ok: true, day: dayUsage.day, limits: { tokens: 200_000, requests: 200 }, used: { tokens: dayUsage.tokens, requests: dayUsage.calls, usd: +dayUsage.spent.toFixed(6) }, remaining: { tokens: Math.max(0, 200_000 - dayUsage.tokens), requests: Math.max(0, 200 - dayUsage.calls) }, reset_hint: "매일 KST 09:00 (UTC 00:00)" });
+});
 
-const BAN = /(루틴|꾸준|마인드셋|자기관리|생산성|동기부여|정리하세요|계획하세요|습관화)/g;
-const genericScore = (txt) => (txt.match(BAN)||[]).length;
-    
- // SDK 버전에 따라 message.parsed가 올 수도, content가 JSON 문자열로 올 수도 있음
- let parsed = cc.choices?.[0]?.message?.parsed
- if (!parsed) {
-   const msg = cc.choices?.[0]?.message?.content ?? "{}"
-   const start = msg.indexOf("{")
-   const end   = msg.lastIndexOf("}")
-   const slice = start >= 0 ? msg.slice(start, end + 1) : "{}"
-   parsed = JSON.parse(slice)
- }
- if (parsed?.reading) {
-  console.log('[OK chat.completions structured]');
-  const response = { ...payload, reading: parsed.reading };
-  _inflight = false;                // 또는 finally에서 처리(아래 참고)
-  return res.json(response);
- }
- throw new Error('chat.completions: invalid JSON')
-  } catch (e) {
-    console.warn('[WARN chat.completions]', e?.response?.status, e?.response?.data || e?.message)
+// ============= 핵심 라우트 =============
+app.post(["/api/read", "/api/ai"], async (req, res) => {
+  console.log("[HIT] /api/read", new Date().toISOString());
+
+  // 테스트 모드(과금/호출 차단)
+  if (!AI_ON) {
+    console.warn("[STUB MODE] USE_OPENAI=false");
+    return res.json({ ok: true, source: "stub", reading: { analysis: "테스트 모드: OpenAI 호출 없이 기본 흐름만 확인합니다.", score: 5, line_readings: ["기본 응답입니다."] } });
   }
 
-  if (parsed?.reading) {
-  const g = genericScore(
-    parsed.reading.analysis + parsed.reading.advice + parsed.reading.cautions
+  if (inflight) {
+    console.warn("[BLOCK] inflight");
+    return res.status(429).json({ ok: false, error: "이미 처리 중입니다." });
+  }
+  inflight = true;
+
+  // 요청 파싱
+  const { question = "", method = "coin", primary = {}, relating = {}, changingLines = [] } = req.body || {};
+  const payload = { question, method, primary, relating, changingLines };
+  console.log("[REQ]", JSON.stringify(payload));
+
+  // 캐시 체크
+  const key = cacheKeyOf(payload);
+  const hit = getCache(key);
+  if (hit) {
+    console.log("[CACHE HIT]", key);
+    inflight = false; // 캐시 리턴 시에도 해제
+    return res.json({ ok: true, source: "cache", ...hit });
+  }
+
+  // 일일 예산 확인
+  rollDay();
+  if (dayUsage.spent >= DAILY_BUDGET_USD) {
+    inflight = false;
+    console.warn("[BUDGET BLOCK]", { spent: dayUsage.spent, budget: DAILY_BUDGET_USD });
+    return res.status(429).json({ ok: false, error: "일일 AI 예산 한도 초과" });
+  }
+
+  // 유저 프롬프트 구성(길이 제한)
+  const userContent = truncate(
+    (question ? `질문: ${question}\n` : "") +
+    `출력은 아래 JSON 스키마를 엄격히 따르세요.
+    - reading.analysis는 600~1000자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요.
+    - reading.score는 0-10점(정수 또는 0.5 단위)로 주세요.
+    - reading.line_readings는 각 변효의 핵심을 1~2문장으로.
+    
+    JSON 입력:
+    ` + JSON.stringify(payload)
   );
-  const scoreTooSafe = parsed.reading.score && parsed.reading.score >= 6 && /凶|吝|悔/.test(parsed.reading.analysis);
-  if (g > 0 || scoreTooSafe) {
-    // 두 번째 패스: “일반론 제거+루브릭 재적용” 지시
-    const redo = await ai.chat.completions.create({
+
+  let parsed; // try 바깥에 선언
+  try {
+    const cc = await ai.chat.completions.create({
       model: "gpt-4o-mini",
-      temperature: 0.7,
+      temperature: 0.8,
+      top_p: 0.9,
+      presence_penalty: 0.2,
+      frequency_penalty: 0.2,
+      n: 1,
+      max_tokens: 1200,
       response_format: { type: "json_schema", json_schema: schema },
       messages: [
-        { role:"system", content: system + "\n이전 출력은 상투어/점수편향이 있어 재작성합니다." },
-        { role:"user", content:
-          "다음 초안을 상투어 제거, 루브릭에 따라 점수 재산정, 모든 조언에 근거 표기하여 다시 써라.\n" +
-          JSON.stringify({ question, method, primary, relating, changingLines })
-        }
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userContent }
       ]
     });
-    // redo.parsed 읽어서 대체
+
+    console.log("[OPENAI BASE]", process.env.OPENAI_BASE_URL || "(default: api.openai.com)");
+    console.log("[RESP ID]", cc?.id);
+
+    const u = cc?.usage || {};
+    const inTok = u.prompt_tokens ?? u.input_tokens ?? 0;
+    const outTok = u.completion_tokens ?? u.output_tokens ?? 0;
+    const totalTok = inTok + outTok;
+
+    // 일일 카운터/예산 누적
+    dayUsage.tokens += totalTok;
+    dayUsage.calls += 1;
+    const $$ = costUSD(inTok, outTok);
+    dayUsage.spent += $$;
+
+    console.log("=== USAGE ===", u);
+    console.log("[RUN COST] this_call=$", $$.toFixed(6), "spent_today=$", dayUsage.spent.toFixed(6));
+
+    // Structured Outputs 파싱 (SDK가 parsed를 제공할 수 있음)
+    parsed = cc.choices?.[0]?.message?.parsed;
+    if (!parsed) {
+      const msg = cc.choices?.[0]?.message?.content ?? "{}";
+      const s = msg.indexOf("{"); const e = msg.lastIndexOf("}");
+      parsed = s >= 0 ? JSON.parse(msg.slice(s, e + 1)) : {};
+    }
+
+    if (!parsed?.reading) throw new Error("chat.completions: invalid JSON");
+
+    console.log("[OK chat.completions structured]");
+    const response = { ok: true, source: "openai", ...payload, reading: parsed.reading };
+    setCache(key, response);
+    return res.json(response);
+  } catch (e) {
+    console.warn("[WARN chat.completions]", e?.response?.status, e?.response?.data || e?.message);
+    return res.status(500).json({ error: "ai_read_failed", message: "AI 해석을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.", hint: "키 권한, 결제/한도, 서버 로그를 확인해 주세요." });
+  } finally {
+    inflight = false; // 성공/실패/예외 모두 해제
   }
-}
+});
 
-  _inflight = false;
-  return res.status(500).json({
-    error: 'ai_read_failed',
-    message: 'AI 해석을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.',
-    hint: '키 권한(All), 결제/한도, 서버 로그를 확인해 주세요.'
-  })
-})
-
+// ============= 서버 시작 =============
+const port = process.env.PORT || 8787;
+app.listen(port, "0.0.0.0", () => console.log("listening", port));
