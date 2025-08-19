@@ -126,14 +126,14 @@ body.icons .index a::after{
 /* 모션 저감 사용자의 경우:
    - 이동/블러만 제거 (깜빡임 최소화)
    - transition은 끄지만, opacity는 기본 0을 유지 → JS로 순차 노출은 그대로 */
-@media (prefers-reduced-motion: reduce) {
+/*@media (prefers-reduced-motion: reduce) {
   .js-reveal,
   [data-reveal-group] > * {
     transform: none !important;
     filter: none !important;
     transition: none !important;
   }
-}
+}*/
   
 /* ===== End styles ===== */
 </style>
