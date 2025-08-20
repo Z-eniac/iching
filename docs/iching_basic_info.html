@@ -78,6 +78,7 @@ h2.page-title{margin:8px 0 14px;text-align:center;font-size:26px}
   font-family:"NotoSerifCJK-ICHING", serif; font-weight:600
 }
 .section p{font-weight:200;line-height:1.9; margin:10px 0}
+.section p .caption{font-size:smaller;color:var(--muted);align-self:center}
 .section p b{font-weight:800}
 .small{font-size:13px;color:#a8b6d7}
 
@@ -210,6 +211,18 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
     transition: none !important;
   }
 }*/
+
+  .logo-spin svg { display:inline-block }
+  /* 중심 고정 (viewBox가 0 0 512 512 라면 중앙은 256,256) */
+  #outer, #mid, #inner {
+    transform-box: view-box;
+    transform-origin: 256px 256px;
+    will-change: transform;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #outer, #mid, #inner { transition: none !important; transform: none !important; }
+  }
+
 </style>
 </head>
 <body>
@@ -238,6 +251,31 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
 <!-- 0) Divina의 간략한 소개 -->
 <section class="section js-reveal" id="introduction">
 <h3>0. Divina 소개</h3>
+  <div class="logo-spin">
+   <svg viewBox="0 0 512 512" width="100" height="100" aria-hidden="true">
+    <!-- 바깥 사각형 -->
+    <g id="outer" fill="#E7EEFC">
+      <path class="st0" d="M461.19,258.83l-86.11,86.11c-1.56,1.56-1.56,4.09,0,5.66l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l104.47-104.47c1.56-1.56,1.56-4.09,0-5.66l-104.47-104.47c-1.56-1.56-4.09-1.56-5.66,0l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l86.11,86.11c1.56,1.56,1.56,4.09,0,5.66h0Z"/>
+      <path class="st0" d="M253.17,14.11L14.11,253.17c-1.56,1.56-1.56,4.09,0,5.66l239.07,239.07c1.56,1.56,4.09,1.56,5.66,0l104.47-104.47c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-86.11,86.11c-1.56,1.56-4.09,1.56-5.66,0L50.81,258.83c-1.56-1.56-1.56-4.09,0-5.66L253.17,50.81c1.56-1.56,4.09-1.56,5.66,0l86.11,86.11c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66L258.83,14.11c-1.56-1.56-4.09-1.56-5.66,0h0Z"/>
+    </g>
+
+    <!-- 중간 사각형 -->
+    <g id="mid" fill="#E7EEFC">
+      <path class="st0" d="M191.99,344.48l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l73.88,73.88c1.56,1.56,4.09,1.56,5.66,0l73.88-73.88c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-55.52,55.52c-1.56,1.56-4.09,1.56-5.66,0l-55.52-55.52c-1.56-1.56-4.09-1.56-5.66,0Z"/>
+      <path class="st0" d="M344.48,320.01l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l73.88-73.88c1.56-1.56,1.56-4.09,0-5.66l-177.89-177.89c-1.56-1.56-4.09-1.56-5.66,0L75.29,253.17c-1.56,1.56-1.56,4.09,0,5.66l73.88,73.88c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66l-55.52-55.52c-1.56-1.56-1.56-4.09,0-5.66L253.17,111.99c1.56-1.56,4.09-1.56,5.66,0l141.18,141.18c1.56,1.56,1.56,4.09,0,5.66l-55.52,55.52c-1.56,1.56-1.56,4.09,0,5.66h0Z"/>
+    </g>
+
+    <!-- 안쪽 사각형 -->
+    <g id="inner" fill="#E7EEFC">
+      <path class="st0" d="M302.12,179.75l-43.29-43.29c-1.56-1.56-4.09-1.56-5.66,0l-116.7,116.7c-1.56,1.56-1.56,4.09,0,5.66l116.7,116.7c1.56,1.56,4.09,1.56,5.66,0l43.29-43.29c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-24.93,24.93c-1.56,1.56-4.09,1.56-5.66,0l-80-80c-1.56-1.56-1.56-4.09,0-5.66l80-80c1.56-1.56,4.09-1.56,5.66,0l24.93,24.93c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66v.04Z"/>
+      <path class="st0" d="M338.82,258.83l-24.93,24.93c-1.56,1.56-1.56,4.09,0,5.66l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l43.29-43.29c1.56-1.56,1.56-4.09,0-5.66l-43.29-43.29c-1.56-1.56-4.09-1.56-5.66,0l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l24.93,24.93c1.56,1.56,1.56,4.09,0,5.66Z"/>
+    </g>
+   </svg>
+  </div>
+  <p class="caption">
+     태극기의 건·곤·감·리를 현대적으로 재해석한 로고입니다.
+     각 사각형이 회전하면서 다른 팔괘가 만들어집니다.
+  </p>
 <p>
     <b><em>Divina</em></b>는 주역 점술의 현대화를 꿈꾸는 당찬 프로젝트입니다.
     전통 방식을 그대로 복각한 알고리즘으로 직접 64괘 점을 치고,
@@ -605,6 +643,40 @@ window.addEventListener('DOMContentLoaded', async () => {
     }, delay);
   });
 });
+
+  const layers = [
+    { sel: '#outer', step: 180, spin: 800, hold: 1600, delay:  2750 },
+    { sel: '#mid',   step: 270, spin: 1100, hold: 1300, delay: 2550 },
+    { sel: '#inner', step: 360, spin: 900, hold: 1500, delay: 2500 },
+  ];
+
+  const ease = 'cubic-bezier(.32,.02,.24,1)';
+
+  function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+  async function spinLoop(el, step, spin, hold, delay){
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let angle = 0;
+    if (delay) await sleep(delay);
+    while(true){
+      // 회전 구간
+      el.style.transition = `transform ${spin}ms ${ease}`;
+      angle += step; // 누적 회전
+      el.style.transform = `rotate(${angle}deg)`;
+      await sleep(spin);
+
+      // 멈춤 구간
+      // transition 유지해도 되지만 확실히 멈춘 느낌을 주려면 아래 줄 주석 해제
+      // el.style.transition = 'none';
+      await sleep(hold);
+    }
+  }
+
+  layers.forEach(({sel, step, spin, hold, delay})=>{
+    const el = document.querySelector(sel);
+    if (el) spinLoop(el, step, spin, hold, delay);
+  });
+
 </script>
 </body>
 </html>
