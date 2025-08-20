@@ -781,9 +781,9 @@ requestAnimationFrame(()=>{
     }  
 
     // 네가 맞춰둔 값 그대로 사용(예: 270/180/360)
-    spinLoop(loader.querySelector('.sq-outer'), 180,  800, 600, 750);
-    spinLoop(loader.querySelector('.sq-mid')  , 270, 1100, 300, 550);
-    spinLoop(loader.querySelector('.sq-inner'), 360,  900, 500, 500);  
+    spinLoop(loader.querySelector('.sq-outer'), 180,  800, 600, 1200);
+    spinLoop(loader.querySelector('.sq-mid')  , 270, 1100, 300,  650);
+    spinLoop(loader.querySelector('.sq-inner'), 360,  900, 500,  500); 
         
     try{
       const res = await fetch('https://iching-ai-ilo2.onrender.com/api/read', {
