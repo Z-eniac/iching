@@ -251,7 +251,7 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
 <!-- 0) Divina의 간략한 소개 -->
 <section class="section js-reveal" id="introduction">
 <h3>0. Divina 소개</h3>
-  <div class="logo-spin" style="justify-items:center;">
+  <div class="logo-spin" style="justify-self:center;">
    <svg viewBox="0 0 512 512" width="100" height="100" aria-hidden="true">
     <!-- 바깥 사각형 -->
     <g id="outer" fill="#E7EEFC">
@@ -645,9 +645,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
   const layers = [
-    { sel: '#outer', step: 180, spin: 1000, hold: 2000, delay: 3750 },
-    { sel: '#mid',   step: 270, spin: 1300, hold: 1700, delay: 2550 },
-    { sel: '#inner', step: 360, spin: 1100, hold: 1900, delay: 1500 },
+    { sel: '#outer', step: 180, spin: 1000, hold: 3000, delay: 3750 },
+    { sel: '#mid',   step: 270, spin: 1300, hold: 2700, delay: 2550 },
+    { sel: '#inner', step: 90, spin: 600, hold: 3400, delay: 1500 },
   ];
 
   const ease = 'cubic-bezier(.32,.02,.24,1)';
