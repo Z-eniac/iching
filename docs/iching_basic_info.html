@@ -118,7 +118,17 @@ td{background:#101a2e}
 .sp{width:26px;height:var(--lineHeight)}
 .hex{display:grid;grid-template-columns:16px 1fr 16px;row-gap:var(--rowGap);align-items:center}
 .hex > * {align-self:center}
-.hex .cell{display:flex;align-items:center}
+.hex input[type=range]{
+  -webkit-appearance:none; appearance:none;
+  display:block;        /* 인라인 라인박스 영향 제거 */
+  height:8px;
+}
+.hex input[type=range]::-webkit-slider-runnable-track{ height:8px; }
+.hex input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:16px; height:16px; margin-top:-4px;
+  border-radius:50%;
+}
+
 .lineWrap{position:relative;width:100%;height:var(--lineHeight);justify-self:center}
 .line{height:100%;border-radius:7px;background:#25324a;position:absolute;inset:0}
 .yang .line::before{content:'';position:absolute;inset:2px;background:#e7eefc;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
@@ -320,7 +330,7 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
 <div class="hexPair">
 <div class="hexBox">
 <div class="small" style="text-align:center;margin-bottom:6px">본괘</div>
-<div class="hex cell">
+<div class="hex">
   <div class="lab">6</div><div class="lineWrap yang"><div class="line"></div></div><div class="sp"></div>
   <div class="lab">5</div><div class="lineWrap yin chg"><div class="line"></div><div class="gap"></div></div><div class="sp"></div>
   <div class="lab">4</div><div class="lineWrap yang"><div class="line"></div></div><div class="sp"></div>
@@ -337,7 +347,7 @@ html.prehide #guide [data-reveal]{ transition:none !important; }
 </div>
 <div class="hexBox">
 <div class="small" style="text-align:center;margin-bottom:6px">변괘</div>
-<div class="hex cell">
+<div class="hex">
   <div class="lab">6</div><div class="lineWrap yang"><div class="line"></div></div><div class="sp"></div>
   <div class="lab">5</div><div class="lineWrap yang chg"><div class="line"></div></div><div class="sp"></div>
   <div class="lab">4</div><div class="lineWrap yang"><div class="line"></div></div><div class="sp"></div>
