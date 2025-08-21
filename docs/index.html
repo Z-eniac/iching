@@ -141,11 +141,16 @@ h1,
 h1{margin-top:46px}
 .centerTop{display:flex;justify-content:center;margin:18px 0 4px}
 .centerTop .run{background:#7c8bf5;color:#fff;border:0;border-radius:14px;padding:12px 18px;font-weight:700;cursor:pointer}
-.stackBtns{display:flex;flex-direction:column;gap:22px;margin:22px auto 10px;max-width:300px}
-.stackBtns .btn{display:block;width:100%;padding:18px 0px;border-radius:14px;color:#fff;font-size:1.2rem;font-weight:900;border:0;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 16px rgba(0,0,0,.2);text-align:center;text-decoration:none}
+.stackBtns{display:flex;flex-direction:column;gap:18px;margin:22px auto 10px;max-width:160px}
+.stackBtns .btn{display:block;width:100%;padding:10px 0px;border:1.4px solid var(--ink);border-radius:0;color:var(--ink);font-size:1.0rem;font-weight:300;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 16px rgba(0,0,0,.2);text-align:center;text-decoration:none}
       .stackBtns .green{background:#407975}
       .stackBtns .blue{background:#23375d}
       .stackBtns .coral{background:#68313f}
+
+.startBtn{display:flex;border:1.4px solid var(--ink);width:140px;height:140px;
+        transform:rotate(45deg);margin:22px auto 22px}
+    .startBtn .start{display:block;font-family:"NotoSerifCJK-ICHING", serif;color:var(--ink);font-size:1.4rem;font-weight:600;letter-spacing:.2px;}
+
 .bottomNav{display:flex;justify-content:center;margin:18px 0 10px}
 .bottomNav a, .bottomNav button{background:#243552;color:#cfe0ff;border:1px solid #2a3b5a;border-radius:12px;padding:10px 16px;font-weight:700;text-decoration:none}
 .hidden{display:none}
@@ -219,14 +224,12 @@ h1{margin-top:46px}
 
   <h2 class="js-reveal">주역점과 인공지능의 만남</h2>
          
-  <div class="topNav js-reveal">
-    <a class="topLink" href="iching_basic_info.html">◆ 기초 안내서 ◆</a>
-    <a class="topLink" href="./Dict/dict_index.html">◆ 64괘 색인 ◆</a>
+  <div class="startBtn js-reveal">
+    <a class="start" href="ai_casters.html">주역점 시작하기</a>
   </div>
   <div class="stackBtns">
-    <a class="btn green js-reveal" href="ai_cast_yarrow.html">지초법 점치기</a>
-    <a class="btn blue js-reveal"  href="ai_cast_coins.html">동전법 점치기</a>
-    <a class="btn coral js-reveal" href="ai_cast_custom.html">커스텀 점괘 입력</a>
+    <a class="btn js-reveal" href="iching_basic_info.html">기초 안내서</a>
+    <a class="btn js-reveal" href="./Dict/dict_index.html">64괘 색인</a>
   </div>
   <div class="legend js-reveal">© 2025. 妙公 (Myo Gong). All Rights Reserved.</div>
 </div>
