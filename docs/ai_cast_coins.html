@@ -125,8 +125,41 @@ h1,
   }
 
   .title a{ color: inherit; text-decoration: none; }
-  .title a:hover{ text-decoration: underline; text-underline-offset: 3px; }
   .title a:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+  /* Metallic Shimmer on title link */
+  .title a, .titleLink{
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  color: inherit;
+  isolation: isolate;           /* 겹침 안전 */
+  overflow: hidden;             /* 빛줄기 클리핑 */
+  }
+
+  /* 쉬머 하이라이트 */
+  .title a::after, .titleLink::after{
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -35%;
+  width: 28%;
+  pointer-events: none;
+  background: linear-gradient(120deg,
+              rgba(255,255,255,0) 0%,
+              rgba(255,255,255,0.85) 50%,
+              rgba(255,255,255,0) 100%);
+  transform: skewX(-20deg) translateX(-200%);
+  transition: transform 800ms cubic-bezier(.2,.8,.2,1);
+  mix-blend-mode: screen;       /* 다크/골드 배경 위에서 금속광 느낌 */
+  opacity: .75;                 /* 필요시 0.6~0.9로 조절 */
+  will-change: transform;
+  }
+
+  .title a:hover::after, .titleLink:hover::after{
+  transform: skewX(-20deg) translateX(450%);
+  }
 
 /* split pages */
 .mainWrap{max-width:1100px;margin:0 auto;padding:0 16px 40px}
