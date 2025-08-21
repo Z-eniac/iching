@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DIVINA: home</title>
+<link rel="icon" type="image/svg+xml" href="icon/No49.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="icon/No49.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/docs/icon/No49_512.png?v=2">
+<link rel="icon" type="image/png" sizes="256x256" href="/docs/icon/No49_256.png?v=2">
+<link rel="icon" type="image/png" sizes="192x192" href="/docs/icon/No49_192.png?v=2">
+<link rel="icon" type="image/png" sizes="32x32"  href="/docs/icon/No49_32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16"  href="/docs/icon/No49_16.png?v=2">
+<link rel="preload"
+      href="./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2"
+      as="font" type="font/woff2" crossorigin>
+<!-- Open Graph (KakaoTalk 미리보기용) -->
+<meta property="og:type"        content="website">
+<meta property="og:site_name"   content="Divina">
+<meta property="og:title"       content="Divina: 주역점과 AI의 만남">
+<meta property="og:description" content="클릭 한 번으로 64괘 점괘와 AI 해석까지.">
+<meta property="og:url"         content="https://www.divina.studio/">
+<meta property="og:locale"      content="ko_KR">
+
+<!-- 썸네일: 절대경로 + 크기 명시 -->
+<meta property="og:image"        content="https://www.divina.studio/icon/No49_og.png?v=1">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- 트위터(기타 메신저 대비) -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="Divina: 주역점과 AI의 만남">
+<meta name="twitter:description" content="클릭 한 번으로 64괘 점괘와 AI 해석까지.">
+<meta name="twitter:image"       content="https://www.divina.studio/icon/No49_og.png?v=1">
+
+<style>
+
+@font-face{
+  font-family: "NotoSerifCJK-ICHING";
+  src: url("./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2") format("woff2");
+  font-weight: 600;          /* Semibold */
+  font-style: normal;
+  font-display: swap;
+}
+  
+  :root{
+    --bg:#0c111b; --card:#111a2b; --border:#22304a; --ink:#eaf0ff;
+    --muted:#a8b6d7; --accent:#2b8cff; --yang:#e7eefc; --yin:#e7eefc; --mark:#ff6b6b;
+    --hexWidth: 192px; --lineHeight: 24px; --rowGap: 12px; --yinGap: 26px;
+    --contentMax: 1200px;
+    --cardW: 360px; --cardGap: 18px; /* more compact cards */
+    --metaCol1: 38px; --metaCol2: 75px; --metaCol3: 45px; --metaCol4: 95px; --metaCol5: 53px; /* tighter grid */
+          /* === Brand size knobs === */
+        --brandLogoSize: 140px;      /* 로고(정사각) 크기 */
+        --brandTypeWidth: 205px;     /* 로고타입(svg 글자) 가로폭 */
+        --brandGap: 12px;            /* 둘 사이 간격 */
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Malgun Gothic',Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:var(--contentMax);margin:0 auto;padding:90px 12px 0}
+
+  .brandWrap{
+  display:flex; flex-direction:column; align-items:center;
+  gap:var(--brandGap);
+  margin: 25px 0 6px;          /* 상단 여백 조절 */
+  }
+  .brandWrap a{ display:inline-block; text-decoration:none; }
+  .brandLogo{ width:var(--brandLogoSize); height:auto; }
+  .brandType{ width:min(var(--brandTypeWidth), 84vw); height:auto; }
+
+  /* 작은 화면에서 자동 보정(원하면 값 수정) */
+  @media (max-width:480px){
+    :root{
+      /*--brandLogoSize: 110px;*/
+      --brandTypeWidth: 180px;
+      --brandGap: 10px;
+    }
+  }
+
+  /* 스크린리더/SEO용 숨김 텍스트 */
+  .sr-only{
+  position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+      
+  h1{font-size:50px;margin:0 0 0px;text-align:center;letter-spacing:-1.0px} /* 1.5x */
+      /* 사이트 공통 헤더(h1) */
+h1,
+.page-title {                /* 페이지 최상단 타이틀에 쓰는 클래스가 있으면 같이 */
+  font-family: "NotoSerifCJK-ICHING", serif !important;
+  font-weight: 600 !important;
+  font-synthesis: none;      /* 가짜 볼드 방지 */
+  letter-spacing:0em;     /* 취향 보정 */
+}
+h2{font-family:"NotoSerifCJK-ICHING",serif;margin:8px 0 14px;text-align:center;font-size:26px;color:var(--ink)}
+.sub{color:var(--muted);font-weight:300;text-align:center; line-height:1.6;margin:14px 0 24px}
+
+  .btns{display:flex;justify-content:center;gap:14px;margin:12px 0 34px}
+  button{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:14px 20px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2);font-size:1.5rem} /* 1.2x text */
+  .row{display:flex;gap:var(--cardGap);align-items:flex-start;flex-wrap:wrap;justify-content:center}
+  .card{flex:0 1 var(--cardW);max-width:var(--cardW);background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  .badge{display:inline-block;background:#1a2540;border:1px solid #2c3b58;border-radius:10px;padding:4px 10px;margin-bottom:8px}
+  .title{text-align:center;margin:6px 0 8px}
+  .title .han{font-size:36px;font-weight:900;letter-spacing:1px}
+  .title .ko{font-size:14px;color:var(--muted);margin-top:4px}
+  .panel{display:grid;grid-template-columns:auto;gap:10px;align-items:center;justify-items:center}
+  .hex{display:grid;grid-template-columns:26px auto 26px;row-gap:var(--rowGap);align-items:center}
+  .lab{text-align:center;font-size:11px;color:#c2cfe9;padding-top:2px}
+  .sp{width:26px;height:var(--lineHeight)}
+  .lineWrap{position:relative;width:var(--hexWidth);height:var(--lineHeight);justify-self:center}
+  .line{height:100%;border-radius:7px;background:#25324a;position:absolute;inset:0}
+  .yang .line::before{content:'';position:absolute;inset:2px;background:var(--yang);border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
+  .yin .line::before, .yin .line::after{content:'';position:absolute;top:2px;bottom:2px;width:calc(50% - (var(--yinGap)/2));background:var(--yin);border-radius:5px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
+  .yin .line::before{left:2px} .yin .line::after{right:2px}
+  .yin .gap{position:absolute;left:50%;top:2px;bottom:2px;transform:translateX(-50%);width:var(--yinGap);background:#111a2b;border-radius:4px;box-shadow:0 0 0 1px rgba(0,0,0,.12) inset}
+  .chg::after{content:'變';position:absolute;right:-8px;top:-4px;background:var(--mark);color:#fff;font-weight:600;font-size:11px;line-height:16px;padding:0 6px;border-radius:6px;box-shadow:0 1px 6px rgba(0,0,0,.3)}
+  /* Meta under hex - fixed columns, tighter */
+  .metaUnder{border-top:1px dashed #2a3b5a;margin-top:8px;padding-top:6px;text-align:center;width:100%}
+  .metaRow{display:grid;grid-template-columns:var(--metaCol1) var(--metaCol2) var(--metaCol3) var(--metaCol4) var(--metaCol5);align-items:center;justify-items:start;column-gap:6px;margin:2px 0}
+  .metaRow .lab2{color:#a9b8dc;justify-self:end;padding-right:2px}
+  .metaRow .mono{font-variant-numeric:tabular-nums}
+  .kw{display:none}
+  .read{margin-top:8px;padding:8px 10px;border:1px solid #2a3b5a;border-radius:10px;background:#0f1a2e}
+  .read h4{margin:0 0 6px;font-size:15px;color:#cfe0ff}
+  .read ul{margin:6px 0 0 18px;padding:0;line-height:1.45}
+  /* Joint interpretation area */
+  .joint{margin-top:22px;padding:28px 28px;border:1px solid #2a3b5a;border-radius:16px;background:#0e172a;text-align:left;width:calc((2 * var(--cardW)) + var(--cardGap));margin-left:auto;margin-right:auto}
+  .joint .summary{font-size:30px;font-weight:900;margin:0 0 16px;text-align:center}
+  .joint .detail{font-size:19px;line-height:2.0;white-space:pre-line}
+  .legend{margin-top:30px;margin-bottom:20px;font-size:12px;color:#a4b2d4;text-align:center}
+  @media (max-width:860px){
+    .card{flex-basis:100%;max-width:640px}
+    .joint{width:auto}
+  }
+
+/* split-pages layout */
+.mainWrap{max-width:1100px;margin:0 auto;padding:0 16px 40px}
+h1{margin-top:46px}
+.centerTop{display:flex;justify-content:center;margin:18px 0 4px}
+.centerTop .run{background:#7c8bf5;color:#fff;border:0;border-radius:14px;padding:12px 18px;font-weight:700;cursor:pointer}
+.stackBtns{display:flex;flex-direction:column;gap:30px;margin:22px auto 10px;max-width:26   0px}
+.stackBtns .btn{display:block;width:100%;border:1px solid var(--ink);padding:18px 0px;color:var(--ink);font-size:1.2rem;font-weight:500;border:0;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 16px rgba(0,0,0,.2);text-align:center;text-decoration:none}
+      .stackBtns .green{background:#4079755a}
+      .stackBtns .blue{background:#23375d5a}
+      .stackBtns .coral{background:#68313f5a}
+.bottomNav{display:flex;justify-content:center;margin:18px 0 10px}
+.bottomNav a, .bottomNav button{background:#243552;color:#cfe0ff;border:1px solid #2a3b5a;border-radius:12px;padding:10px 16px;font-weight:700;text-decoration:none}
+.hidden{display:none}
+
+/* 순차 등장: 기본 상태(숨김) + 항상 transition 적용 */
+.js-reveal,
+[data-reveal-group] > * {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(2px);
+  transition: opacity .6s ease, transform .6s ease, filter .6s ease;
+  will-change: opacity, transform, filter;
+}
+
+/* 보일 때 */
+.js-reveal.show,
+[data-reveal-group] > *.show {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 모션 저감 사용자의 경우:
+   - 이동/블러만 제거 (깜빡임 최소화)
+   - transition은 끄지만, opacity는 기본 0을 유지 → JS로 순차 노출은 그대로 */
+/*@media (prefers-reduced-motion: reduce) {
+  .js-reveal,
+  [data-reveal-group] > * {
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}*/
+
+ /* 상단 텍스트 링크 */
+.topNav{
+  display:column; gap:17px;
+  justify-content:center;
+  margin: 10px 0 6px;
+}
+.topLink{
+  display:inline-block;
+  font-weight: 400;          /* 약간의 두께 */
+  font-size: 15px;           /* 작은 텍스트 */
+  letter-spacing: .02em;
+  color:#a4b2d4;
+  text-decoration: none;     /* 기본은 밑줄 없음 */
+  text-underline-offset: 3px;
+}
+.topLink:hover,
+.topLink:focus-visible{
+  text-decoration: underline; /* hover/focus에만 밑줄 */
+  outline: none;
+}
+      
+</style></head>
+<body>
+<div class="mainWrap">
+  <h1 class="sr-only">Divina Studio</h1>
+      <!-- 브랜드 블록: 위 로고, 아래 로고타입 -->
+    <div class="brandWrap">
+        <!-- 로고: 클릭 시 index.html 이동 -->
+        <a href="index.html" aria-label="Divina Studio Home">
+          <img src="./icon/No49.svg" alt="Divina logo" class="brandLogo">
+        </a>
+    </div>
+
+  <h2 class="js-reveal">어떤 방식으로 볼까요?</h2>
+  <p class="sub">
+    <a href="iching_basic_info.html#methods">지초법과 동전법이 뭐에요?</a><br>
+  </p>
+  <div class="stackBtns">
+    <a class="btn green js-reveal" href="ai_cast_yarrow.html">지초법으로 할게요</a>
+    <a class="btn blue js-reveal"  href="ai_cast_coins.html">동전법으로 할게요</a>
+    <a class="btn coral js-reveal" href="ai_cast_custom.html">커스텀으로 입력할게요</a>
+  </div>
+  <div class="legend js-reveal">© 2025. 妙公 (Myo Gong). All Rights Reserved.</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const items = [
+    ...document.querySelectorAll('.js-reveal') /*,
+    ...document.querySelectorAll('[data-reveal-group] > *') */
+  ];
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const baseDelay = 800;  // 헤더만 먼저 보이게 잠깐 대기
+  const step = 200;       // 항목 간 지연(ms) — 취향껏 120~240 사이로 조절
+
+  items.forEach((el, i) => {
+    const delay = baseDelay + i * step;
+    setTimeout(() => {
+      // reflow로 첫 프레임 확실히 고정
+      void el.offsetWidth;
+      el.classList.add('show');  // reduce여도 순차 등장(애니 없음)
+    }, delay);
+  });
+});
+</script>
+</body></html>
