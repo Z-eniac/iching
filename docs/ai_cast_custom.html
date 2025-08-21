@@ -71,6 +71,10 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   .title .han{font-size:45px;letter-spacing:1px;font-weight:700}
   .title .ko{font-size:14px;color:var(--muted);margin-top:4px}
 
+  /* 카드 타이틀을 클릭 가능한 링크로 */
+  .title a{ color: inherit; text-decoration: none; }
+  .title a:hover{ text-decoration: underline; text-underline-offset: 3px; }
+
   .hex{min-width: calc(26px + var(--hexWidth) + 26px); display:grid;grid-template-columns:26px auto 26px;row-gap:var(--rowGap);align-items:center}
   .lab{font-size:11px;color:#c2cfe9;text-align:center;padding-top:2px}
   .sp{width:26px;height:var(--lineHeight)}
@@ -434,9 +438,18 @@ function lookup(hex){
   return META['u'+up+'l'+low];
 }
 function makeTitle(info){
-  const big=TRI_MEAN_HAN[info.upper]+TRI_MEAN_HAN[info.lower]+info.nameHan;
-  const small='No.'+info.no+' '+TRI_ATTR_KO[info.upper]+TRI_ATTR_KO[info.lower]+info.nameKo;
-  return '<div class="han">'+big+'</div><div class="ko">'+small+'</div>';
+  const big   = TRI_MEAN_HAN[info.upper] + TRI_MEAN_HAN[info.lower] + info.nameHan;
+  const small = 'No.' + info.no + ' ' + TRI_ATTR_KO[info.upper] + TRI_ATTR_KO[info.lower] + info.nameKo;
+
+  const pad2  = n => String(n).padStart(2,'0');
+  // 👉 Dict 폴더 안 상세파일 경로 (예: ./Dict/hex_09_소축.html)
+  const href  = `./Dict/hex_${pad2(info.no)}_${encodeURIComponent(info.nameKo)}.html`;
+
+  // 타이틀 전체를 링크로 감싸기
+  return `<a href="${href}" target="_blank" rel="noopener" class="titleLink">
+            <div class="han">${big}</div>
+            <div class="ko">${small}</div>
+          </a>`;
 }
 function metaRow(label,tri){ const m=TRI_META[tri];
   return '<div class="metaRow">'
