@@ -142,7 +142,15 @@ h1{margin-top:46px}
     .stackBtns .green{background:#4079755a}
     .stackBtns .blue{background:#23375d5a}
     .stackBtns .coral{background:#68313f5a}
-       .stackBtns .btn::after{content: ""; 
+        .stackBtns a, .btn{
+              position: relative;
+              display: inline-block;
+              text-decoration: none;
+              color: inherit;
+              isolation: isolate;           /* 겹침 안전 */
+              overflow: hidden;             /* 빛줄기 클리핑 */
+              }
+       .stackBtns a::after, .stackBtns .btn::after{content: ""; 
               background: linear-gradient(120deg,
               rgba(255,255,255,0) 0%,
               rgba(255,255,255,0.85) 50%,
