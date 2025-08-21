@@ -139,10 +139,21 @@ h1{margin-top:46px}
 .centerTop .run{background:#7c8bf5;color:#fff;border:0;border-radius:14px;padding:12px 18px;font-weight:700;cursor:pointer}
 .stackBtns{display:flex;flex-direction:column;gap:30px;margin:22px auto 10px;max-width:260px}
 .stackBtns .btn{display:block;width:100%;border:1.4px solid var(--ink);padding:18px 0px;color:var(--ink);font-size:1.2rem;font-weight:300;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 16px rgba(0,0,0,.2);text-align:center;text-decoration:none}
-      .stackBtns .green{background:#4079755a}
-      .stackBtns .blue{background:#23375d5a}
-      .stackBtns .coral{background:#68313f5a}
-    .stackBtns .btn:hover{transform:scale(1.05);font-weight:700;border:2.3px solid var(--ink)}
+    .stackBtns .green{background:#4079755a}
+    .stackBtns .blue{background:#23375d5a}
+    .stackBtns .coral{background:#68313f5a}
+       .stackBtns .btn:hover{font-weight:700;border:2.3px solid var(--ink)}
+       .stackBtns .btn::after{content: ""; 
+              background: linear-gradient(120deg,
+              rgba(255,255,255,0) 0%,
+              rgba(255,255,255,0.85) 50%,
+              rgba(255,255,255,0) 100%);
+              transform: skewX(-20deg) translateX(-200%);
+              transition: transform 800ms cubic-bezier(.2,.8,.2,1);
+              mix-blend-mode: screen;       /* 다크/골드 배경 위에서 금속광 느낌 */
+              opacity: .75;                 /* 필요시 0.6~0.9로 조절 */
+              will-change: transform;}
+       .stackBtns .btn:hover::after{transform: skewX(-20deg) translateX(450%)}
 .bottomNav{display:flex;justify-content:center;margin:18px 0 10px}
 .bottomNav a, .bottomNav button{background:#243552;color:#cfe0ff;border:1px solid #2a3b5a;border-radius:12px;padding:10px 16px;font-weight:700;text-decoration:none}
 .hidden{display:none}
