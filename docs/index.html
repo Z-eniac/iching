@@ -156,15 +156,15 @@ h1{margin-top:46px}
   display: grid;                 /* 가운데 정렬을 가장 간단히 */
   place-items: center;           /* 가로+세로 중앙 */
   width: 170px; height: 170px;
-  margin: 22px auto;
+  margin: 45px auto;
   transform: rotate(45deg);      /* 정사각 → 다이아 */
   border: 1.6px solid var(--ink);
   border-radius: 0;           /* (선택) 모서리 살짝 둥글게 */
   overflow: visible;
   background: transparent;
   box-shadow:   /* 아주 약한 기본 글로우 */
-    0 0 6px color-mix(in srgb, var(--ink) 20%, transparent),
-    0 0 14px color-mix(in srgb, var(--ink) 10%, transparent);
+    0 0 6px color-mix(in srgb, var(--ink) 60%, transparent),
+    0 0 14px color-mix(in srgb, var(--ink) 40%, transparent);
 }
 /* 텍스트(링크) — 다이아 안에서 바르게 세워주기 */
 .startBtn .starter{
@@ -179,12 +179,12 @@ h1{margin-top:46px}
   font-size: 1.3rem; font-weight: 600; letter-spacing: .2px;
    /* 텍스트도 아주 은은하게만 빛나게 */
   text-shadow:
-    0 0 4px color-mix(in srgb, var(--ink) 20%, transparent),
-    0 0 10px color-mix(in srgb, var(--ink) 10%, transparent);
+    0 0 4px color-mix(in srgb, var(--ink) 60%, transparent),
+    0 0 10px color-mix(in srgb, var(--ink) 40%, transparent);
 }
 
-.startBtn .start:hover,
-.startBtn .start:focus-visible{
+.startBtn .starter:hover,
+.startBtn .starter:focus-visible{
   text-decoration: none; outline: none;
 }
 
@@ -224,6 +224,7 @@ h1{margin-top:46px}
   0%   { background-position: 18% 28%, 82% 18%, 50% 50%; }
   50%  { background-position: 58% 36%, 42% 76%, 50% 50%; }
   100% { background-position: 78% 64%, 12% 24%, 50% 50%; }
+}
 
 .bottomNav{display:flex;justify-content:center;margin:18px 0 10px}
 .bottomNav a, .bottomNav button{background:#243552;color:#cfe0ff;border:1px solid #2a3b5a;border-radius:12px;padding:10px 16px;font-weight:700;text-decoration:none}
