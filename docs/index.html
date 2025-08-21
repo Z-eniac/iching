@@ -199,30 +199,6 @@ h1{margin-top:46px}
   opacity:.35; pointer-events:none;
 }
 
-/* 오로라 레이어 — 매우 느리고 은은하게, 잔상 느낌만 */
-.startBtn ._aurora{
-  position: absolute; inset:-22%;
-  pointer-events: none; z-index: 1;
-  mix-blend-mode: screen;
-  filter: blur(22px) saturate(105%);
-  opacity: .55;
-
-  /* var(--ink) 기반의 아주 옅은 빛결 (지원 안 되면 아래 @supports fallback) */
-  background:
-    radial-gradient(120% 70% at 20% 15%,  color-mix(in srgb, currentColor 18%, transparent) 0%, transparent 65%),
-    radial-gradient(100% 80% at 80% 20%,  color-mix(in srgb, currentColor 14%, transparent) 0%, transparent 70%),
-    conic-gradient(from 25deg at 50% 50%, transparent 0 12%, color-mix(in srgb, currentColor 12%, transparent) 16% 22%, transparent 26% 100%);
-  background-size: 200% 200%, 220% 220%, 100% 100%;
-  background-position: 18% 28%, 82% 18%, 50% 50%;
-  animation: auroraDrift 26s ease-in-out infinite alternate;
-}
-
-@keyframes auroraDrift{
-  0%   { background-position: 18% 28%, 82% 18%, 50% 50%; }
-  50%  { background-position: 58% 36%, 42% 76%, 50% 50%; }
-  100% { background-position: 78% 64%, 12% 24%, 50% 50%; }
-}
-
 .bottomNav{display:flex;justify-content:center;margin:18px 0 10px}
 .bottomNav a, .bottomNav button{background:#243552;color:#cfe0ff;border:1px solid #2a3b5a;border-radius:12px;padding:10px 16px;font-weight:700;text-decoration:none}
 .hidden{display:none}
