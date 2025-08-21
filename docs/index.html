@@ -218,9 +218,9 @@ h1{margin-top:46px}
   opacity: .5;                          /* 강도 조절: 0.35 ~ 0.6 추천 */
   /* var(--ink) 기반 아주 옅은 빛결 */
   background:
-    radial-gradient(120% 70% at 20% 15%,  color-mix(in srgb, var(--mark) 18%, transparent) 0%, transparent 65%),
-    radial-gradient(100% 80% at 80% 20%,  color-mix(in srgb, var(--mark) 14%, transparent) 0%, transparent 70%),
-    conic-gradient(from 25deg at 50% 50%, transparent 0 12%, color-mix(in srgb, var(--mark) 12%, transparent) 16% 22%, transparent 26% 100%);
+    radial-gradient(120% 70% at 20% 15%,  color-mix(in srgb, var(--ink) 18%, transparent) 0%, transparent 65%),
+    radial-gradient(100% 80% at 80% 20%,  color-mix(in srgb, var(--ink) 14%, transparent) 0%, transparent 70%),
+    conic-gradient(from 25deg at 50% 50%, transparent 0 12%, color-mix(in srgb, var(--ink) 12%, transparent) 16% 22%, transparent 26% 100%);
   background-size: 200% 200%, 220% 220%, 100% 100%;
   background-position: 18% 28%, 82% 18%, 50% 50%;
   animation: auroraDrift 4s ease-in-out infinite alternate;
@@ -247,6 +247,16 @@ h1{margin-top:46px}
   outline: none;
 }
 
+.stackBtn:hover,
+.stackBtn:focus-visible{
+  border-color: var(--ink);
+  box-shadow:
+    0 0 8px  color-mix(in srgb, var(--ink) 30%, transparent),
+    0 0 16px color-mix(in srgb, var(--ink) 15%, transparent);
+  text-decoration: none;
+  outline: none;
+}
+
 /* 2) 텍스트 네온도 한 단계 업 */
 .startBtn:hover .starter,
 .startBtn:focus-visible .starter{
@@ -254,6 +264,14 @@ h1{margin-top:46px}
     0 0 6px  color-mix(in srgb, var(--ink) 50%, transparent),
     0 0 18px color-mix(in srgb, var(--ink) 25%, transparent),
     0 0 36px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.stackBtn:hover .btn,
+.stackBtn:focus-visible .btn{
+  color:var(--ink);
+  text-shadow:
+    0 0 6px  color-mix(in srgb, var(--ink) 30%, transparent),
+    0 0 12px color-mix(in srgb, var(--ink) 15%, transparent),
 }
 
 .bottomNav{display:flex;justify-content:center;margin:18px 0 10px}
