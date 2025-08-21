@@ -172,8 +172,10 @@ h1{margin-top:46px}
   z-index: 2;                    /* 광휘 위에 텍스트 */
   display: grid;
   place-items: center;
-  width: 100%; height: 100%;     /* 전체 영역 클릭(원하면 빼도 됨) */
+  width: 100%; height: 100%;
+  margin: 22px auto;     /* 전체 영역 클릭(원하면 빼도 됨) */
   transform: rotate(-45deg);     /* 부모 회전을 상쇄 → 글자 수평 */
+  transform-origin: 50% 50%;
   font-family:"NotoSerifCJK-ICHING", serif;
   color: var(--ink);
   font-size: 1.3rem; font-weight: 600; letter-spacing: .2px;
@@ -299,9 +301,9 @@ h1{margin-top:46px}
 
   <h2 class="js-reveal">주역점과 인공지능의 만남</h2>
          
-  <div class="startBtn js-reveal">
-    <a class="starter" href="ai_casters.html">주역점 시작하기</a>
-  </div>
+  <a class="startBtn js-reveal">
+    <p class="starter" href="ai_casters.html">주역점 시작하기</a>
+  </a>
   <div class="stackBtns">
     <a class="btn js-reveal" href="iching_basic_info.html">기초 안내서</a>
     <a class="btn js-reveal" href="./Dict/dict_index.html">64괘 색인</a>
