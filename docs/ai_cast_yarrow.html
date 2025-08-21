@@ -439,14 +439,26 @@ function lookup(hex){
 }
 
 function makeTitle(info){
-  const big   = TRI_MEAN_HAN[info.upper] + TRI_MEAN_HAN[info.lower] + info.nameHan;
-  const small = 'No.' + info.no + ' ' + TRI_ATTR_KO[info.upper] + TRI_ATTR_KO[info.lower] + info.nameKo;
+  // 1) 한자 큰 제목: 상·하괘가 같으면 '重+속성+괘명'
+  const same = info.upper === info.lower;
+  const big = same
+    ? '重' + TRI_MEAN_HAN[info.upper] + info.nameHan
+    :      TRI_MEAN_HAN[info.upper] + TRI_MEAN_HAN[info.lower] + info.nameHan;
 
-  const pad2  = n => String(n).padStart(2,'0');
-  // 👉 Dict 폴더 안 상세파일 경로 (예: ./Dict/hex_09_소축.html)
-  const href  = `./Dict/hex_${pad2(info.no)}_${encodeURIComponent(info.nameKo)}.html`;
+  // 2) 한글 작은 제목:
+  //    - 상괘가 震이면 '뇌', 하괘가 震이면 '뢰'
+  const attrKoUpper = (info.upper === '震') ? '뇌' : TRI_ATTR_KO[info.upper];
+  const attrKoLower = (info.lower === '震') ? '뢰' : TRI_ATTR_KO[info.lower];
 
-  // 타이틀 전체를 링크로 감싸기
+  const small = same
+    // 동일 상·하괘면 '중 + (하괘 쪽 두음 규칙 적용된 속성) + 괘명'
+    ? 'No.' + info.no + ' ' + '중' + attrKoLower + info.nameKo
+    // 다르면 기존처럼 '상속성+하속성+괘명' (단, 하괘=震이면 '뢰')
+    : 'No.' + info.no + ' ' + attrKoUpper + attrKoLower + info.nameKo;
+
+  const pad2 = n => String(n).padStart(2,'0');
+  const href = `./Dict/hex_${pad2(info.no)}_${encodeURIComponent(info.nameKo)}.html`;
+
   return `<a href="${href}" target="_blank" rel="noopener" class="titleLink">
             <div class="han">${big}</div>
             <div class="ko">${small}</div>
