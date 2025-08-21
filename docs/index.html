@@ -215,7 +215,7 @@ h1{margin-top:46px}
   z-index: 1;
   mix-blend-mode: screen;
   filter: blur(22px) saturate(105%);
-  opacity: .45;                          /* 강도 조절: 0.35 ~ 0.6 추천 */
+  opacity: .6;                          /* 강도 조절: 0.35 ~ 0.6 추천 */
   /* var(--ink) 기반 아주 옅은 빛결 */
   background:
     radial-gradient(120% 70% at 20% 15%,  color-mix(in srgb, var(--ink) 18%, transparent) 0%, transparent 65%),
@@ -223,13 +223,45 @@ h1{margin-top:46px}
     conic-gradient(from 25deg at 50% 50%, transparent 0 12%, color-mix(in srgb, var(--ink) 12%, transparent) 16% 22%, transparent 26% 100%);
   background-size: 200% 200%, 220% 220%, 100% 100%;
   background-position: 18% 28%, 82% 18%, 50% 50%;
-  animation: auroraDrift 26s ease-in-out infinite alternate;
+  animation: auroraDrift 10s ease-in-out infinite alternate;
 }
 
 @keyframes auroraDrift{
   0%   { background-position: 18% 28%, 82% 18%, 50% 50%; }
   50%  { background-position: 58% 36%, 42% 76%, 50% 50%; }
   100% { background-position: 78% 64%, 12% 24%, 50% 50%; }
+}
+
+/* =========================
+   Hover/Foucus 강화 세팅
+   ========================= */
+
+/* 1) 다이아 테두리/외곽 네온 살짝 증폭 */
+.startBtn:hover,
+.startBtn:focus-visible{
+  border-color: color-mix(in srgb, var(--ink) 80%, transparent);
+  box-shadow:
+    0 0 8px  color-mix(in srgb, var(--ink) 40%, transparent),
+    0 0 22px color-mix(in srgb, var(--ink) 20%, transparent);
+  text-decoration: none;
+  outline: none;
+}
+
+/* 2) 텍스트 네온도 한 단계 업 */
+.startBtn:hover .starter,
+.startBtn:focus-visible .starter{
+  text-shadow:
+    0 0 6px  color-mix(in srgb, var(--ink) 30%, transparent),
+    0 0 18px color-mix(in srgb, var(--ink) 18%, transparent),
+    0 0 36px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+/* 3) 오로라: 진해지고(불투명도↑) 더 빠르게 드리프트 */
+.startBtn:hover ._aurora,
+.startBtn:focus-visible ._aurora{
+  opacity: .7;                       /* 기본 .45 → .62 정도 */
+  filter: blur(22px) saturate(112%) brightness(108%);
+  animation-duration: 6s;            /* 기본 26s → 14s (조금 빠르게) */
 }
 
 .bottomNav{display:flex;justify-content:center;margin:18px 0 10px}
