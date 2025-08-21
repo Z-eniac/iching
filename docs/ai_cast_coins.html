@@ -127,7 +127,7 @@ h1,
   .title a{ color: inherit; text-decoration: none; }
   .title a:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 
-/* 기본 링크 모양 */
+  /* 기본 링크 모양 */
 .title a, .titleLink{
   position: relative;
   display: inline-block;
@@ -135,47 +135,58 @@ h1,
   text-decoration: none;
 }
 
-/* 두 줄(한자/한글) 각각을 오버레이할 준비 */
+/* 두 줄(한자/국문) 각각 오버레이 준비 */
 .titleLink .han,
 .titleLink .ko{
   position: relative;
-  display: block; /* 두 줄이면 블록이 안전 */
+  display: block;
 }
 
-/* ★ 마스크 리빌 오버레이: 같은 텍스트를 위에 한 번 더 올리고, 그라데를 '글자 내부'에만 채움 */
+/* 라디얼 스팟: 같은 텍스트를 위에 겹치고, 그라데를 '글자 내부'에만 채움 */
 .titleLink .han::after,
 .titleLink .ko::after{
-  content: attr(data-text);     /* JS로 data-text에 원문을 복사해 둘 거야 */
+  content: attr(data-text);       /* JS로 원문 복사해 줄 거야 */
   position: absolute;
   inset: 0;
   pointer-events: none;
 
-  /* 텍스트 내부만 보이게 */
+  /* 글자 내부만 보이게 */
   color: transparent;
-  background: linear-gradient(90deg,
-              var(--mr-start, #3c6ac7) 0%,
-              var(--mr-mid,   #abc1f5) 50%,
-              var(--mr-end,   #1a4397) 100%);
+  background:
+    radial-gradient(220px 220px at var(--mx, 50%) var(--my, 50%),
+      rgba(245,230,170, .95) 0%,
+      rgba(245,230,170, .45) 28%,
+      rgba(245,230,170, .10) 52%,
+      rgba(245,230,170,  0) 65%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 
-  /* 처음엔 전부 가려둠(왼→오른쪽으로 펼치기) */
-  clip-path: inset(0 100% 0 0);
-  background-size: 180% 100%;
-  background-position: 0% 50%;
-  transition:
-    clip-path 600ms cubic-bezier(.2,.8,.2,1),
-    background-position 600ms ease-out;
+  opacity: 0;                     /* 기본은 숨김 */
+  transition: opacity 180ms ease-out, filter 180ms ease-out;
+  filter: saturate(1.05) brightness(1.06); /* 살짝 윤기 */
 }
 
-/* 호버/포커스 시 왼→오른쪽으로 채워지며 나타남 */
+/* 호버/포커스 시 스팟 등장 */
 .titleLink:hover .han::after,
 .titleLink:hover .ko::after,
 .titleLink:focus-visible .han::after,
 .titleLink:focus-visible .ko::after{
-  clip-path: inset(0 0 0 0);
-  background-position: 100% 50%;
+  opacity: 1;
+}
+
+/* 접근성: 키보드 포커스 시 중앙에 스팟 고정 */
+.titleLink:focus-visible{
+  outline: 2px solid var(--accent, #c7a64b);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.titleLink:focus-visible{ --mx: 50%; --my: 50%; }
+
+/* 모션 민감 사용자 배려 */
+@media (prefers-reduced-motion: reduce){
+  .titleLink .han::after,
+  .titleLink .ko::after{ transition: opacity 0.01s linear; }
 }
 
 /* split pages */
@@ -576,10 +587,40 @@ function render(prefix, hex, changed, vals, info){
   }
   if (info){
     title.innerHTML = makeTitle(info);
-    initMaskTitle(title); // ← 이 줄 추가
     metaUnder.innerHTML = metaRow('상괘', info.upper) + metaRow('하괘', info.lower);
     readBox.innerHTML = makeInterpretation(changed, vals, info);
   } else { title.textContent='—'; }
+}
+
+function initRadialSpot(rootEl){
+  const link = rootEl.querySelector('.titleLink');
+  if(!link || link.dataset.radialSpotBound) return;
+
+  // 같은 텍스트를 ::after에서 다시 그리기 위해 data-text에 복사
+  link.querySelectorAll('.han, .ko')
+    .forEach(el => el.setAttribute('data-text', el.textContent));
+
+  // 마우스 위치를 CSS 변수로 넘겨서 라디얼 중심 제어
+  let raf = null;
+  const onMove = (e)=>{
+    const r = link.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    if(raf) cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(()=>{
+      link.style.setProperty('--mx', x + 'px');
+      link.style.setProperty('--my', y + 'px');
+    });
+  };
+
+  link.addEventListener('mousemove', onMove);
+  link.addEventListener('mouseleave', ()=>{
+    link.style.removeProperty('--mx');
+    link.style.removeProperty('--my');
+  });
+
+  // 중복 바인딩 방지
+  link.dataset.radialSpotBound = '1';
 }
 
 function renderJoint(base, mutated, changed, vals, bInfo, mInfo){
