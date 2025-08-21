@@ -247,16 +247,6 @@ h1{margin-top:46px}
   outline: none;
 }
 
-.stackBtn:hover,
-.stackBtn:focus-visible{
-  border-color: var(--ink);
-  box-shadow:
-    0 0 8px  color-mix(in srgb, var(--ink) 30%, transparent),
-    0 0 16px color-mix(in srgb, var(--ink) 15%, transparent);
-  text-decoration: none;
-  outline: none;
-}
-
 /* 2) 텍스트 네온도 한 단계 업 */
 .startBtn:hover .starter,
 .startBtn:focus-visible .starter{
@@ -266,12 +256,16 @@ h1{margin-top:46px}
     0 0 36px color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
-.stackBtn:hover .btn,
-.stackBtn:focus-visible .btn{
+.stackBtns:hover{
+  color:var(--ink);
+  box-shadow:
+    0 0 6px  var(--ink) 30%, transparent
+}
+
+.stackBtns:hover .btn{
   color:var(--ink);
   text-shadow:
-    0 0 6px  color-mix(in srgb, var(--ink) 30%, transparent),
-    0 0 12px color-mix(in srgb, var(--ink) 15%, transparent),
+    0 0 6px  var(--ink) 30%, transparent
 }
 
 .bottomNav{display:flex;justify-content:center;margin:18px 0 10px}
