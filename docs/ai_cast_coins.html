@@ -124,6 +124,9 @@ h1,
     .joint{width:auto}
   }
 
+  .title a{ color: inherit; text-decoration: none; }
+  .title a:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
 /* 기본 링크 모양 */
 .title a, .titleLink{
   position: relative;
@@ -524,6 +527,11 @@ function makeTitle(info){
           </a>`;
 }
 
+function initMaskTitle(rootEl){
+  rootEl.querySelectorAll('.titleLink .han, .titleLink .ko')
+    .forEach(el => el.setAttribute('data-text', el.textContent));
+}
+
 function metaRow(label, tri){
   const m = TRI_META[tri];
   return '<div class="metaRow">'
@@ -568,6 +576,7 @@ function render(prefix, hex, changed, vals, info){
   }
   if (info){
     title.innerHTML = makeTitle(info);
+    initMaskTitle(title); // ← 이 줄 추가
     metaUnder.innerHTML = metaRow('상괘', info.upper) + metaRow('하괘', info.lower);
     readBox.innerHTML = makeInterpretation(changed, vals, info);
   } else { title.textContent='—'; }
