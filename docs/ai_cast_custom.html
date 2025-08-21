@@ -164,7 +164,19 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   .landing{font-weight:300;line-height:1.6;color:#a9b8dc;display:flex;flex-direction:column;align-items:center;text-align:center;}
   .landing .small{color:#fff;display:block;font-size:20px;font-weight:700;text-align:center}
   .landing .center{display:flex;justify-content:center}
-  .intro textarea{margin:8px;max-width:500px;width:100%;min-height:140px;background:#0b1324;border:1px solid #2a3b5a;border-radius:12px;color:var(--ink);padding:14px;font-size:16px}
+  /* Landing & loader (AI) */
+.landing .muted{color:#9fb1d4}
+.intro textarea{margin:8px;max-width:500px;width:100%;min-height:140px;background:#0b1324;border:1px solid #2a3b5a;border-radius:12px;color:var(--ink);padding:14px;font-size:16px}
+
+/* 카운터 배치/상태 */
+.qaField{ max-width:500px; }
+.charCounter{
+  display:flex; justify-content:flex-end;
+  font-size:12px; opacity:.75;
+  margin:4px 12px 0 0; user-select:none;
+}
+.charCounter.warn{ color:var(--accent, #c7a64b); }
+.charCounter.error{ color:#ff5a5a; }
   
   .qWrap{display:flex;flex-direction:column;align-items:center;gap:10px}
   .qWrap textarea{width:min(780px, 92vw);min-height:90px;background:#0f1a2d;color:var(--ink);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:16px;line-height:1.5}

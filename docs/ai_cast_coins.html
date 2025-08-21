@@ -268,7 +268,19 @@ h2{font-family:"NotoSerifCJK-ICHING",serif;margin:8px 0 14px;text-align:center;f
 
 /* Landing & loader (AI) */
 .landing .muted{color:#9fb1d4}
+/* Landing & loader (AI) */
+.landing .muted{color:#9fb1d4}
 .intro textarea{margin:8px;max-width:500px;width:100%;min-height:140px;background:#0b1324;border:1px solid #2a3b5a;border-radius:12px;color:var(--ink);padding:14px;font-size:16px}
+
+/* 카운터 배치/상태 */
+.qaField{ max-width:500px; }
+.charCounter{
+  display:flex; justify-content:flex-end;
+  font-size:12px; opacity:.75;
+  margin:4px 12px 0 0; user-select:none;
+}
+.charCounter.warn{ color:var(--accent, #c7a64b); }
+.charCounter.error{ color:#ff5a5a; }
 .intro .run{margin-top:8px}
 #readingUI .centerTop{display:none}  /* 기존 상단 실행 버튼은 숨김 (랜딩에서 시작) */
 
