@@ -175,7 +175,7 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   font-size:12px; opacity:.75;
   margin:4px 12px 0 0; user-select:none;
 }
-.charCounter.warn{ font-weight:700 ;color:#dc5d0e; }
+.charCounter.warn2{ font-weight:700 ;color:#dc5d0e; }
 .charCounter.error{ color:#ff5a5a; }
   
   .qWrap{display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -1058,7 +1058,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const update = () => {
     const len = gCount(ta.value);
     counter.textContent = `${len}/${LIMIT}`;
-    counter.classList.toggle('warn', LIMIT - len <= 20 && LIMIT - len >= 0);
+    counter.classList.toggle('warn2', LIMIT - len <= 20 && LIMIT - len >= 0);
     counter.classList.toggle('error', len > LIMIT);
   };
 
