@@ -153,42 +153,37 @@ h1{margin-top:46px}
 /* 다이아 버튼 컨테이너 */
 .startBtn{
   position: relative;
-  display: grid;                 /* 가운데 정렬을 가장 간단히 */
-  place-items: center;           /* 가로+세로 중앙 */
+  display: grid;               /* ← grid로 바꿔서 place-items 사용 */
+  place-items: center;         /* 가로+세로 중앙정렬 */
   width: 160px; height: 160px;
-  transform: rotate(45deg);      /* 정사각 → 다이아 */
+  margin: 22px auto;           /* ← 페이지 가운데 정렬 */
+  transform: rotate(45deg);    /* 정사각 → 마름모 */
   transform-origin: 50% 50%;
   border: 1.6px solid var(--ink);
-  border-radius: 0;           /* (선택) 모서리 살짝 둥글게 */
-  overflow: visible;
+  border-radius: 0;
   background: transparent;
   text-decoration: none;
-  box-shadow:   /* 아주 약한 기본 글로우 */
-    0 0 6px color-mix(in srgb, var(--ink) 60%, transparent),
+  color: var(--ink);
+  box-shadow:
+    0 0 6px color-mix(in srgb, var(--ink) 50%, transparent),
     0 0 14px color-mix(in srgb, var(--ink) 40%, transparent);
 }
-/* 텍스트(링크) — 다이아 안에서 바르게 세워주기 */
+
 .startBtn .starter{
-  position: relative;
-  z-index: 2;                    /* 광휘 위에 텍스트 */
-  display: grid;
-  place-items: center;
+  display: grid; place-items: center;
   width: 100%; height: 100%;
-  margin: 22px auto;     /* 전체 영역 클릭(원하면 빼도 됨) */
-  transform: rotate(-45deg);     /* 부모 회전을 상쇄 → 글자 수평 */
+  transform: rotate(-45deg);   /* 부모 회전 상쇄 → 글자 수평 */
+  margin: 0;                   /* 불필요한 마진 제거 */
+  text-decoration: none;
+  color: inherit;
   font-family:"NotoSerifCJK-ICHING", serif;
-  color: var(--ink);
-  font-size: 1.3rem; font-weight: 600; letter-spacing: .2px;
-   /* 텍스트도 아주 은은하게만 빛나게 */
+  font-weight: 700; font-size: 1.3rem; letter-spacing: .2px;
   text-shadow:
-    0 0 4px color-mix(in srgb, var(--ink) 60%, transparent),
+    0 0 4px color-mix(in srgb, var(--ink) 50%, transparent),
     0 0 10px color-mix(in srgb, var(--ink) 40%, transparent);
 }
-
-.startBtn .starter:hover,
-.startBtn .starter:focus-visible{
-  text-decoration: none; outline: none;
-}
+.startBtn:focus-visible,
+.startBtn .starter:focus-visible{ outline: none; }
 
 /* 바깥/안쪽 링을 과하지 않게 — 깜빡임 없이 '숨 쉬듯'만 */
 .startBtn::before{
@@ -301,9 +296,9 @@ h1{margin-top:46px}
 
   <h2 class="js-reveal">주역점과 인공지능의 만남</h2>
          
-  <div class="startBtn js-reveal">
-    <a class="starter" href="ai_casters.html">주역점 시작하기</a>
-  </div>
+  <a class="startBtn js-reveal" href="ai_casters.html" aria-label="주역점 시작하기">
+    <span class="starter">주역점 시작하기</span>
+  </a>
   <div class="stackBtns">
     <a class="btn js-reveal" href="iching_basic_info.html">기초 안내서</a>
     <a class="btn js-reveal" href="./Dict/dict_index.html">64괘 색인</a>
