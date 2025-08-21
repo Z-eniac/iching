@@ -397,8 +397,8 @@ h2{font-family:"NotoSerifCJK-ICHING",serif;margin:8px 0 14px;text-align:center;f
     <label class="small js-reveal" for="userQuestion">질문 입력</label>
         <textarea class="js-reveal" id="userQuestion" 
       placeholder="예: 이번 이직 제안이 내게 유리할까? 연봉 협상에서 유의점은?"
-      maxlength="300" aria-describedby="userQuestionCount"></textarea>
-    <div class="charCounter js-reveal" id="userQuestionCount" aria-live="polite">0/300</div>
+      maxlength="200" aria-describedby="userQuestionCount"></textarea>
+    <div class="charCounter js-reveal" id="userQuestionCount" aria-live="polite">0/200</div>
     <div class="center js-reveal" style="margin-top:10px;margin-bottom:0">
       <button id="btnRunLanding" class="run">제출 및 점괘 실행</button>
     </div>
@@ -1046,7 +1046,7 @@ if (typeof reading.score === 'number') parts.push(`길흉 점수: ${reading.scor
 });
       
   (function(){
-  const LIMIT = 300; // ← 글자 수 제한 (HTML maxlength와 맞춰줘)
+  const LIMIT = 200; // ← 글자 수 제한 (HTML maxlength와 맞춰줘)
   const ta = document.getElementById('userQuestion');
   const counter = document.getElementById('userQuestionCount');
   if(!ta || !counter) return;
