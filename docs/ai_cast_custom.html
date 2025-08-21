@@ -363,7 +363,10 @@ h1{ font-family:"NotoSerifCJK-ICHING","Source Han Serif K",serif; font-weight:60
   <section id="landingUI" class="intro landing">
     <p class="js-reveal">상황과 질문을 상세히 입력해 주세요.<br>미입력 시 기본 점괘 해석만 제공됩니다.<br></p>
     <label class="small js-reveal" for="userQuestion">질문 입력</label>
-    <textarea class="js-reveal" id="userQuestion" placeholder="예: 이번 이직 제안이 내게 유리할까? 연봉 협상에서 유의점은?"></textarea>
+        <textarea class="js-reveal" id="userQuestion" 
+      placeholder="예: 이번 이직 제안이 내게 유리할까? 연봉 협상에서 유의점은?"
+      maxlength="300" aria-describedby="userQuestionCount"></textarea>
+    <div class="charCounter js-reveal" id="userQuestionCount" aria-live="polite">0/300</div>
     <div class="center js-reveal" style="margin-top:10px;margin-bottom:20px">
 
     <div id="customUI" class="customUI">
@@ -1029,7 +1032,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }, delay);
   });
 });
-  
+
+  (function(){
+  const LIMIT = 300; // ← 글자 수 제한 (HTML maxlength와 맞춰줘)
+  const ta = document.getElementById('userQuestion');
+  const counter = document.getElementById('userQuestionCount');
+  if(!ta || !counter) return;
+  ta.setAttribute('maxlength', LIMIT); // 혹시 HTML 안 넣었을 때 대비
+
+  // 이모지/한글 조합 고려: UTF-16 길이 대신 그래페임 단위로 카운트
+  const gCount = (s) => Array.from(s || '').length;
+
+  const update = () => {
+    const len = gCount(ta.value);
+    counter.textContent = `${len}/${LIMIT}`;
+    counter.classList.toggle('warn', LIMIT - len <= 20 && LIMIT - len >= 0);
+    counter.classList.toggle('error', len > LIMIT);
+  };
+
+  // 붙여넣기 등으로 maxlength 우회될 때 잘라내기
+  ta.addEventListener('input', () => {
+    const arr = Array.from(ta.value);
+    if (arr.length > LIMIT) {
+      ta.value = arr.slice(0, LIMIT).join('');
+    }
+    update();
+  });
+
+  // 한글·일본어 등 IME 조합 종료 시 길이 보정
+  ta.addEventListener('compositionend', update);
+
+  // 초기 표시
+  update();
+})();
+
 </script>
 </body>
 </html>
