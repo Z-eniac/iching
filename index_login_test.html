@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DIVINA: home</title>
+<link rel="icon" type="image/svg+xml" href="icon/No49.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="icon/No49.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/docs/icon/No49_512.png?v=2">
+<link rel="icon" type="image/png" sizes="256x256" href="/docs/icon/No49_256.png?v=2">
+<link rel="icon" type="image/png" sizes="192x192" href="/docs/icon/No49_192.png?v=2">
+<link rel="icon" type="image/png" sizes="32x32"  href="/docs/icon/No49_32.png?v=2">
+<link rel="icon" type="image/png" sizes="16x16"  href="/docs/icon/No49_16.png?v=2">
+<link rel="preload"
+      href="./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2"
+      as="font" type="font/woff2" crossorigin>
+<!-- Open Graph (KakaoTalk 미리보기용) -->
+<meta property="og:type"        content="website">
+<meta property="og:site_name"   content="Divina">
+<meta property="og:title"       content="Divina: 주역점과 AI의 만남">
+<meta property="og:description" content="클릭 한 번으로 64괘 점괘와 AI 해석까지.">
+<meta property="og:url"         content="https://www.divina.studio/">
+<meta property="og:locale"      content="ko_KR">
+
+<!-- 썸네일: 절대경로 + 크기 명시 -->
+<meta property="og:image"        content="https://www.divina.studio/icon/No49_og.png?v=1">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- 트위터(기타 메신저 대비) -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="Divina: 주역점과 AI의 만남">
+<meta name="twitter:description" content="클릭 한 번으로 64괘 점괘와 AI 해석까지.">
+<meta name="twitter:image"       content="https://www.divina.studio/icon/No49_og.png?v=1">
+
+<style>
+
+@font-face{
+  font-family: "NotoSerifCJK-ICHING";
+  src: url("./assets/fonts/NotoSerifCJKkr-Semibold-iching.woff2") format("woff2");
+  font-weight: 600;          /* Semibold */
+  font-style: normal;
+  font-display: swap;
+}
+  
+  :root{
+    --bg:#0c111b; --card:#111a2b; --border:#22304a; --ink:#eaf0ff;
+    --muted:#a8b6d7; --accent:#2b8cff; --yang:#e7eefc; --yin:#e7eefc; --mark:#ff6b6b;
+    --hexWidth: 192px; --lineHeight: 24px; --rowGap: 12px; --yinGap: 26px;
+    --contentMax: 1200px;
+    --cardW: 360px; --cardGap: 18px; /* more compact cards */
+    --metaCol1: 38px; --metaCol2: 75px; --metaCol3: 45px; --metaCol4: 95px; --metaCol5: 53px; /* tighter grid */
+          /* === Brand size knobs === */
+        --brandLogoSize: 140px;      /* 로고(정사각) 크기 */
+        --brandTypeWidth: 205px;     /* 로고타입(svg 글자) 가로폭 */
+        --brandGap: 12px;            /* 둘 사이 간격 */
+    --neon:   #6cf;     /* 기본 네온(청록) */
+    --neon-2: #39a8ff;  /* 보조 네온(청청) */
+    --neon-bg: var(--bg, #0b1324); /* 버튼 내부 배경 참고용 */
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Malgun Gothic',Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:var(--contentMax);margin:0 auto;padding:90px 12px 0}
+
+  .brandWrap{
+  display:flex; flex-direction:column; align-items:center;
+  gap:var(--brandGap);
+  margin: 25px 0 6px;          /* 상단 여백 조절 */
+  }
+  .brandWrap a{ display:inline-block; text-decoration:none; }
+  .brandLogo{ width:var(--brandLogoSize); height:auto; }
+  .brandType{ width:min(var(--brandTypeWidth), 84vw); height:auto; }
+
+  /* 작은 화면에서 자동 보정(원하면 값 수정) */
+  @media (max-width:480px){
+    :root{
+      /*--brandLogoSize: 110px;*/
+      --brandTypeWidth: 180px;
+      --brandGap: 10px;
+    }
+  }
+
+  /* 스크린리더/SEO용 숨김 텍스트 */
+  .sr-only{
+  position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+      
+  h1{font-size:50px;margin:0 0 0px;text-align:center;letter-spacing:-1.0px} /* 1.5x */
+      /* 사이트 공통 헤더(h1) */
+h1,
+.page-title {                /* 페이지 최상단 타이틀에 쓰는 클래스가 있으면 같이 */
+  font-family: "NotoSerifCJK-ICHING", serif !important;
+  font-weight: 600 !important;
+  font-synthesis: none;      /* 가짜 볼드 방지 */
+  letter-spacing:0em;     /* 취향 보정 */
+}
+  h2{font-weight:300;font-size:16px;margin:0 0 50px;text-align:center}
+
+  .btns{display:flex;justify-content:center;gap:14px;margin:12px 0 34px}
+  button{background:var(--accent);color:#fff;border:0;border-radius:12px;padding:14px 20px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2);font-size:1.5rem} /* 1.2x text */
+  .legend{margin-top:30px;margin-bottom:20px;font-size:12px;color:#a4b2d4;text-align:center}
+  @media (max-width:860px){
+    .card{flex-basis:100%;max-width:640px}
+    .joint{width:auto}
+  }
+
+/* split-pages layout */
+.mainWrap{max-width:1100px;margin:0 auto;padding:0 16px 40px}
+h1{margin-top:46px}
+.centerTop{display:flex;justify-content:center;margin:18px 0 4px}
+.centerTop .run{background:#7c8bf5;color:#fff;border:0;border-radius:14px;padding:12px 18px;font-weight:700;cursor:pointer}
+.stackBtns{display:flex;flex-direction:column;gap:10px;margin:60px auto 10px;max-width:160px}
+.stackBtns .btn{display:block;width:100%;padding:4px 0px;border:0;border-radius:0;color:var(--muted);font-size:15px;font-weight:300;cursor:pointer;letter-spacing:.2px;box-shadow:0 4px 16px rgba(0,0,0,.2);text-align:center;text-decoration:none}
+      .stackBtns .green{background:#407975}
+      .stackBtns .blue{background:#23375d}
+      .stackBtns .coral{background:#68313f}
+
+/* 다이아 버튼 컨테이너 */
+.startBtn{
+  position: relative;
+  display: grid;               /* ← grid로 바꿔서 place-items 사용 */
+  place-items: center;         /* 가로+세로 중앙정렬 */
+  width: 140px; height: 140px;
+  margin: 15px auto 0px;           /* ← 페이지 가운데 정렬 */
+  transform: rotate(45deg);    /* 정사각 → 마름모 */
+  transform-origin: 50% 50%;
+  border: 1.6px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  text-decoration: none;
+  color: var(--ink);
+  box-shadow:
+    0 0 6px color-mix(in srgb, var(--ink) 50%, transparent),
+    0 0 14px color-mix(in srgb, var(--ink) 40%, transparent);
+}
+
+.startBtn .starter{
+  display: grid; place-items: center;
+  width: 100%; height: 100%;
+  transform: rotate(-45deg);   /* 부모 회전 상쇄 → 글자 수평 */
+  margin: 0;                   /* 불필요한 마진 제거 */
+  text-decoration: none;
+  color: inherit;
+  font-family:"NotoSerifCJK-ICHING", serif;
+  font-weight: 700; font-size: 1.2rem; letter-spacing: .2px;
+  text-shadow:
+    0 0 4px color-mix(in srgb, var(--ink) 30%, transparent),
+    0 0 10px color-mix(in srgb, var(--ink) 15%, transparent);
+}
+.startBtn:focus-visible,
+.startBtn .starter:focus-visible{ outline: none; }
+
+/* 바깥/안쪽 링을 과하지 않게 — 깜빡임 없이 '숨 쉬듯'만 */
+.startBtn::before{
+  content:""; position:absolute; inset:-6px;
+  border: 1px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: inherit; filter: blur(8px);
+  opacity:.45; pointer-events:none;
+}
+.startBtn::after{
+  content:""; position:absolute; inset: 10px;
+  border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  border-radius: inherit; filter: blur(8px);
+  opacity:.35; pointer-events:none;
+}
+
+/* 다이아 내부에서만 보이게 살짝 잘라줌 (안전) */
+.startBtn{ overflow: hidden; }
+
+/* 텍스트가 오로라 위에 오도록 */
+.startBtn .starter{ position: relative; z-index: 2; }
+
+/* 은은한 오로라 레이어 */
+.startBtn ._aurora{
+  position: absolute;
+  inset: -22%;
+  /* 부모(.startBtn)가 45° 회전 중이라, 시각적으로 수평이 되도록 역회전 */
+  transform: rotate(-45deg);
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: screen;
+  filter: blur(22px) saturate(105%);
+  opacity: .5;                          /* 강도 조절: 0.35 ~ 0.6 추천 */
+  /* var(--ink) 기반 아주 옅은 빛결 */
+  background:
+    radial-gradient(120% 70% at 20% 15%,  color-mix(in srgb, var(--ink) 18%, transparent) 0%, transparent 65%),
+    radial-gradient(100% 80% at 80% 20%,  color-mix(in srgb, var(--ink) 14%, transparent) 0%, transparent 70%),
+    conic-gradient(from 25deg at 50% 50%, transparent 0 12%, color-mix(in srgb, var(--ink) 12%, transparent) 16% 22%, transparent 26% 100%);
+  background-size: 200% 200%, 220% 220%, 100% 100%;
+  background-position: 18% 28%, 82% 18%, 50% 50%;
+  animation: auroraDrift 4s ease-in-out infinite alternate;
+}
+
+@keyframes auroraDrift{
+  0%   { background-position: 18% 28%, 82% 18%, 50% 50%; }
+  50%  { background-position: 58% 36%, 42% 76%, 50% 50%; }
+  100% { background-position: 78% 64%, 12% 24%, 50% 50%; }
+}
+
+/* =========================
+   Hover/Foucus 강화 세팅
+   ========================= */
+
+/* 1) 다이아 테두리/외곽 네온 살짝 증폭 */
+.startBtn:hover,
+.startBtn:focus-visible{
+  border-color: color-mix(in srgb, var(--ink) 80%, transparent);
+  box-shadow:
+    0 0 8px  color-mix(in srgb, var(--ink) 80%, transparent),
+    0 0 22px color-mix(in srgb, var(--ink) 60%, transparent);
+  text-decoration: none;
+  outline: none;
+}
+
+/* 2) 텍스트 네온도 한 단계 업 */
+.startBtn:hover .starter,
+.startBtn:focus-visible .starter{
+  text-shadow:
+    0 0 6px  color-mix(in srgb, var(--ink) 50%, transparent),
+    0 0 18px color-mix(in srgb, var(--ink) 25%, transparent),
+    0 0 36px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.stackBtns .btn:hover{
+  color:var(--ink);
+  text-shadow:
+    0 0 6px  var(--ink) 30%, transparent
+}
+
+/* ===== 작은 마름모 버튼 그룹 ===== */
+.miniNav{
+  display:flex; justify-content:center; gap:44px;
+  margin: 0px 0 38px;
+}
+.miniBtn{
+  position:relative;
+  display:grid; place-items:center;
+  width:70px; height:70px;                 /* 크기 */
+  transform: rotate(45deg);                 /* 정사각 → 마름모 */
+  border:1.2px solid color-mix(in srgb, var(--ink) 80%, transparent);
+  background: transparent;
+  color: var(--ink); text-decoration:none;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--ink) 25%, transparent);
+  overflow:hidden;                          /* 내부 링 잘림 방지 */
+}
+.miniBtn .label{
+  transform: rotate(-45deg);                /* 글자 수평 복원 */
+  font-family: "NotoSerifCJK-ICHING", serif;
+  font-weight: 600; font-size: 13px; line-height:1;
+  text-align:center; white-space: nowrap;
+  text-shadow: 0 0 4px color-mix(in srgb, var(--ink) 20%, transparent);
+}
+.miniBtn::after{
+  content:""; position:absolute; inset:10px;
+  border:1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  filter: blur(6px); opacity:.4; pointer-events:none;
+}
+.miniBtn:hover, .miniBtn:focus-visible{
+  outline:none;
+  border-color: color-mix(in srgb, var(--ink) 90%, transparent);
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--ink) 60%, transparent),
+    0 0 24px color-mix(in srgb, var(--ink) 35%, transparent);
+}
+.miniBtn:hover .label, .miniBtn:focus-visible .label{
+  text-shadow:
+    0 0 3px color-mix(in srgb, var(--ink) 60%, transparent),
+    0 0 8px color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
+/* 모바일 살짝 축소 
+@media (max-width:480px){
+  .miniNav{ gap:26px; }
+  .miniBtn{ width:78px; height:78px; }
+  .miniBtn .label{ font-size:12px; }
+}*/
+
+.bottomNav{display:flex;justify-content:center;margin:18px 0 10px}
+.bottomNav a, .bottomNav button{background:#243552;color:#cfe0ff;border:1px solid #2a3b5a;border-radius:12px;padding:10px 16px;font-weight:700;text-decoration:none}
+.hidden{display:none}
+
+/* 순차 등장: 기본 상태(숨김) + 항상 transition 적용 */
+.js-reveal,
+[data-reveal-group] > * {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(2px);
+  transition: opacity .6s ease, transform .6s ease, filter .6s ease;
+  will-change: opacity, transform, filter;
+}
+
+/* 보일 때 */
+.js-reveal.show,
+[data-reveal-group] > *.show {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 모션 저감 사용자의 경우:
+   - 이동/블러만 제거 (깜빡임 최소화)
+   - transition은 끄지만, opacity는 기본 0을 유지 → JS로 순차 노출은 그대로 */
+/*@media (prefers-reduced-motion: reduce) {
+  .js-reveal,
+  [data-reveal-group] > * {
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}*/
+
+ /* 상단 텍스트 링크 */
+.topNav{
+  display:flex;flex-direction:column;gap:15px;
+  align-items:center;
+  margin: 55px 0 6px;
+}
+.topLink{
+  display:inline-block;
+  font-weight: 400;          /* 약간의 두께 */
+  font-size: 15px;           /* 작은 텍스트 */
+  letter-spacing: .02em;
+  color:#a4b2d4;
+  text-decoration: none;     /* 기본은 밑줄 없음 */
+  text-underline-offset: 3px;
+}
+.topLink:hover,
+.topLink:focus-visible{
+  text-decoration: underline; /* hover/focus에만 밑줄 */
+  outline: none;
+}
+
+  .logo-spin svg { display:inline-block }
+  /* 중심 고정 (viewBox가 0 0 512 512 라면 중앙은 256,256) */
+  #outer, #mid, #inner {
+    transform-box: view-box;
+    transform-origin: 256px 256px;
+    will-change: transform;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #outer, #mid, #inner { transition: none !important; transform: none !important; }
+  }
+
+</style></head>
+<body>
+<div class="mainWrap">
+  <h1 class="sr-only">Divina Studio</h1>
+      <!-- 브랜드 블록: 위 로고, 아래 로고타입 -->
+    <div class="brandWrap">
+      <div class="logo-spin" style="max-width:140px;margin-inline:auto">
+        <svg viewBox="0 0 512 512" width="140" height="140" aria-hidden="true">
+        <!-- 바깥 사각형 -->
+        <g id="outer" fill="#E7EEFC">
+         <path class="st0" d="M461.19,258.83l-86.11,86.11c-1.56,1.56-1.56,4.09,0,5.66l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l104.47-104.47c1.56-1.56,1.56-4.09,0-5.66l-104.47-104.47c-1.56-1.56-4.09-1.56-5.66,0l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l86.11,86.11c1.56,1.56,1.56,4.09,0,5.66h0Z"/>
+          <path class="st0" d="M253.17,14.11L14.11,253.17c-1.56,1.56-1.56,4.09,0,5.66l239.07,239.07c1.56,1.56,4.09,1.56,5.66,0l104.47-104.47c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-86.11,86.11c-1.56,1.56-4.09,1.56-5.66,0L50.81,258.83c-1.56-1.56-1.56-4.09,0-5.66L253.17,50.81c1.56-1.56,4.09-1.56,5.66,0l86.11,86.11c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66L258.83,14.11c-1.56-1.56-4.09-1.56-5.66,0h0Z"/>
+        </g>
+
+        <!-- 중간 사각형 -->
+        <g id="mid" fill="#E7EEFC">
+          <path class="st0" d="M191.99,344.48l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l73.88,73.88c1.56,1.56,4.09,1.56,5.66,0l73.88-73.88c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-55.52,55.52c-1.56,1.56-4.09,1.56-5.66,0l-55.52-55.52c-1.56-1.56-4.09-1.56-5.66,0Z"/>
+          <path class="st0" d="M344.48,320.01l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l73.88-73.88c1.56-1.56,1.56-4.09,0-5.66l-177.89-177.89c-1.56-1.56-4.09-1.56-5.66,0L75.29,253.17c-1.56,1.56-1.56,4.09,0,5.66l73.88,73.88c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66l-55.52-55.52c-1.56-1.56-1.56-4.09,0-5.66L253.17,111.99c1.56-1.56,4.09-1.56,5.66,0l141.18,141.18c1.56,1.56,1.56,4.09,0,5.66l-55.52,55.52c-1.56,1.56-1.56,4.09,0,5.66h0Z"/>
+        </g>
+
+        <!-- 안쪽 사각형 -->
+        <g id="inner" fill="#E7EEFC">
+          <path class="st0" d="M302.12,179.75l-43.29-43.29c-1.56-1.56-4.09-1.56-5.66,0l-116.7,116.7c-1.56,1.56-1.56,4.09,0,5.66l116.7,116.7c1.56,1.56,4.09,1.56,5.66,0l43.29-43.29c1.56-1.56,1.56-4.09,0-5.66l-12.7-12.7c-1.56-1.56-4.09-1.56-5.66,0l-24.93,24.93c-1.56,1.56-4.09,1.56-5.66,0l-80-80c-1.56-1.56-1.56-4.09,0-5.66l80-80c1.56-1.56,4.09-1.56,5.66,0l24.93,24.93c1.56,1.56,4.09,1.56,5.66,0l12.7-12.7c1.56-1.56,1.56-4.09,0-5.66v.04Z"/>
+          <path class="st0" d="M338.82,258.83l-24.93,24.93c-1.56,1.56-1.56,4.09,0,5.66l12.7,12.7c1.56,1.56,4.09,1.56,5.66,0l43.29-43.29c1.56-1.56,1.56-4.09,0-5.66l-43.29-43.29c-1.56-1.56-4.09-1.56-5.66,0l-12.7,12.7c-1.56,1.56-1.56,4.09,0,5.66l24.93,24.93c1.56,1.56,1.56,4.09,0,5.66Z"/>
+        </g>
+        </svg>
+      </div>
+  <!-- 로고타입(글자): 클릭 시 index.html 이동 -->
+      <a href="index.html" aria-label="Divina Studio Home">
+          <img src="./icon/Divina_beta.svg" alt="Divina wordmark" class="brandType js-reveal">
+        </a>
+    </div>
+
+  <h2 class="js-reveal">주역점과 인공지능의 만남</h2>
+  
+  <div class="js-reveal">
+    <a class="startBtn" href="ai_casters.html" aria-label="주역점 시작하기">
+      <span class="_aurora" aria-hidden="true"></span>
+      <span class="starter">주역점 시작하기</span>
+    </a>
+  </div>  
+  <div class="miniNav js-reveal" aria-label="보조 메뉴">
+    <a class="miniBtn" href="iching_basic_info.html" aria-label="기초 안내서">
+      <span class="label">기초 안내서</span>
+    </a>
+    <a class="miniBtn" href="./Dict/dict_index.html" aria-label="64괘 색인">
+      <span class="label">64괘 색인</span>
+    </a>
+  </div>
+  <div class="legend js-reveal">© 2025. 妙公 (Myo Gong). All Rights Reserved.</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const items = [
+    ...document.querySelectorAll('.js-reveal') /*,
+    ...document.querySelectorAll('[data-reveal-group] > *') */
+  ];
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const baseDelay = 800;  // 헤더만 먼저 보이게 잠깐 대기
+  const step = 200;       // 항목 간 지연(ms) — 취향껏 120~240 사이로 조절
+
+  items.forEach((el, i) => {
+    const delay = baseDelay + i * step;
+    setTimeout(() => {
+      // reflow로 첫 프레임 확실히 고정
+      void el.offsetWidth;
+      el.classList.add('show');  // reduce여도 순차 등장(애니 없음)
+    }, delay);
+  });
+});
+
+  const layers = [
+    { sel: '#outer', step: 360, spin: 1800, hold: 6000, delay: 2800 },
+    { sel: '#mid',   step: 360, spin: 1800, hold: 6000, delay: 2500 },
+    { sel: '#inner', step: 360, spin: 1800, hold: 6000, delay: 2200 },
+  ];
+
+  const ease = 'cubic-bezier(.32,.02,.24,1)';
+
+  function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+  async function spinLoop(el, step, spin, hold, delay){
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let angle = 0;
+    if (delay) await sleep(delay);
+    while(true){
+      // 회전 구간
+      el.style.transition = `transform ${spin}ms ${ease}`;
+      angle += step; // 누적 회전
+      el.style.transform = `rotate(${angle}deg)`;
+      await sleep(spin);
+
+      // 멈춤 구간
+      // transition 유지해도 되지만 확실히 멈춘 느낌을 주려면 아래 줄 주석 해제
+      // el.style.transition = 'none';
+      await sleep(hold);
+    }
+  }
+
+  layers.forEach(({sel, step, spin, hold, delay})=>{
+    const el = document.querySelector(sel);
+    if (el) spinLoop(el, step, spin, hold, delay);
+  });
+</script>
+</body></html>
