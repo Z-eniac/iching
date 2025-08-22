@@ -371,20 +371,6 @@ button:focus-visible .run{
   --subLogoBottom: 12px;                  /* 아래 여백 */
 }
 
-.brandWrap--sub{
-  display:flex; justify-content:center; align-items:center;
-  margin: var(--subLogoTop) 0 var(--subLogoBottom);
-}
-.brandWrap--sub .brandLogo{
-  width: var(--subLogoSize); height:auto;
-}
-
-/* 혹시 전역 페이드가 상속되면 즉시 표시로 강제 */
-.brandWrap--sub, .brandWrap--sub *{
-  opacity:1 !important; transform:none !important;
-  transition:none !important; animation:none !important;
-}
-
 /* brandWrap 안의 실제 콘텐츠 영역은 가로 100%로 펼치기 */
 .brandWrap > #readingUI,
 .brandWrap > #landingUI{
