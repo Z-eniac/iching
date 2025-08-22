@@ -260,7 +260,7 @@ const { data: cc, response: raw } = await (async function doCall(p, retried = fa
   lastCallTs = Date.now();
 
   try {
-    return await ai.chat.completions.withResponse.create(p);
+    return await ai.chat.completions.create(p).withResponse();
   } catch (e) {
     if (!retried && e?.response?.status === 429) {
       console.warn("[429] retry once after 65s");
