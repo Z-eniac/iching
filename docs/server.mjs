@@ -14,6 +14,28 @@ const app = express();
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: "2mb" }));
 
+// 신뢰 가능한 프록시 헤더(IP 추적용)
+app.set("trust proxy", true);
+
+// 인스턴스/레이트리밋 보조 유틸
+const INSTANCE = process.env.RENDER_INSTANCE_ID || process.env.HOSTNAME || "local";
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+// 분당 호출 간격(우발 중복 완화)
+const MIN_GAP_MS = 300;
+let lastCallTs = 0;
+
+// 최근 60초 토큰 추적(우리 측 관측치)
+const last60s = []; // [{ ts, tokens }]
+function track60s(tokensNow){
+  const now = Date.now();
+  last60s.push({ ts: now, tokens: tokensNow });
+  while (last60s.length && now - last60s[0].ts > 60_000) last60s.shift();
+  const used = last60s.reduce((s, x) => s + x.tokens, 0);
+  console.log("[MY 60s]", { used });
+  return used;
+}
+
 app.get("/healthz", (_, res) => res.status(200).send("ok"));
 app.get("/", (_, res) => res.status(200).send("OK"));
 
@@ -22,11 +44,11 @@ const AI_ON = String(process.env.USE_OPENAI ?? "true") === "true"; // 기본 on
 const ADMIN_KEY = process.env.ADMIN_KEY || ""; // /api/usage 보호키(선택)
 
 // 예산(USD) — 미설정/NaN이면 무제한
-const DAILY_BUDGET_USD = Number(process.env.DAILY_BUDGET_USD) || Infinity;
+const DAILY_BUDGET_USD = Number(process.env.DAILY_BUDGET_USD) || 1;
 
 // 모델/토큰 상한 (상한은 환경변수로만 제어; 기본은 1200)
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-const OPENAI_MAX_TOKENS = Number(process.env.OPENAI_MAX_TOKENS) || 1500;
+const OPENAI_MAX_TOKENS = Number(process.env.OPENAI_MAX_TOKENS) || 1200;
 
 // 단가(1M tokens 기준) — gpt-4o-mini 기본값
 const PRICE_IN_PER_M = Number(process.env.PRICE_IN_PER_M ?? 0.15);   // 입력 $/1M tok
@@ -163,7 +185,7 @@ app.get("/api/usage", (req, res) => {
 
 // ================== 핵심 라우트 ==================
 app.post(["/api/read", "/api/ai"], async (req, res) => {
-  console.log("[HIT] /api/read", new Date().toISOString());
+  console.log(`[HIT ${INSTANCE}] /api/read`, new Date().toISOString(), "from", (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").toString());
 
   if (!AI_ON) {
     console.warn("[STUB MODE] USE_OPENAI=false");
@@ -200,11 +222,11 @@ app.post(["/api/read", "/api/ai"], async (req, res) => {
   let parsed;
   try {
     // === OpenAI 호출 (프롬프트 요약/트렁케이트 없음) ===
-    const taskPrompt = `
-  사용자 질문과 점괘 JSON이 주어집니다.
-  - analysis에 1000~1500자 분량의 象傳 기반 본문을 쓰세요.
-  - 길흉 점수는 0~10점(정수/0.5 단위)입니다.
-  스키마: { \"reading\": { \"summary\": string, \"analysis\": string, \"advice\": string, \"cautions\": string, \"timing\": string, \"score\": number, \"tags\": string[], \"line_readings\": [{\"line\": number, \"meaning\": string}] } }`;
+    const taskPrompt = `사용자 질문과 점괘 JSON이 주어집니다.
+- 질문(question) 문자열 맨 앞에 [오더: ...] 블록이 있을 수 있음. 있으면 그 지시(금지어/점수분포/톤 등)를 **최우선**으로 반영하세요.
+- analysis에 600~1000자 분량의 象傳 기반 본문을 쓰세요.
+- 길흉 점수는 0~10점(정수/0.5 단위)입니다.
+스키마: { \"reading\": { \"summary\": string, \"analysis\": string, \"advice\": string, \"cautions\": string, \"timing\": string, \"score\": number, \"tags\": string[], \"line_readings\": [{\"line\": number, \"meaning\": string}] } }`;
 
 const messages = [
   { role: "system", content: systemPrompt },
@@ -212,7 +234,7 @@ const messages = [
 ${taskPrompt}
 
 출력은 위 JSON 스키마를 엄격히 따르세요.
-- reading.analysis는 1000~1500자(문단 여러 개)로 象傳/爻辭 맥락을 풀어주세요.
+- reading.analysis는 1000~1500자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요.
 - reading.score는 0~10점(정수 또는 0.5 단위)로 주세요.
 - reading.line_readings는 변효가 없으면 현상 유지 방안을, 있으면 각 효의 핵심 의미를 1~2문장으로 구체화.
 
@@ -223,13 +245,31 @@ ${JSON.stringify(payload)}
 ` }
 ];
 
-    const cc = await ai.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages,
-      // 길이 제한 강제 없음(요청자 요구). 단, 과도 폭주 방지를 위해 상한만 환경변수로 제어
-      max_tokens: OPENAI_MAX_TOKENS,
-      response_format: { type: "json_schema", json_schema: schema }
-    });
+    // === OpenAI 호출 (withResponse로 헤더까지 확보) ===
+const params = {
+  model: OPENAI_MODEL,
+  messages,
+  max_tokens: OPENAI_MAX_TOKENS,
+  response_format: { type: "json_schema", json_schema: schema }
+};
+
+const { data: cc, response: raw } = await (async function doCall(p, retried = false) {
+  // 소프트 쿨다운 — 우발 중복 완화
+  const gap = Date.now() - lastCallTs;
+  if (gap < MIN_GAP_MS) await sleep(MIN_GAP_MS - gap);
+  lastCallTs = Date.now();
+
+  try {
+    return await ai.chat.completions.withResponse.create(p);
+  } catch (e) {
+    if (!retried && e?.response?.status === 429) {
+      console.warn("[429] retry once after 65s");
+      await sleep(65_000);
+      return await doCall(p, true);
+    }
+    throw e;
+  }
+})(params);
 
     console.log("[OPENAI BASE]", process.env.OPENAI_BASE_URL || "(default: api.openai.com)");
     console.log("[RESP ID]", cc?.id);
@@ -238,6 +278,8 @@ ${JSON.stringify(payload)}
     const inTok  = u.prompt_tokens     ?? u.input_tokens  ?? 0;
     const outTok = u.completion_tokens ?? u.output_tokens ?? 0;
     const totalTok = inTok + outTok;
+// 우리 측 최근 60초 누적 관측(중복/외부 사용 감지용)
+track60s(totalTok);
 
     // 일일 집계
     dayUsage.tokens += totalTok;
@@ -246,6 +288,16 @@ ${JSON.stringify(payload)}
     dayUsage.spent += $$;
 
     console.log("=== USAGE ===", u);
+// OpenAI 레이트리밋 헤더 — 실제 TPM 남은치 확인
+const limit_tpm  = raw.headers.get("x-ratelimit-limit-tokens");
+const remain_tpm = raw.headers.get("x-ratelimit-remaining-tokens");
+const reset_tpm  = raw.headers.get("x-ratelimit-reset-tokens");
+console.log("[RL]", { limit_tpm, remain_tpm, reset_tpm });
+// 매우 낮으면 잠시 대기(사용자 체감 429 완화)
+if (Number(remain_tpm || "0") < 2000) {
+  console.warn("[ALERT] remain_tpm low — pausing 60s");
+  await sleep(60_000);
+}
     console.log("[RUN COST] this_call=$", $$.toFixed(6), "spent_today=$", dayUsage.spent.toFixed(6));
 
     // Structured Outputs → 파싱
@@ -255,7 +307,6 @@ ${JSON.stringify(payload)}
 
     const response = { ok: true, source: "openai", ...payload, reading: parsed.reading };
     setCache(key, response);
-    console.log("[USAGE]", JSON.stringify(dayUsage));
     return res.json(response);
   } catch (e) {
     console.warn("[WARN chat.completions]", e?.response?.status, e?.response?.data || e?.message);
