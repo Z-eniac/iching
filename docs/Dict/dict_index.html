@@ -16,7 +16,7 @@
 }
 :root{
   --bg:#0c111b; --surface:#101827; --border:#22304a; --ink:#eaf0ff; --muted:#9fb1d4;
-  --accent:#7aa2ff; --cols:8; --fs:clamp(28px,5.6vw,72px);
+  --accent:#7aa2ff; --mark:#ff6b6b; --cols:8; --fs:clamp(28px,5.6vw,72px);
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink);
@@ -61,14 +61,14 @@ h2{font-family:"NotoSerifCJK-ICHING",serif;margin:8px 0 14px;text-align:center;f
   border-radius:10px;overflow:hidden;min-height:68px;aspect-ratio: 2 / 1;
   transition:border-color .15s ease, transform .08s ease;
 }
-.index li:hover{transform:translateY(-2px);border:2px solid #B27D42}
+.index li:hover{transform:translateY(-2px);border:2.4px solid var(--mark)}
 .index a{display:block;position:relative;width:100%;height:100%;padding:10px 14px}
 
 /* number badge */
 .badge{
   position:absolute;left:7px;top:3px;display:inline-grid;place-items:start;
   min-width:34px;height:28px;border-radius:10px;
-  color:#B27D42;font-weight:700;font-variant-numeric:tabular-nums;
+  color:var(--mark);font-weight:700;font-variant-numeric:tabular-nums;
   font-size:17px;letter-spacing:0;
 }
 
