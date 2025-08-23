@@ -266,11 +266,13 @@ h1{margin-top:46px}
   box-shadow: 0 2px 8px rgba(0,0,0,.25);
 }
 
-.modal__close span{position:absolute; top:8%; left:27%;}
+.modal__close svg{fill:var(--muted); width:20px; height:20px; position:absolute; top:27%; right:25%; }
 
 .modal__close:hover{
-  background:var(--muted); border-color:var(--muted); color:var(--bg)
+  background:var(--muted); border-color:var(--muted);
 }
+
+.modal__close:hover svg{fill:var(--bg)}
 
 /* (fallback) 일부 브라우저에서 backdrop-filter 미지원 시 페이지 자체 블러 */
 .blurPage{ filter: blur(4px); pointer-events: none; user-select: none; }
@@ -349,7 +351,10 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
     <button class="modal__close" aria-label="Close" data-close>
-      <span style="text-align:center">&times;</span>
+      <svg id="_레이어_1" data-name="레이어_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 40 40">
+        <!-- Generator: Adobe Illustrator 29.7.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 8)  -->
+        <polygon points="5.7 39.62 .55 33.98 14.54 19.91 .35 5.67 5.67 .38 19.87 14.59 34.14 .38 34.18 .39 39.65 5.66 25.26 20.02 39.49 34.21 34.03 39.43 19.96 25.35 5.7 39.62"/>
+      </svg>
     </button>
 
   </div>
