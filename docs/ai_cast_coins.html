@@ -195,8 +195,9 @@ h1{text-align:center;margin-top:46px;margin-bottom:30px}
 h2{font-family:"NotoSerifCJK-ICHING",serif;margin:8px 0 0;text-align:center;font-size:26px;color:var(--ink)}
 .centerTop{display:flex;flex-direction:column;align-items:center;margin:18px 0 18px}
 .centerTop .run{background:#23375d;color:#fff;border:0;border-radius:14px;padding:12px 18px;font-weight:700;cursor:pointer}
-.bottomNav{display:flex;justify-content:center;margin:18px 0 10px}
-.bottomNav a, .bottomNav button{background:#243552;color:#cfe0ff;border:1px solid #2a3b5a;border-radius:12px;padding:10px 16px;font-weight:700;text-decoration:none}
+.bottomNav{display:flex;justify-content:center;margin:18px 0 10px;gap:14px}
+.bottomNav a{background:#243552;font-size:16px;color:#cfe0ff;border:1px solid #2a3b5a;border-radius:12px;padding:10px 16px;font-weight:700;text-decoration:none}
+.bottomNav button{background:var(--mark);font-size:16px;color:#ffffff;border:1px solid #2a3b5a;border-radius:12px;padding:10px 16px;font-weight:700;text-decoration:none;cursor:pointer}
 /* gist between hex and meta */
 .gist{margin:10px 0 8px;text-align:center}
 .gist .gistLabel{font-size:14px;color:#9fb1d4;margin-bottom:4px}
@@ -282,7 +283,7 @@ h2{font-family:"NotoSerifCJK-ICHING",serif;margin:8px 0 0;text-align:center;font
 .charCounter.warn{ font-weight:700 ;color:#dc5d0e; }
 .charCounter.error{ color:#ff5a5a; }
 
-button{
+.js-reveal button{
   color:var(--ink);cursor:pointer;
   position: relative;
   display: grid;               /* ← grid로 바꿔서 place-items 사용 */
@@ -320,8 +321,8 @@ button{
    ========================= */
 
 /* 1) 다이아 테두리/외곽 네온 살짝 증폭 */
-button:hover,
-button:focus-visible{
+.center button:hover,
+.center button:focus-visible{
   border-color: color-mix(in srgb, var(--ink) 80%, transparent);
   box-shadow:
     0 0 8px  color-mix(in srgb, var(--ink) 80%, transparent),
@@ -331,8 +332,8 @@ button:focus-visible{
 }
 
 /* 2) 텍스트 네온도 한 단계 업 */
-button:hover .run,
-button:focus-visible .run{
+.center button:hover .run,
+.center button:focus-visible .run{
   text-shadow:
     0 0 6px  color-mix(in srgb, var(--ink) 50%, transparent),
     0 0 18px color-mix(in srgb, var(--ink) 25%, transparent),
@@ -498,7 +499,10 @@ button:focus-visible .run{
     <div class="detail" id="jointText"></div>
   </div>
   
-  <div class="bottomNav hidden" id="backWrap"><a href="index.html">돌아가기</a></div>
+<div class="bottomNav hidden" id="backWrap">
+  <button type="button" id="btnSave">저장하기</button>
+  <a href="index.html">돌아가기</a>
+</div>
   <div class="legend">© 2025. 妙公 (Myo Gong). All Rights Reserved.</div>
 
 </div>
@@ -1131,6 +1135,133 @@ if (typeof reading.score === 'number') parts.push(`길흉 점수: ${reading.scor
   update();
 })();
 
+</script>
+
+<script>
+/* --- 결과 저장: 본괘+변괘 카드와 공유 해석을 PNG로 다운 --- */
+(function(){
+  // 필요 시 html2canvas를 CDN에서 로드
+  async function ensureHtml2Canvas(){
+    if(window.html2canvas) return;
+    await new Promise((ok,err)=>{
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      s.onload=ok; s.onerror=()=>err(new Error('html2canvas load fail'));
+      document.head.appendChild(s);
+    });
+  }
+
+  const pad = n => String(n).padStart(2,'0');
+  function timestamp(){
+    const d = new Date();
+    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
+  }
+
+  async function saveReading(){
+    const row   = document.querySelector('.row');       // 본괘/변괘 카드 묶음
+    const joint = document.getElementById('jointBox');  // 공유 해석 박스
+    if(!row || !joint || !row.querySelector('.lineWrap')){
+      alert('아직 점괘가 생성되지 않았어!');
+      return;
+    }
+    await ensureHtml2Canvas();
+
+    // 파일명 구성: DIVINA_본괘-변괘_YYYYMMDD_HHMM.png
+    const getKo = sel => document.querySelector(sel)?.textContent || '';
+    const bKo   = getKo('#baseTitle .ko'); // 예: "No.03 수뢰둔"
+    const mKo   = getKo('#mutTitle .ko');
+    const bNo   = (bKo.match(/No\.(\d+)/)||[])[1] || '00';
+    const mNo   = (mKo.match(/No\.(\d+)/)||[])[1] || '00';
+    const fname = `DIVINA_${bNo}-${mNo}_${timestamp()}`;
+
+    // 오프스크린 캡처 레이어 생성
+    const wrap = document.createElement('div');
+    const bodyStyle = getComputedStyle(document.body);
+    wrap.style.position   = 'fixed';
+    wrap.style.left       = '-10000px';
+    wrap.style.top        = '0';
+    wrap.style.padding    = '18px';
+    wrap.style.background = bodyStyle.backgroundColor;  // 현재 테마 그대로
+    wrap.style.color      = bodyStyle.color;
+    wrap.style.fontFamily = bodyStyle.fontFamily;
+    wrap.style.width      = Math.max(row.offsetWidth, 900) + 'px';
+
+    // 헤더(제목/질문)
+    const head = document.createElement('div');
+    head.style.textAlign  = 'center';
+    head.style.fontWeight = '800';
+    head.style.fontSize   = '22px';
+    head.style.margin     = '0 0 10px';
+    head.textContent = '주역점 결과 (동전법)';
+    wrap.appendChild(head);
+
+    // 질문이 있었으면 함께 표시
+    const q = (window.__userQuestion || '').trim();
+    if(q){
+      const sub = document.createElement('div');
+      sub.style.textAlign = 'center';
+      sub.style.fontSize  = '13px';
+      sub.style.opacity   = '.85';
+      sub.style.margin    = '0 0 14px';
+      sub.textContent = '질문: ' + q;
+      wrap.appendChild(sub);
+    }
+
+    // 본문 복제(애니/로더 제거)
+    const cloneRow   = row.cloneNode(true);
+    const cloneJoint = joint.cloneNode(true);
+    [cloneRow, cloneJoint].forEach(n=>{
+      n.querySelectorAll('.animating').forEach(el=>el.classList.remove('animating'));
+      n.querySelectorAll('.loader').forEach(el=>el.remove());
+      n.classList.remove('loading','ai-owned');
+    });
+
+    wrap.appendChild(cloneRow);
+    wrap.appendChild(cloneJoint);
+    document.body.appendChild(wrap);
+
+    // 렌더링 → PNG
+    const scale  = Math.min(3, (window.devicePixelRatio||1) * 1.5); // 선명도
+    const canvas = await html2canvas(wrap, {
+      backgroundColor: wrap.style.background,
+      scale,
+      useCORS: true,
+      allowTaint: false,
+      windowWidth: wrap.offsetWidth,
+      scrollX: 0, scrollY: 0
+    });
+
+    document.body.removeChild(wrap);
+
+    // 다운로드 (iOS 등 일부 브라우저 호환 고려)
+    if(canvas.toBlob){
+      canvas.toBlob(blob=>{
+        const a = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fname + '.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, 'image/png', 1);
+    }else{
+      // 극단적 폴백
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fname + '.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+  }
+
+  // 버튼 클릭 바인딩
+  document.addEventListener('click', (e)=>{
+    if(e.target && e.target.id === 'btnSave') saveReading();
+  });
+})();
 </script>
 
 </body></html>
