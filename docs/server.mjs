@@ -48,7 +48,7 @@ const DAILY_BUDGET_USD = Number(process.env.DAILY_BUDGET_USD) || 1;
 
 // 모델/토큰 상한 (상한은 환경변수로만 제어; 기본은 1200)
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-const OPENAI_MAX_TOKENS = Number(process.env.OPENAI_MAX_TOKENS) || 1200;
+const OPENAI_MAX_TOKENS = Number(process.env.OPENAI_MAX_TOKENS) || 1000;
 
 // 단가(1M tokens 기준) — gpt-4o-mini 기본값
 const PRICE_IN_PER_M = Number(process.env.PRICE_IN_PER_M ?? 0.15);   // 입력 $/1M tok
@@ -136,7 +136,7 @@ const schema = {
 // 시스템 프롬프트 — 길이 제한/요약 지시 없음
 const systemPrompt = `
 
-당신은 주역 64괘 전문 해석가입니다. 원전에 충실한 해석을 한국어 존댓말로 답하세요.
+당신은 주역점 64괘 전문 해석가입니다. 주역 원전에 충실한 해석을 한국어 존댓말로 답하세요.
 평범한 조언이 아니라 질문에 충실한 구체적인 제안을 적극적으로 작성해야 합니다.
 
 [편향 교정] (매우 중요)
@@ -153,9 +153,8 @@ const systemPrompt = `
 - 대흉: 0–1 (중대한 금기·재앙 암시)
 
 [해석 절차]
-1) 본괘와 변괘의 판단을 한 줄로 요약합니다(卦辭/彖傳 근거).
+1) 본괘와 변괘의 판단을 한 줄로 요약합니다(卦辭/象傳 근거).
 2) 象傳의 이미지로 현재와 다가올 정세를 15~25문장(최소 1000자)으로 풀이합니다.
-   - 내괘(1-3효로 구성된 팔괘)와 외괘(4-6효로 구성된 팔괘)의 오행·방위·계절 힌트를 간단히 포함.
 3) 변효가 있으면 각 변효(1~6효)를 효사(爻辭)와 함께 짧게 해석하고, 마지막에 변괘 방향성으로 통합합니다.
 4) 조언 3~5개(Bullet)와 주의할 점 2~3개(Bullet)를 제시합니다.
 5) 길흉 점수는 0~10점(정수 또는 0.5 단위)로 덧붙입니다.
@@ -171,7 +170,7 @@ const systemPrompt = `
   ‘凶/吝/悔’·불리 문구가 우세하면 5 이하로 내릴 것. 극단값(0~1, 9~10)도 허용.
 - 조언 3~5개는 전부 爻辭/象傳에 앵커.
 - 구체적인 질문(가령 "무엇을 하면 좋을까?" 식의 질문)에는 구체적으로 답하기(예: 구체적인 식사메뉴, 활동, 사고방식 등).
-
+- 운세를 묻는 질문에는 구체적인 항목을 제시할 것(예: 인간관계, 금전, 건강, 사업 등).
 `;
 
 // ================== 개인용 조회 ==================
@@ -223,8 +222,7 @@ app.post(["/api/read", "/api/ai"], async (req, res) => {
   try {
     // === OpenAI 호출 (프롬프트 요약/트렁케이트 없음) ===
     const taskPrompt = `사용자 질문과 점괘 JSON이 주어집니다.
-- 질문(question) 문자열 맨 앞에 [오더: ...] 블록이 있을 수 있음. 있으면 그 지시(금지어/점수분포/톤 등)를 **최우선**으로 반영하세요.
-- analysis에 600~1000자 분량의 象傳 기반 본문을 쓰세요.
+- analysis에 1000~1500자 분량의 象傳 기반 본문을 쓰세요.
 - 길흉 점수는 0~10점(정수/0.5 단위)입니다.
 스키마: { \"reading\": { \"summary\": string, \"analysis\": string, \"advice\": string, \"cautions\": string, \"timing\": string, \"score\": number, \"tags\": string[], \"line_readings\": [{\"line\": number, \"meaning\": string}] } }`;
 
@@ -234,7 +232,7 @@ const messages = [
 ${taskPrompt}
 
 출력은 위 JSON 스키마를 엄격히 따르세요.
-- reading.analysis는 1000~1500자(문단 여러 개)로 象傳/효사 맥락을 풀어주세요.
+- reading.analysis는 1000~1500자(문단 여러 개)로 象傳/爻辭 맥락을 풀어주세요.
 - reading.score는 0~10점(정수 또는 0.5 단위)로 주세요.
 - reading.line_readings는 변효가 없으면 현상 유지 방안을, 있으면 각 효의 핵심 의미를 1~2문장으로 구체화.
 
