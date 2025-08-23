@@ -47,12 +47,12 @@ const ADMIN_KEY = process.env.ADMIN_KEY || ""; // /api/usage 보호키(선택)
 const DAILY_BUDGET_USD = Number(process.env.DAILY_BUDGET_USD) || 1;
 
 // 모델/토큰 상한 (상한은 환경변수로만 제어; 기본은 1200)
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5-mini";
 const OPENAI_MAX_TOKENS = Number(process.env.OPENAI_MAX_TOKENS) || 1200;
 
-// 단가(1M tokens 기준) — gpt-4o-mini 기본값
+// 단가(1M tokens 기준) — gpt-5-mini 기본값
 const PRICE_IN_PER_M = Number(process.env.PRICE_IN_PER_M ?? 0.15);   // 입력 $/1M tok
-const PRICE_OUT_PER_M = Number(process.env.PRICE_OUT_PER_M ?? 0.60); // 출력 $/1M tok
+const PRICE_OUT_PER_M = Number(process.env.PRICE_OUT_PER_M ?? 2.00); // 출력 $/1M tok
 
 // 일일 사용량(UTC 기준 자정 리셋)
 const dayUsage = { day: utcDay(), tokens: 0, calls: 0, spent: 0 };
