@@ -232,6 +232,10 @@ h1{margin-top:46px}
   -webkit-backdrop-filter: blur(8px);
 }
 
+.modal__wrap{
+  display:flex; flex-direction:column; align-items:center;
+}
+
 .modal__dialog{
   position: relative;
   max-width: 540px;
@@ -255,11 +259,17 @@ h1{margin-top:46px}
 .modal__more a{font-weight: 700; color: var(--muted); text-decoration: underline}
 
 .modal__close{
-  position:absolute; top:8px; right:10px;
-  width:36px; height:36px; border:0; border-radius:10px;
-  background:#1a2540; color:#cfe0ff; font-size:24px; line-height:36px;
+  display:block; position:relative; margin:22px auto 22px;
+  width:42px; height:42px; border:1px solid var(--border); border-radius:10px;
+  background:var(--card); color:var(--muted); font-size:32px; line-height:36px;
   cursor:pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+
+.modal__close span{position:absolute; top:8%; left:27%;}
+
+.modal__close:hover{
+  background:var(--muted); border-color:var(--muted); color:var(--bg)
 }
 
 /* (fallback) 일부 브라우저에서 backdrop-filter 미지원 시 페이지 자체 블러 */
@@ -315,6 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <div id="methodModal" class="modal hidden" aria-hidden="true">
   <div class="modal__backdrop" data-close></div>
 
+  <div class="modal__wrap">
   <div class="modal__dialog" role="dialog" aria-labelledby="methodTitle" aria-modal="true">
 
     <h3 id="methodTitle" class="modal__title">지초법과 동전법</h3>
@@ -334,6 +345,12 @@ document.addEventListener('DOMContentLoaded', () => {
         자세한 설명은 <a href="iching_basic_info.html#methods">기초 안내서</a>를 참고해주세요.
       </p>
     </div>
+
+  </div>
+
+    <button class="modal__close" aria-label="Close" data-close>
+      <span style="text-align:center">&times;</span>
+    </button>
 
   </div>
 </div>
