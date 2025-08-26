@@ -998,7 +998,7 @@ requestAnimationFrame(()=>{
     spinLoop(loader.querySelector('.sq-inner'), 360, 1000, 400,  500);        
 
     try{
-      const res = await fetch('https://iching-ai-ilo2.onrender.com/api/read', {
+      const res = await fetch('https://iching-ai-ilo2.onrender.com/backend/api/read', {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify(payload)
