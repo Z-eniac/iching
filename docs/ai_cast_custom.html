@@ -1012,7 +1012,7 @@ async function animateBothAllAtOnce(base, mutated, changed, vals, bInfo, mInfo, 
     
     try{
       // 동전법과 동일 엔드포인트 사용
-      const res = await fetch('https://iching-ai-ilo2.onrender.com/backend/api/read', {
+      const res = await fetch('https://iching-ai-ilo2.onrender.com/api/read', {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify(payload)
