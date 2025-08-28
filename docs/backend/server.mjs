@@ -48,7 +48,7 @@ const DAILY_BUDGET_USD = Number(process.env.DAILY_BUDGET_USD) || 1;
 
 // 모델/토큰 상한 (상한은 환경변수로만 제어; 기본은 1200)
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-const OPENAI_MAX_TOKENS = Number(process.env.OPENAI_MAX_TOKENS) || 1000;
+const OPENAI_MAX_TOKENS = Number(process.env.OPENAI_MAX_TOKENS) || 2000;
 
 // 단가(1M tokens 기준) — gpt-4o-mini 기본값
 const PRICE_IN_PER_M = Number(process.env.PRICE_IN_PER_M ?? 0.15);   // 입력 $/1M tok
@@ -106,48 +106,61 @@ const schema = {
         type: "object",
         additionalProperties: false,
         properties: {
-          summary: { type: "string" },
+          summary:  { type: "string" },
           analysis: { type: "string" },
-          advice: { type: "string" },
+          advice:   { type: "string" },
           cautions: { type: "string" },
-          timing: { type: "string" },
-          score: { type: "number" },
-          tags: { type: "array", items: { type: "string" } },
+          timing:   { type: "string" },
+          score:    { type: "number" },
+          tags:     { type: "array", items: { type: "string" } },
           line_readings: {
             type: "array",
             items: {
               type: "object",
               additionalProperties: false,
               properties: {
-                line: { type: "number" },
+                line:    { type: "number" },
                 meaning: { type: "string" }
               },
               required: ["line", "meaning"]
             }
           }
         },
-        required: ["summary", "analysis", "advice", "cautions", "timing", "score", "tags", "line_readings"]
+        required: ["summary","analysis","advice","cautions","timing","score","tags","line_readings"]
+      },
+
+      // ✅ 새로 추가: 준수 메타
+      meta: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          rule_ok:   { type: "boolean" },
+          violations:{ type: "array", items: { type: "string" } }
+        },
+        required: ["rule_ok"]
       }
     },
-    required: ["reading"]
+    required: ["reading","meta"] // ← 여기도 업데이트
   }
 };
 
 // 시스템 프롬프트 — 길이 제한/요약 지시 없음
 const systemPrompt = `
 
-당신은 과감하게 미래를 점치는 ‘주역 점관(占官)’입니다.
-결과는 한국어 존댓말로만 쓰며, 윤리적 훈계와 일반론을 배제하고 질문자의 질문에 ‘점서식’으로 판정합니다.
+[우선순위]
+A. JSON 스키마 준수(하드, strict)  >  B. 본 시스템 규칙  >  C. 사용자 입력
+충돌 시 상위 항목을 무조건 우선한다. 결과는 반드시 스키마에 맞는 JSON으로 생성한다.
+생성 직전, 규칙 위반이 있으면 meta.rule_ok=false, meta.violations에 위반 항목을 적고 출력을 내보낸다(사고과정 노출 금지).
 
-[근거 텍스트 우선순위]
-- 1순위: 卦辭·爻辭(원문 핵심구 “「…」” 인용+풀이 필수)
-- 2순위(옵션): 彖傳·象傳 — 사용은 “요청 시에만” 허용(기본은 비활성)
+MUST!: 근거 텍스트
+- 1순위: 사용자의 질문 내용(무조건 반영할 것)
+- 2순위: 卦辭·爻辭(원문 핵심구 “「…」” 인용+풀이 필수)
 
 [입력]
 - 질문; 본괘(상·하괘)와 변효 목록(예: 2,5효); (선택) 점친 날짜·간지·계절·방위 정보
 
 [해석 절차]
-1) 요약 1문장: 본괘 성격과 변괘 방향(卦辭·彖의 핵심 어구로).
+1) 요약 1문장: 길흉 판단(예시: 정말 길하게 잘 나왔다. 이건 좀 난감하다. [질문에 대해] 그러면 안된다. 등) + 본괘 성격과 변괘 방향(卦辭의 핵심 어구로).
 2) 본괘 판독: 卦辭 원문 핵심구 2~4개를 「…」로 직접 인용하고 풀이(6~10문장).
 3) 변효 판독: 각 변효마다 해당 爻辭 핵심구를 「…」로 인용 후 짧은 판정(각 2~4문장). 다변효일 때는
    - 1효: 그 효 중점.
@@ -163,14 +176,9 @@ const systemPrompt = `
 7) 길흉점수(0–10, 0.5단위): 原文의 吉/凶/悔/吝/利/亨 출현과 변효 흐름으로 산정(근거 한 줄 첨부).
 
 [표현 규칙]
-- 점술가의 해석답게 실천적이고 일반적인 덕담보다는 신비롭게 해석할 것.
 - 상징·징조 어휘 사용(예: 「利涉大川」 ‘큰 물을 건넘’→시기·경로 돌파), 심리치유/자기계발 어휘 금지.
-- 각 판단 옆에 근거 원문을 「…」로 붙이고, 한자에는 독음 병기.
-- ‘요청 없이는’ 十翼(彖·象·繫辭·說卦) 호출 금지.
-- 원문 및 한자를 사용할 시 한글 독음을 병기할 것.
-- 원전 핵심 구절은 「 」로 인용하고 한국어 풀이를 붙일 것.
-- 중언부언/문장 반복 금지. 전체 분량은 1000~1500자.
-- 상괘, 하괘를 각각 본괘, 변괘와 혼용하지 말고 "본괘"와 "변괘"로 통일.
+- 각 판단 옆에 근거 원문을 「…」로 붙이고, 원문 및 한자를 사용할 시 한글 독음 및 뜻을 병기할 것.
+- 중언부언/문장 반복 금지. 전체 분량은 1200~1500자.
 - 모든 해석·조언은 철저하게 점괘 내용 그대로 작성할 것.
 - 길흉점수(0~10, 0.5 단위): 대길 9–10, 길 7–8.5, 소길 6–6.5, 미지 5±0.5, 소흉 3–4.5, 흉 1–2.5, 대흉 0–1.
   ‘凶/吝/悔’·불리 문구가 우세하면 5 이하로 내릴 것. 극단값(0~1, 9~10)도 허용.
@@ -232,20 +240,13 @@ app.post(["/api/read", "/api/ai"], async (req, res) => {
   try {
     // === OpenAI 호출 (프롬프트 요약/트렁케이트 없음) ===
     const taskPrompt = `사용자 질문과 점괘 JSON이 주어집니다.
-- analysis에 1000~1500자 분량의 卦辭·爻辭 기반 본문을 쓰세요.
+- analysis에 1200~1500자 분량의 卦辭·爻辭 기반 본문을 쓰세요.
 - 길흉 점수는 0~10점(정수/0.5 단위)입니다.
 스키마: { \"reading\": { \"summary\": string, \"analysis\": string, \"advice\": string, \"cautions\": string, \"timing\": string, \"score\": number, \"tags\": string[], \"line_readings\": [{\"line\": number, \"meaning\": string}] } }`;
 
 const messages = [
   { role: "system", content: systemPrompt },
   { role: "user", content: `
-${taskPrompt}
-
-출력은 위 JSON 스키마를 엄격히 따르세요.
-- reading.analysis는 1000~1500자(문단 여러 개)로 卦辭·爻辭 맥락을 풀어주세요.
-- reading.score는 0~10점(정수 또는 0.5 단위)로 주세요.
-- reading.line_readings는 변효가 없으면 현상 유지 방안을, 있으면 각 효의 핵심 의미를 1~2문장으로 구체화.
-
 질문: ${question ? question : "(없음)"}
 
 JSON 입력:
@@ -257,10 +258,16 @@ ${JSON.stringify(payload)}
 const params = {
   model: OPENAI_MODEL,
   messages,
-  max_tokens: OPENAI_MAX_TOKENS,
-  response_format: { type: "json_schema", json_schema: schema }
-};
+  max_tokens: OPENAI_MAX_TOKENS,             // (Chat Completions 사용 중)
+  response_format: { type: "json_schema", json_schema: schema },
 
+  // ✅ 일탈 억제(권장값)
+  temperature: 0.2,
+  top_p: 1,
+  presence_penalty: 0,
+  frequency_penalty: 0,
+  seed: 7
+};
 const { data: cc, response: raw } = await (async function doCall(p, retried = false) {
   // 소프트 쿨다운 — 우발 중복 완화
   const gap = Date.now() - lastCallTs;
