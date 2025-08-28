@@ -137,7 +137,7 @@ const schema = {
           rule_ok:   { type: "boolean" },
           violations:{ type: "array", items: { type: "string" } }
         },
-        required: ["rule_ok"]
+        required: ["rule_ok", "violations"]
       }
     },
     required: ["reading","meta"] // ← 여기도 업데이트
@@ -320,7 +320,7 @@ if (Number(remain_tpm || "0") < 2000) {
     if (!parsed) parsed = parseJsonFromText(cc.choices?.[0]?.message?.content ?? "{}");
     if (!parsed?.reading) throw new Error("chat.completions: invalid JSON");
 
-    const response = { ok: true, source: "openai", ...payload, reading: parsed.reading };
+    const response = { ok: true, source: "openai", ...payload, reading: parsed.reading, meta: parsed.meta };
     setCache(key, response);
     return res.json(response);
   } catch (e) {
