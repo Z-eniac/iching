@@ -70,7 +70,7 @@ const LRU = new Map();
 const now = () => Date.now();
 function setCache(key, val, ttl = CACHE_TTL) { LRU.set(key, { val, exp: now() + ttl }); }
 function getCache(key) { const h = LRU.get(key); if (!h) return null; if (now() > h.exp) { LRU.delete(key); return null; } return h.val; }
-const PROMPT_VER = "v-length-1200-1700"; // 프롬프트/스키마 바뀔 때마다 변경
+const PROMPT_VER = "no-dup-body-v3";
 function cacheKeyOf({ method, primary, relating, question }) {
   const hex = `${primary?.number ?? ''}-${relating?.number ?? ''}`;
   return `${PROMPT_VER}|${method || ''}|${hex}|${(question || '').trim()}`;
@@ -148,6 +148,12 @@ const schema = {
 // 시스템 프롬프트 — 길이 제한/요약 지시 없음
 const systemPrompt = `
 
+당신은 '주역 점관(占官)'입니다. 한국어 존댓말로 답하세요.
+
+[우선순위]
+Schema(strict) > 출력 분리/중복 금지 > 해석 절차
+충돌 시 상위 항목 우선. analysis에는 조언/주의/점수/타이밍/효 상세를 절대 쓰지 말 것.
+
 [출력 분리/중복 금지]
 - analysis(본문)는 해석 서술만 담고, 절대 다음을 포함하지 말 것: "조언:", "주의:", "금기:", "타이밍:", "길흉 점수", 숫자 점수 표기.
 - advice, cautions, timing, score는 각각 해당 필드에만 작성한다(본문에 재진술 금지).
@@ -171,15 +177,16 @@ const systemPrompt = `
 
 [해석 절차]
 1) 요약 1문장: 길흉 판단(예시: 정말 길하게 잘 나왔다. 이건 좀 난감하다. [질문에 대해] 그러면 안된다. 등) + 본괘 성격과 변괘 방향(卦辭의 핵심 어구로).
-2) 본괘 판독: 卦辭 원문 핵심구 2~4개를 「…」로 직접 인용하고 풀이(6~10문장).
-3) 변효 판독: 각 변효마다 해당 爻辭 핵심구를 「…」로 인용 후 짧은 판정(각 2~4문장). 다변효일 때는
-   - 1효: 그 효 중점.
-   - 2~3효: 각 효 판정 후 ‘우세 방향’ 및 상충·보완 정리.
-   - 4~5효: 본괘 卦象 위주, 변괘는 보조.
-   - 6효: 변괘 중심.
-4) 통합 결론: 본괘→변효→변괘 순으로 흐름을 한 단락으로 묶고, ‘해야 할 것/피할 것’을 점서식으로 3~5문장.
-5) 조언 3–5개: 모두 卦辭/爻辭 근거에서만 파생(구체적·행동형), 금기 2–3개 명시.
-6) 길흉점수(0–10, 0.5단위): 原文의 吉/凶/悔/吝/利/亨 출현과 변효 흐름으로 산정(근거 한 줄 첨부).
+2) 본괘 판독: 卦辭 핵심구 2~4개를 「…」로 인용+풀이(6~10문장).
+3) 변효 **통합**: (analysis에는) 변효들의 공통 흐름만 1문단으로 요약한다.
+   각 변효의 상세 판독은 **line_readings 필드에만** 작성한다.
+4) 통합 결론: 본괘→변효→변괘 흐름을 한 단락으로 정리(다음 행동의 **방향성**만 암시).
+
+[필드 채우기]
+- advice: 卦辭/爻辭 근거 행동형 3–5개(번호/불릿 OK)
+- cautions: 피해야 할 2–3개
+- timing: 시점/계절/방위
+- score: 0–10점(0.5 단위, 근거 한 줄은 본문이 아닌 score 산정 메모에 불가)
 
 [표현 규칙]
 - 상징·징조 어휘 사용(예: 「利涉大川」 ‘큰 물을 건넘’→시기·경로 돌파), 심리치유/자기계발 어휘 금지.
@@ -331,6 +338,16 @@ if (Number(remain_tpm || "0") < 2000) {
       parsed.meta ||= { rule_ok: true, violations: [] };
       parsed.meta.rule_ok = false;
       parsed.meta.violations = [...(parsed.meta.violations||[]), "analysis_contains_forbidden_headings"];
+      // ✅ 본문에서 금지된 헤딩/구역 제거
+      let cleaned = a
+        .replace(/(?:\n|^)\s*(조언|주의|금기|타이밍)\s*:\s*[^]*?($|\n{2,})/g, "\n")
+        .replace(/(?:\n|^)\s*길흉\s*점수\s*[:：][^\n]*$/gm, "")
+        .replace(/(?:\n|^)\s*점수\s*[:：][^\n]*$/gm, "");
+      // 변효 상세가 line_readings로 이미 넘어왔으면 [n효] 항목을 본문에서 제거
+      if ((parsed.reading.line_readings?.length || 0) > 0) {
+        cleaned = cleaned.replace(/(?:\n|^)\s*\[\d+효\][^\n]*(?:\n[^\n]*)*/g, "\n");
+      }
+      parsed.reading.analysis = cleaned.trim();
       }
     const response = { ok: true, source: "openai", ...payload, reading: parsed.reading, meta: parsed.meta };
     setCache(key, response);
