@@ -48,7 +48,7 @@ const DAILY_BUDGET_USD = Number(process.env.DAILY_BUDGET_USD) || 1;
 
 // 모델/토큰 상한 (상한은 환경변수로만 제어; 기본은 1200)
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-const OPENAI_MAX_TOKENS = Number(process.env.OPENAI_MAX_TOKENS) || 2000;
+const OPENAI_MAX_TOKENS = Number(process.env.OPENAI_MAX_TOKENS) || 3000;
 
 // 단가(1M tokens 기준) — gpt-4o-mini 기본값
 const PRICE_IN_PER_M = Number(process.env.PRICE_IN_PER_M ?? 0.15);   // 입력 $/1M tok
@@ -70,9 +70,10 @@ const LRU = new Map();
 const now = () => Date.now();
 function setCache(key, val, ttl = CACHE_TTL) { LRU.set(key, { val, exp: now() + ttl }); }
 function getCache(key) { const h = LRU.get(key); if (!h) return null; if (now() > h.exp) { LRU.delete(key); return null; } return h.val; }
+const PROMPT_VER = "v-length-1200-1700"; // 프롬프트/스키마 바뀔 때마다 변경
 function cacheKeyOf({ method, primary, relating, question }) {
   const hex = `${primary?.number ?? ''}-${relating?.number ?? ''}`;
-  return `${method || ''}|${hex}|${(question || '').trim()}`;
+  return `${PROMPT_VER}|${method || ''}|${hex}|${(question || '').trim()}`;
 }
 
 // 연타 방지
@@ -107,7 +108,7 @@ const schema = {
         additionalProperties: false,
         properties: {
           summary:  { type: "string" },
-          analysis: { type: "string" },
+          analysis: { type: "string", minLength: 1200, maxLength: 1700 },
           advice:   { type: "string" },
           cautions: { type: "string" },
           timing:   { type: "string" },
