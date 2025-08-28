@@ -108,7 +108,7 @@ const schema = {
         additionalProperties: false,
         properties: {
           summary:  { type: "string" },
-          analysis: { type: "string", minLength: 900, maxLength: 1700 },
+          analysis: { type: "string", minLength: 1000, maxLength: 2000 },
           advice:   { type: "string" },
           cautions: { type: "string" },
           timing:   { type: "string" },
@@ -150,10 +150,6 @@ const systemPrompt = `
 
 당신은 '주역 점관(占官)'입니다. 한국어 존댓말로 답하세요.
 
-[우선순위]
-Schema(strict) > 출력 분리/중복 금지 > 해석 절차
-충돌 시 상위 항목 우선. analysis에는 조언/주의/점수/타이밍/효 상세를 절대 쓰지 말 것.
-
 [출력 분리/중복 금지]
 - analysis(본문)는 해석 서술만 담고, 절대 다음을 포함하지 말 것: "조언:", "주의:", "금기:", "타이밍:", "길흉 점수", 숫자 점수 표기.
 - advice, cautions, timing, score는 각각 해당 필드에만 작성한다(본문에 재진술 금지).
@@ -163,27 +159,23 @@ Schema(strict) > 출력 분리/중복 금지 > 해석 절차
 1) 한줄 핵심(질문 맥락 반영)
 2) 괘상 분석: 상괘/하괘의 상징, 卦辭 및 爻辭 핵심구 「…」 2~4개 인용+풀이
    +십익 및 기타 주석서의 내용 추가 인용+풀이
-3) 상황화: 사용자 질문 맥락으로 의미 전개(예시 1개)
-4) 변효 통합: line_readings의 요지를 1문단으로 종합(중복 서술 금지)
+3) 사용자 질문 맥락으로 의미 전개(예시 1개)
+4) 변효를 통합 해석하여 line_readings의 요지를 1문단으로 종합(중복 서술 금지)
 5) 전개-장애-반전의 3막 서사로 ‘흐름’ 묘사
-6) 2문장 결론(다음 행동의 방향만 암시; 구체 조언은 advice에 분리)
+6) 2문장 결론(다음 행동 방향 암시; 구체적 조언은 advice에 분리)
 
 [근거 텍스트]
-- 1순위: 卦辭·爻辭(원문 핵심구 “「…」” 인용+풀이 필수)
-- 2순위: 象傳·彖傳·文言傳·說卦傳·序卦傳·雜卦傳(인용+풀이)
-
-[입력]
-- 질문; 본괘(상·하괘)와 변효 목록(예: 2,5효); (선택) 점친 날짜·간지·계절·방위 정보
+- 卦辭·爻辭·象傳·彖傳·文言傳·說卦傳·序卦傳·雜卦傳(원문 핵심구 “「…」” 인용+풀이 필수)
 
 [해석 절차]
 1) 요약 1문장: 길흉 판단(예시: 정말 길하게 잘 나왔다. 이건 좀 난감하다. [질문에 대해] 그러면 안된다. 등) + 본괘 성격과 변괘 방향(卦辭의 핵심 어구로).
-2) 본괘 판독: 卦辭 핵심구 2~4개를 「…」로 인용+풀이(6~10문장).
-3) 변효 **통합**: (analysis에는) 변효들의 공통 흐름만 1문단으로 요약한다.
+2) 본괘 판독: 卦辭 핵심구와 상전 등에서 2~4개를 「…」로 인용+풀이(6~10문장).
+3) 변효: (analysis에는) 변효들의 공통 흐름을 효사, 상전을 인용하여 1~2문단으로 종합.
    각 변효의 상세 판독은 **line_readings 필드에만** 작성한다.
 4) 통합 결론: 본괘→변효→변괘 흐름을 한 단락으로 정리(다음 행동의 **방향성**만 암시).
 
 [필드 채우기]
-- advice: 卦辭/爻辭 근거 행동형 3–5개(번호/불릿 OK)
+- advice: 卦辭/爻辭/象傳 근거 행동형 3–5개(번호/불릿 OK)
 - cautions: 피해야 할 2–3개
 - timing: 시점/계절/방위
 - score: 0–10점(0.5 단위, 근거 한 줄은 본문이 아닌 score 산정 메모에 불가)
@@ -195,7 +187,7 @@ Schema(strict) > 출력 분리/중복 금지 > 해석 절차
 - 모든 해석·조언은 철저하게 점괘 내용 그대로 작성할 것.
 - 길흉점수(0~10, 0.5 단위): 대길 9–10, 길 7–8.5, 소길 6–6.5, 미지 5±0.5, 소흉 3–4.5, 흉 1–2.5, 대흉 0–1.
   ‘凶/吝/悔’·불리 문구가 우세하면 5 이하로 내릴 것. 극단값(0~1, 9~10)도 허용.
-- 조언 3~5개는 전부 爻辭에 앵커.
+- 조언 3~5개는 전부 爻辭/象傳에 앵커.
 - 구체적인 질문(가령 "무엇을 하면 좋을까?" 식의 질문)에는 구체적으로 답하기(예: 구체적인 식사메뉴, 활동, 사고방식 등).
 - 운세를 묻는 질문에는 구체적인 항목을 제시할 것(예: 인간관계, 금전, 건강, 사업 등).
 `;
@@ -345,6 +337,39 @@ if (Number(remain_tpm || "0") < 2000) {
       }
       parsed.reading.analysis = cleaned.trim();
       }
+
+    // ✅ 반복 문장/문단 자동 정리
+    function dedupeParagraphs(text) {
+      const paras = text.split(/\n{2,}/).map(s => s.trim()).filter(Boolean);
+      const seen = new Set(); const out = [];
+      for (const p of paras) {
+        const key = p.replace(/\s+/g, " ").toLowerCase().slice(0, 140);
+        if (seen.has(key)) continue;
+        seen.add(key); out.push(p);
+      }
+      return out.join("\n\n");
+    }
+    function dedupeSentences(text) {
+      const sents = text.split(/(?<=[.!?。…]|[다요]\.)\s+/); // 한/영 마침표 기준
+      const seen = new Set(); const out = [];
+      for (const s of sents) {
+        const norm = s.replace(/\s+/g, " ").trim().toLowerCase();
+        if (!norm) continue;
+        if (seen.has(norm)) continue;
+        seen.add(norm); out.push(s.trim());
+      }
+      return out.join(" ");
+    }
+    let cleaned = dedupeParagraphs(parsed.reading.analysis || "");
+    cleaned = dedupeSentences(cleaned);
+    // 30자 이상 동일 문장 3회 이상 반복 탐지 → 위반 표기
+    if (/([^\n]{30,})\s+\1\s+\1/.test(parsed.reading.analysis || "")) {
+      parsed.meta ||= { rule_ok: true, violations: [] };
+      parsed.meta.rule_ok = false;
+      parsed.meta.violations = [...(parsed.meta.violations||[]), "repetition"];
+    }
+    parsed.reading.analysis = cleaned.trim();
+
     const response = { ok: true, source: "openai", ...payload, reading: parsed.reading, meta: parsed.meta };
     setCache(key, response);
     return res.json(response);
