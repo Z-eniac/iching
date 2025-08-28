@@ -108,7 +108,7 @@ const schema = {
         additionalProperties: false,
         properties: {
           summary:  { type: "string" },
-          analysis: { type: "string", minLength: 1200, maxLength: 1700 },
+          analysis: { type: "string", minLength: 900, maxLength: 1700 },
           advice:   { type: "string" },
           cautions: { type: "string" },
           timing:   { type: "string" },
@@ -167,10 +167,9 @@ Schema(strict) > 출력 분리/중복 금지 > 해석 절차
 5) 전개-장애-반전의 3막 서사로 ‘흐름’ 묘사
 6) 2문장 결론(다음 행동의 방향만 암시; 구체 조언은 advice에 분리)
 
-[MUST!: ]근거 텍스트]
-- 1순위: 사용자의 질문 내용(무조건 반영할 것)
-- 2순위: 卦辭·爻辭(원문 핵심구 “「…」” 인용+풀이 필수)
-- 3순위: 象傳·彖傳·文言傳·說卦傳·序卦傳·雜卦傳(인용+풀이)
+[근거 텍스트]
+- 1순위: 卦辭·爻辭(원문 핵심구 “「…」” 인용+풀이 필수)
+- 2순위: 象傳·彖傳·文言傳·說卦傳·序卦傳·雜卦傳(인용+풀이)
 
 [입력]
 - 질문; 본괘(상·하괘)와 변효 목록(예: 2,5효); (선택) 점친 날짜·간지·계절·방위 정보
